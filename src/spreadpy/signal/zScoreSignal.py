@@ -20,28 +20,30 @@ class ZScoreSignal(SignalGenerator):
 
     Entry / exit rules:
 
-        LONG  if z_t < −entry_threshold   (spread below its rolling mean)
-        SHORT if z_t > +entry_threshold   (spread above its rolling mean)
-        FLAT  if |z_t| < exit_threshold   (mean reversion complete)
-        FLAT  if |z_t| > stop_threshold   (stop-loss)
+        LONG   if z_t < −entry_threshold
+        SHORT  if z_t > +entry_threshold
+        FLAT   if LONG  and z_t > −revert_threshold  (z reverted back up)
+        FLAT   if SHORT and z_t < +revert_threshold  (z reverted back down)
+
+    Setting ``revert_threshold=0`` exits at the mean crossing (z crosses 0).
+    Setting it to a positive value exits before the mean is fully reached.
 
     :param int window: Number of bars for the rolling z-score computation.
     :param float entry_threshold: |z| level above which a position is opened.
-    :param float exit_threshold: |z| level below which an open position is closed.
-    :param float stop_threshold: |z| level above which a position is stopped out (risk cap).
+    :param float revert_threshold: z level at which mean reversion is considered
+        complete and the position is closed. Must be ≤ entry_threshold.
+        Use 0.0 to exit at the mean (default).
     """
 
     def __init__(
         self,
         window: int = 60,
         entry_threshold: float = 1.0,
-        exit_threshold: float = 0.0,
-        stop_threshold: float = 4.0,
+        revert_threshold: float = 0.0,
     ) -> None:
         self.window = window
         self.entry_threshold = entry_threshold
-        self.exit_threshold = exit_threshold
-        self.stop_threshold = stop_threshold
+        self.revert_threshold = revert_threshold
 
         # Fitted attributes
         self._mu: Optional[float] = None
@@ -75,11 +77,13 @@ class ZScoreSignal(SignalGenerator):
                 signals.append(Signal(Direction.FLAT, float("nan"), ts))
                 continue
 
-            z_abs = abs(z)
-
-            # --- Exit / stop conditions (checked first) ---
+            # --- Exit condition (checked first) ---
             if prev_direction != Direction.FLAT:
-                if z_abs < self.exit_threshold or z_abs > self.stop_threshold:
+                reverted = (
+                    (prev_direction == Direction.LONG  and z > -self.revert_threshold) or
+                    (prev_direction == Direction.SHORT and z <  self.revert_threshold)
+                )
+                if reverted:
                     sig = Signal(Direction.FLAT, z, ts, is_entry=False)
                     prev_direction = Direction.FLAT
                     signals.append(sig)
