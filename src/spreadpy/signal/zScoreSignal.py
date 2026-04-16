@@ -9,23 +9,26 @@ from spreadpy.spread.spreadSeries import SpreadSeries
 
 class ZScoreSignal(SignalGenerator):
     """
-    Classic z-score entry/exit signal.
+    Classic z-score entry / exit signal generator.
 
-    Entry:
-      - LONG  spread when zscore < -entry_threshold
-      - SHORT spread when zscore > +entry_threshold
+    At each bar, computes a rolling z-score of the spread residuals:
 
-    Exit:
-      - FLAT when |zscore| < exit_threshold  OR  |zscore| > stop_threshold
+        z_t = (s_t − μ̂_t) / σ̂_t
 
-    Position sizing is driven downstream by the zscore value.
+    where μ̂_t and σ̂_t are the rolling mean and standard deviation over
+    the last ``window`` bars (no lookahead).
 
-    Parameters
-    ----------
-    window          : Rolling window for z-score computation (bars)
-    entry_threshold : |z| above which we enter
-    exit_threshold  : |z| below which we exit
-    stop_threshold  : |z| above which we stop-out (risk management)
+    Entry / exit rules:
+
+        LONG  if z_t < −entry_threshold   (spread below its rolling mean)
+        SHORT if z_t > +entry_threshold   (spread above its rolling mean)
+        FLAT  if |z_t| < exit_threshold   (mean reversion complete)
+        FLAT  if |z_t| > stop_threshold   (stop-loss)
+
+    :param int window: Number of bars for the rolling z-score computation.
+    :param float entry_threshold: |z| level above which a position is opened.
+    :param float exit_threshold: |z| level below which an open position is closed.
+    :param float stop_threshold: |z| level above which a position is stopped out (risk cap).
     """
 
     def __init__(

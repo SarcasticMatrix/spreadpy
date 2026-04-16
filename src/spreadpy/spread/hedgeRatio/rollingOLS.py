@@ -8,11 +8,18 @@ from spreadpy.spread.hedgeRatioEstimator import HedgeRatioEstimator
 
 class RollingOLS(HedgeRatioEstimator):
     """
-    Rolling OLS hedge ratio estimation.
+    Rolling OLS hedge ratio estimator.
 
-    At each bar t, OLS is run on the window [t-window+1, t].
-    Bars before the first full window are filled with the first
-    available estimate (forward-fill).
+    At each bar t, fits OLS on the most recent ``window`` observations:
+
+        y_s = α + β_t · x_s + ε_s,   s ∈ [t − w + 1,  t]
+
+    This adapts to structural shifts in the cointegration relationship
+    without the complexity of a state-space model. Bars before the first
+    complete window are filled with the first available estimate (forward-fill).
+
+    :param int window: Number of bars in each rolling regression (must be ≥ 2).
+    :param bool add_intercept: If True (default), includes an intercept term α.
     """
 
     def __init__(self, window: int = 60, add_intercept: bool = True) -> None:

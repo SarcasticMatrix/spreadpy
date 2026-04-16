@@ -12,23 +12,22 @@ from typing import Tuple
 @dataclass
 class TransactionCosts:
     """
-    Models transaction costs applied at fill time.
+    Transaction cost model applied at each leg fill.
 
-    Parameters
-    ----------
-    slippage_bps : float
-        One-way slippage in basis points (applied as adverse price move).
-    commission_per_unit : float
-        Fixed commission per unit traded (in price currency).
-    commission_bps : float
-        Commission as a fraction of notional (e.g. 0.0001 = 1 bps) in basis points.
-    min_commission : float
-        Minimum per-trade commission.
+    The total cost per fill is computed as:
 
-    Cost model per trade
-    --------------------
-    total = slippage_cost +
-        max(commission_per_unit * qty + notional * commission_bps/100, min_commission)
+        fill_price  = mid ± (slippage_bps / 10 000) · mid    (+ for buys, − for sells)
+        slippage    = |fill_price − mid| · qty
+        commission  = max(commission_per_unit · qty
+                          + notional · commission_bps / 10 000,
+                          min_commission)
+        total_cost  = slippage + commission
+
+    :param float slippage_bps: One-way adverse price move in basis points.
+    :param float commission_per_unit: Fixed commission charged per unit traded.
+    :param float commission_bps: Ad-valorem commission on notional, in basis points
+        (e.g. 1.0 = 1 bps = 0.01%).
+    :param float min_commission: Minimum commission floor per fill.
     """
 
     slippage_bps: float = 2.0

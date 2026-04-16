@@ -18,18 +18,22 @@ from spreadpy.signal import Signal
 @dataclass
 class BacktestResult:
     """
-    Output of a single backtest split (validation or test).
+    Immutable container for the output of a single backtest split.
 
-    Attributes
-    ----------
-    split                          : "val" or "test"
-    train_start, train_end         : In-sample (fitting) period
-    eval_start, eval_end           : Out-of-sample evaluation period
-    equity_curve                   : Mark-to-market equity over the eval period
-    trades                         : All fills in the eval period
-    signals                        : Full signal series over the eval period
-    spread                         : SpreadSeries for the eval period
-    metrics                        : Risk metrics summary (pd.Series)
+    Produced by :class:`BacktestEngine` for both the validation and test
+    periods. The ``split`` field identifies which period this result covers.
+
+    :param str split: Period identifier — ``'val'`` or ``'test'``.
+    :param pd.Timestamp train_start: Start of the in-sample (fitting) period.
+    :param pd.Timestamp train_end: End of the in-sample (fitting) period.
+    :param pd.Timestamp eval_start: Start of the out-of-sample evaluation period.
+    :param pd.Timestamp eval_end: End of the out-of-sample evaluation period.
+    :param pd.DataFrame equity_curve: Bar-level mark-to-market equity.
+        Columns: ``equity``, ``cash``, ``unrealised_pnl``, ``realised_pnl``, ``total_costs``.
+    :param List[Trade] trades: All leg fills executed during the eval period.
+    :param pd.Series signals: :class:`Signal` objects indexed by timestamp.
+    :param SpreadSeries spread: Spread series for the eval period.
+    :param pd.Series metrics: Risk metrics summary from :class:`RiskMetrics`.
     """
 
     split: str

@@ -20,10 +20,16 @@ from spreadpy.spread import SpreadSeries
 
 class HedgeRatioEstimator(ABC):
     """
-    Abstract estimator: given two aligned price series (y, x),
-    produce a time-series of hedge ratios β such that
-        spread_t = y_t - β_t * x_t
-    is (ideally) stationary.
+    Abstract base class for hedge ratio estimators.
+
+    Given two price series y (dependent leg) and x (independent leg),
+    an estimator produces a time series β_t such that the spread
+
+        s_t = y_t − β_t · x_t
+
+    is (ideally) stationary. All concrete subclasses must implement
+    :meth:`fit`, which returns a ``pd.Series`` of hedge ratios aligned
+    with ``y.index``.
     """
 
     @abstractmethod

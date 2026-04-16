@@ -8,12 +8,17 @@ import pandas as pd
 
 class PriceTimeSeries:
     """
-    Thin wrapper around a pandas Series of prices.
+    Thin wrapper around a pandas Series for price data.
 
-    Guarantees:
-    - DatetimeIndex, sorted ascending
-    - No NaN values (filled or dropped on construction)
-    - Consistent timezone handling (tz-naive by default)
+    Guarantees a clean, well-formed series at construction time:
+    sorted DatetimeIndex, no NaN values, and a consistent name.
+    NaNs are either forward-filled or dropped depending on ``fill_method``.
+
+    :param pd.Series prices: Raw price series. A non-DatetimeIndex is coerced
+        to DatetimeIndex automatically.
+    :param str name: Optional label for the series (used in repr and downstream labelling).
+    :param str fill_method: NaN handling strategy — ``'ffill'`` (forward-fill, then drop
+        any leading NaNs) or ``'drop'`` (remove all NaN rows entirely).
     """
 
     def __init__(

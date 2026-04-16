@@ -11,14 +11,17 @@ from spreadpy.spread.hedgeRatioEstimator import HedgeRatioEstimator
 @dataclass
 class KalmanFilterWithVelocityParams:
     """
-    Paramètres du modèle state-space (Palomar §15.6.3, eq. 15.4).
+    Hyperparameters for the :class:`KalmanFilterWithVelocity` state-space model.
 
-    sigma2_eps  : variance du bruit d'observation
-    sigma2_mu   : variance du bruit d'état sur μ_t
-    sigma2_gam  : variance du bruit d'état sur γ_t
-    sigma2_dgam : variance du bruit d'état sur γ̇_t (vélocité)
-    mu0, gam0   : états initiaux (issus du LS bootstrap)
-    P0          : matrice de covariance initiale (3×3)
+    Derived from an OLS bootstrap following Palomar (2024), §15.6.3, eq. (15.4).
+
+    :param float sigma2_eps: Observation noise variance σ²_ε.
+    :param float sigma2_mu: State noise variance for the intercept μ_t.
+    :param float sigma2_gam: State noise variance for the hedge ratio γ_t.
+    :param float sigma2_dgam: State noise variance for the velocity γ̇_t.
+    :param float mu0: Initial intercept estimate μ₁ (from OLS).
+    :param float gam0: Initial hedge ratio estimate γ₁ (from OLS).
+    :param np.ndarray P0: Initial state covariance matrix (3×3, diagonal).
     """
     sigma2_eps:  float
     sigma2_mu:   float
@@ -31,46 +34,42 @@ class KalmanFilterWithVelocityParams:
 
 class KalmanFilterWithVelocity(HedgeRatioEstimator):
     """
-    Kalman filter avec état augmenté [μ_t, γ_t, γ̇_t] — Palomar (2024),
+    Kalman filter hedge ratio estimator with augmented state [μ_t, γ_t, γ̇_t].
+
+    Extends :class:`KalmanFilter` with a velocity state γ̇_t that allows
+    the hedge ratio to follow a locally linear trend. Implements Palomar (2024),
     §15.6.3, eq. (15.4).
 
-    State-space model
-    -----------------
-    Observation :
-        y1_t = [1, y2_t, 0] @ [μ_t, γ_t, γ̇_t]ᵀ + ε_t,  ε_t ~ N(0, σ²_ε)
+    Observation equation:
 
-    Transition :
-        [μ_{t+1}  ]   [1  0  0] [μ_t  ]   [η_μ,t  ]
-        [γ_{t+1}  ] = [0  1  1] [γ_t  ] + [η_γ,t  ]
-        [γ̇_{t+1} ]   [0  0  1] [γ̇_t ]   [η_γ̇,t ]
+        y_t = μ_t + γ_t · x_t + ε_t,   ε_t ~ N(0, σ²_ε)
 
-        γ_{t+1} = γ_t + γ̇_t + η_γ,t   →  le hedge ratio suit son trend
-        γ̇_{t+1} = γ̇_t       + η_γ̇,t  →  la vélocité évolue lentement
+    Transition equations:
 
-    Spread normalisé (Palomar, après eq. 15.4) :
-        z_t = (y1_t - γ_{t|t-1}·y2_t - μ_{t|t-1}) / (1 + γ_{t|t-1})
+        μ_{t+1} = μ_t                  + η_{μ,t}
+        γ_{t+1} = γ_t  + γ̇_t         + η_{γ,t}
+        γ̇_{t+1} =       γ̇_t         + η_{γ̇,t}
 
-    Initialisation (heuristique LS identique à KalmanFilterWithDrift)
-    -----------------------------------------------------------------
-    OLS sur `ls_window` barres → (μ_LS, γ_LS, ε^LS), puis :
-        σ²_ε       = Var[ε^LS]
-        σ²_μ       = α      · Var[ε^LS]
-        σ²_γ       = α      · Var[ε^LS] / Var[y2]
-        σ²_γ̇      = α_dgam · Var[ε^LS] / Var[y2]
-        γ̇₁ ~ N(0, σ²_γ)   (vélocité initiale nulle, incertitude ~ celle de γ)
+    γ follows a locally linear trend driven by its velocity γ̇.
+    The velocity is a slow random walk (σ²_γ̇ ≪ σ²_γ).
 
-    Parameters
-    ----------
-    alpha : float
-        Hyper-paramètre α pour σ²_μ et σ²_γ.
-        Palomar recommande α=1e-6 pour le modèle avec momentum.
-    alpha_dgam : float
-        Hyper-paramètre pour le bruit de la vélocité γ̇.
-        En général alpha_dgam < alpha pour que γ̇ varie lentement.
-        Défaut : alpha / 10.
-    ls_window : int | None
-        Nombre de barres pour l'initialisation LS.
-        None → série entière (passer train_size depuis le WalkForwardEngine).
+    The predictive hedge ratio γ_{t|t−1} is returned by :meth:`fit`.
+    The normalised spread (no lookahead) is:
+
+        z_t = (y_t − γ_{t|t−1} · x_t − μ_{t|t−1}) / (1 + γ_{t|t−1})
+
+    Hyperparameters are initialised via OLS bootstrap (same heuristic as
+    :class:`KalmanFilter`), with an additional term for σ²_γ̇:
+
+        σ²_γ̇ = alpha_dgam · σ²_ε / Var[x]
+
+    :param float alpha: State noise scale for μ and γ. Palomar recommends
+        1e-6 for this model.
+    :param Optional[float] alpha_dgam: State noise scale for γ̇. Should satisfy
+        alpha_dgam < alpha so that velocity varies slowly.
+        Defaults to alpha / 10.
+    :param Optional[int] ls_window: Bars used for OLS initialisation.
+        None uses the full series.
     """
 
     def __init__(

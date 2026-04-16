@@ -8,8 +8,20 @@ from spreadpy.spread.hedgeRatioEstimator import HedgeRatioEstimator
 
 class ConstantOLS(HedgeRatioEstimator):
     """
-    Single full-sample OLS regression.
-    β is constant across the entire series.
+    Full-sample OLS hedge ratio estimator.
+
+    Fits a single linear regression over the entire supplied period:
+
+        y_t = α + β · x_t + ε_t
+
+    and returns the constant slope β as the hedge ratio for all bars.
+    Suitable as a baseline when the cointegration relationship is stable.
+
+    After calling :meth:`fit`, the fitted values are available as
+    ``beta_``, ``alpha_``, and ``r_squared_``.
+
+    :param bool add_intercept: If True (default), fits with an intercept α.
+        If False, forces the regression through the origin (α = 0).
     """
 
     def __init__(self, add_intercept: bool = True) -> None:

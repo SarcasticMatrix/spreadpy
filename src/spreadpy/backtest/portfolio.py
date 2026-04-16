@@ -22,18 +22,16 @@ from spreadpy.backtest.costs import TransactionCosts
 @dataclass
 class Trade:
     """
-    Represents a single fill on one leg of the spread.
+    Record of a single leg fill.
 
-    Attributes
-    ----------
-    timestamp       : Fill time
-    leg             : 'y' or 'x'
-    direction       : +1 (buy) or -1 (sell)
-    qty             : Absolute quantity
-    price           : Mid price at signal
-    fill_price      : Price after slippage
-    cost            : Total transaction cost (monetary)
-    signal          : The Signal that triggered this trade
+    :param pd.Timestamp timestamp: Fill time.
+    :param str leg: Asset leg — ``'y'`` (dependent) or ``'x'`` (independent).
+    :param int direction: Fill direction: +1 (buy) or −1 (sell).
+    :param float qty: Absolute quantity filled.
+    :param float price: Mid price at signal time.
+    :param float fill_price: Execution price after slippage.
+    :param float cost: Total transaction cost in monetary units (always positive).
+    :param Optional[Signal] signal: The Signal that triggered this fill.
     """
 
     timestamp: pd.Timestamp
@@ -56,18 +54,20 @@ class Trade:
 
 class Portfolio:
     """
-    Maintains the state of the backtest portfolio.
+    Manages position state, P&L, and equity throughout a backtest.
 
-    Tracks:
-    - Open positions per leg (qty and avg_fill_price)
-    - Realised P&L and accrued costs
-    - Equity curve (mark-to-market)
+    Tracks open positions per leg (qty and average fill price), realised P&L,
+    and bar-by-bar mark-to-market equity. Position changes use FIFO accounting.
 
-    Usage
-    -----
-    Call fill() at each signal bar to update positions.
-    Call mark() at each bar to record equity.
-    Call equity_curve() at the end to retrieve the full equity series.
+    Mark-to-market equity at each bar:
+
+        equity_t = cash_t + Σ_leg  qty_leg · (price_leg − avg_fill_leg)
+
+    where ``cash_t`` accumulates realised P&L net of transaction costs.
+
+    :param float initial_capital: Starting equity in monetary units.
+    :param Optional[TransactionCosts] costs: Cost model applied at each fill.
+        Defaults to ``TransactionCosts()`` (2 bps slippage + 1 bps commission).
     """
 
     def __init__(

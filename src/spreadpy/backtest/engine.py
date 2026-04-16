@@ -25,26 +25,31 @@ class BacktestEngine:
     """
     Simple train / validation / test backtest engine.
 
-    The series is split once into three consecutive periods:
+    Splits the data once into three consecutive periods and fits the full
+    pipeline — hedge ratio estimator then signal generator — on the training
+    period only:
 
-        |<---- train_frac ---->|<-- val_frac -->|<-- test (remainder) -->|
+        |←── train_frac ──→|←── val_frac ──→|←── test (remainder) ──→|
 
-    The hedge ratio estimator and signal generator are fitted on the
-    training period only.  Use the validation result to tune
-    hyper-parameters; the test result is the final held-out evaluation.
+    Use the validation result to tune hyperparameters; consult the test
+    result only for the final held-out evaluation.
 
-    Parameters
-    ----------
-    estimator        : HedgeRatioEstimator instance
-    signal_gen       : SignalGenerator instance
-    sizer            : PositionSizer instance
-    costs            : TransactionCosts instance
-    initial_capital  : Starting equity
-    train_frac       : Fraction of data for training   (default 0.6)
-    val_frac         : Fraction of data for validation  (default 0.2).
-                       Set to 0.0 to skip validation entirely.
-                       The remaining fraction is used as the test set.
-    periods_per_year : For annualisation (252 = daily, 52 = weekly, etc.)
+    :param HedgeRatioEstimator estimator: Hedge ratio estimator
+        (e.g. :class:`KalmanFilterWithVelocity`).
+    :param SignalGenerator signal_gen: Signal generator
+        (e.g. :class:`ZScoreSignal`).
+    :param PositionSizer sizer: Position sizing model.
+    :param Optional[TransactionCosts] costs: Transaction cost model.
+        Defaults to 2 bps slippage + 1 bps commission.
+    :param float initial_capital: Starting equity in monetary units.
+    :param float train_frac: Fraction of data reserved for training / fitting
+        (default 0.6).
+    :param float val_frac: Fraction of data used as validation set (default 0.2).
+        Set to 0.0 for a simple train / test split with no validation —
+        :meth:`run` will then return ``(None, test_result)``.
+        The remainder ``1 − train_frac − val_frac`` forms the test set.
+    :param int periods_per_year: Bars per year for annualisation
+        (252 for daily, 252 × 23 ≈ 5796 for hourly futures).
     """
 
     def __init__(

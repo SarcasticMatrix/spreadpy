@@ -16,17 +16,24 @@ if TYPE_CHECKING:
 
 class RiskMetrics:
     """
-    Stateless risk metric calculator.
-    All methods take an equity curve (pd.Series or equity column of DataFrame).
+    Stateless risk metric calculator for a backtest equity curve.
+
+    All methods operate on the equity series supplied at construction
+    and return scalar values. Annualisation uses the ``periods_per_year``
+    argument passed to each method.
+
+    Key metrics:
+
+        Sharpe  = E[r − r_f] / σ[r] · √T
+        Sortino = (CAGR − r_f) / σ_down · √T     (downside std below MAR)
+        Calmar  = CAGR / |MaxDD|
+        MaxDD   = min_t  (equity_t / max_{s≤t} equity_s  − 1)
+
+    :param pd.Series equity: Bar-level or daily equity curve (NaNs are dropped).
+    :param float risk_free_rate: Annual risk-free rate r_f (e.g. 0.04 for 4%).
     """
 
     def __init__(self, equity: pd.Series, risk_free_rate: float = 0.0) -> None:
-        """
-        Parameters
-        ----------
-        equity         : pd.Series of equity values (daily or bar-level)
-        risk_free_rate : Annual risk-free rate (e.g. 0.04 for 4%)
-        """
         if isinstance(equity, pd.DataFrame):
             equity = equity["equity"]
         self.equity = equity.dropna()

@@ -8,12 +8,17 @@ from spreadpy.data.priceTimeSeries import PriceTimeSeries
 
 class SpreadSeries:
     """
-    Residual spread series: spread_t = y_t - β_t * x_t
+    Residual spread series s_t = y_t − β_t · x_t.
 
-    Holds:
-    - The raw residual series
-    - The time-varying hedge ratio
-    - Diagnostics: half-life, ADF statistic
+    Given aligned price series y, x and a time-varying hedge ratio β_t,
+    the spread is computed bar-by-bar. Provides stationarity diagnostics
+    (Ornstein-Uhlenbeck half-life, ADF test) and a rolling z-score.
+
+    :param PriceTimeSeries y: Dependent leg price series.
+    :param PriceTimeSeries x: Independent leg price series.
+    :param pd.Series hedge_ratio_ts: Time series of hedge ratios β_t,
+        aligned (or reindexed + forward-filled) to ``y.index``.
+    :param str estimator_name: Label for the estimator used (for display and repr).
     """
 
     def __init__(

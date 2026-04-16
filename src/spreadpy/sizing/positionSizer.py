@@ -6,20 +6,26 @@ from spreadpy.signal.signal import Signal, Direction
 
 class PositionSizer:
     """
-    Converts a Signal into (qty_y, qty_x) pair given available capital
-    and the current hedge ratio.
+    Converts a Signal into (qty_y, qty_x) absolute quantities.
 
-    Position sizing is driven by the z-score magnitude (|z|):
-        notional_y = max_notional * scale_fn(|z|)
-        notional_x = notional_y  (hedge ratio adjusts qty_x)
+    The position size is proportional to the z-score magnitude via a scaling function:
 
-    Parameters
-    ----------
-    max_notional : float
-        Maximum notional per leg in monetary units.
-    scale_fn     : Callable[[float], float]
-        Maps |z| → [0, 1] fraction of max_notional.
-        Default: linear ramp capped at 1 between z=1 and z=3.
+        notional_y = max_notional · scale(|z|)
+        qty_y      = notional_y / price_y
+        qty_x      = notional_y · |β| / price_x
+
+    where β is the hedge ratio at signal time. The x-leg quantity is adjusted
+    so that the notional exposure is hedged: qty_x · price_x ≈ |β| · qty_y · price_y.
+
+    The default scale function is a linear ramp:
+
+        scale(|z|) = clip((|z| − 1) / 2,  0,  1)
+
+    mapping |z| = 1 → 0% and |z| ≥ 3 → 100% of ``max_notional``.
+
+    :param float max_notional: Maximum notional per leg in monetary units.
+    :param Optional[Callable[[float], float]] scale_fn: Maps |z| → [0, 1].
+        Defaults to the linear ramp described above.
     """
 
     def __init__(

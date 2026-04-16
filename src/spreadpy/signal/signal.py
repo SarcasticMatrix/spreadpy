@@ -17,9 +17,16 @@ from spreadpy.spread.spreadSeries import SpreadSeries
 
 
 class Direction(IntEnum):
-    LONG  =  1   # long spread: buy y, sell x
-    SHORT = -1   # short spread: sell y, buy x
-    FLAT  =  0   # no position / exit
+    """
+    Spread position direction.
+
+    ``LONG``  (+1): buy y, sell x  — spread expected to rise (revert upward).
+    ``SHORT`` (−1): sell y, buy x  — spread expected to fall (revert downward).
+    ``FLAT``   (0): no position / exit signal.
+    """
+    LONG  =  1
+    SHORT = -1
+    FLAT  =  0
 
 
 @dataclass
@@ -27,13 +34,12 @@ class Signal:
     """
     Output of a SignalGenerator at a single bar.
 
-    Attributes
-    ----------
-    direction   : Direction (LONG / SHORT / FLAT)
-    zscore      : Z-score of the spread at signal time
-    prob        : Conditional probability of mean-reversion (copula) or NaN
-    timestamp   : Bar timestamp
-    is_entry    : True for entry signals, False for exit / hold
+    :param Direction direction: Desired position direction (LONG, SHORT, or FLAT).
+    :param float zscore: Z-score of the spread at signal time, used for position sizing.
+    :param pd.Timestamp timestamp: Bar timestamp.
+    :param float prob: Conditional mean-reversion probability from a copula signal,
+        or ``nan`` for z-score signals.
+    :param bool is_entry: True for new position entries; False for holds or exits.
     """
 
     direction: Direction
@@ -57,13 +63,12 @@ class Signal:
 
 class SignalGenerator(ABC):
     """
-    Abstract signal generator.
+    Abstract base class for signal generators.
 
-    Subclasses implement `generate(spread)` which returns a
-    pd.Series of Signal objects indexed by timestamp.
-
-    fit() must be called on in-sample data before generate() is
-    called on out-of-sample data (walk-forward discipline).
+    Enforces the fit / generate discipline required for walk-forward backtesting:
+    :meth:`fit` is called on in-sample data to calibrate any parameters,
+    then :meth:`generate` is called on out-of-sample data to produce signals
+    without lookahead.
     """
 
     @abstractmethod

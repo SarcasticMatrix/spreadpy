@@ -12,28 +12,32 @@ from spreadpy.spread.spreadSeries import SpreadSeries
 
 class CopulaSignal(SignalGenerator):
     """
-    Copula-based signal using conditional probability of mean-reversion.
+    Copula-based entry / exit signal generator.
 
-    Approach
-    --------
-    1. Fit a bivariate copula on (u_t, v_t) = (rank(y_t), rank(x_t))
-       from the in-sample period.
-    2. At each bar, compute P(U < u_t | V = v_t) and P(V < v_t | U = u_t).
-    3. Entry triggers when the conditional probability is extreme
-       (close to 0 or 1), indicating the spread is likely to revert.
+    Uses the conditional CDF of a fitted bivariate copula to detect
+statistical mispricings between the two legs.
 
-    The z-score is still computed (rolling) and used for position sizing;
-    the copula probability acts as the entry filter.
+    In-sample fitting:
+        1. Convert prices to pseudo-observations u_t = F̂_y(y_t),
+           v_t = F̂_x(x_t) via empirical ranks (Hazen formula).
+        2. Estimate Kendall's τ and invert to copula parameter θ:
+               Gaussian:  θ = sin(π/2 · τ)
+               Clayton:   θ = 2τ / (1 − τ)   (θ > 0)
+               Gumbel:    θ = 1 / (1 − τ)    (θ ≥ 1)
 
-    Supported families: 'gaussian', 'clayton', 'gumbel'
+    Entry logic (out-of-sample):
+        LONG  if C(u_t | v_t) < entry_prob         (y cheap relative to x)
+        SHORT if C(u_t | v_t) > 1 − entry_prob     (y expensive relative to x)
 
-    Parameters
-    ----------
-    family          : Copula family
-    window          : Rolling window for z-score (position sizing)
-    entry_prob      : Probability threshold for entry (default: 0.1 / 0.9)
-    exit_zscore     : Exit when |z| < this value
-    stop_zscore     : Stop-loss when |z| > this value
+    Exit uses the rolling z-score: FLAT when |z| < exit_zscore or |z| > stop_zscore.
+    The z-score is also passed to the :class:`PositionSizer` for sizing.
+
+    :param str family: Copula family — ``'gaussian'``, ``'clayton'``, or ``'gumbel'``.
+    :param int window: Rolling window for the z-score computation (position sizing only).
+    :param float entry_prob: Tail probability threshold for entry (default 0.10).
+        Fires when the conditional CDF is below ``entry_prob`` or above ``1 − entry_prob``.
+    :param float exit_zscore: Exit position when |z| drops below this value.
+    :param float stop_zscore: Stop-loss when |z| exceeds this value.
     """
 
     SUPPORTED_FAMILIES = {"gaussian", "clayton", "gumbel"}

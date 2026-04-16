@@ -11,13 +11,19 @@ from spreadpy.spread.hedgeRatioEstimator import HedgeRatioEstimator
 @dataclass
 class KalmanFilterParams:
     """
-    Paramètres du modèle state-space (Palomar §15.6.3, eq. 15.3).
+    Hyperparameters for the :class:`KalmanFilter` state-space model.
 
-    sigma2_eps : variance du bruit d'observation  ε_t ~ N(0, σ²_ε)
-    sigma2_mu  : variance du bruit d'état sur μ_t ~ N(0, σ²_μ)
-    sigma2_gam : variance du bruit d'état sur γ_t ~ N(0, σ²_γ)
-    mu0, gam0  : états initiaux
-    P0         : matrice de covariance initiale (2×2)
+    Derived from an OLS bootstrap on the first ``ls_window`` bars,
+    following the heuristic of Palomar (2024), §15.6.3.
+
+    :param float sigma2_eps: Observation noise variance σ²_ε.
+    :param float sigma2_mu: State noise variance for the intercept,
+        σ²_μ = α · σ²_ε.
+    :param float sigma2_gam: State noise variance for the hedge ratio,
+        σ²_γ = α · σ²_ε / Var[x].
+    :param float mu0: Initial intercept estimate μ₁ (from OLS).
+    :param float gam0: Initial hedge ratio estimate γ₁ (from OLS).
+    :param np.ndarray P0: Initial state covariance matrix (2×2, diagonal).
     """
     sigma2_eps: float
     sigma2_mu:  float
@@ -29,41 +35,34 @@ class KalmanFilterParams:
 
 class KalmanFilter(HedgeRatioEstimator):
     """
-    Kalman filter pairs trading — Palomar (2024), §15.6.3, eq. (15.3).
+    Kalman filter hedge ratio estimator with two latent states [μ_t, γ_t].
 
-    State-space model
-    -----------------
-    Observation :
-        y1_t = [1, y2_t] @ [μ_t, γ_t]ᵀ + ε_t,   ε_t ~ N(0, σ²_ε)
+    Implements the pairs-trading state-space model of Palomar (2024), §15.6.3, eq. (15.3).
 
-    Transition (random walk sur les deux états) :
-        [μ_{t+1}]   [1 0] [μ_t]   [η_1t]
-        [γ_{t+1}] = [0 1] [γ_t] + [η_2t]
+    Observation equation:
 
-        η_1t ~ N(0, σ²_μ),  η_2t ~ N(0, σ²_γ)
+        y_t = μ_t + γ_t · x_t + ε_t,   ε_t ~ N(0, σ²_ε)
 
-    Le spread normalisé (leverage 1) vaut :
-        z_t = (y1_t - γ_{t|t-1}·y2_t - μ_{t|t-1}) / (1 + γ_{t|t-1})
+    Transition equations (independent random walks):
 
-    Initialisation des hyperparamètres (heuristique LS de Palomar)
-    --------------------------------------------------------------
-    On estime (μ_LS, γ_LS) par OLS sur les `ls_window` premières barres, puis :
-        σ²_ε      = Var[ε^LS]
-        σ²_μ      = α · Var[ε^LS]
-        σ²_γ      = α · Var[ε^LS] / Var[y2]
-        μ₁  ~ N(μ_LS,  σ²_ε / T_LS)
-        γ₁  ~ N(γ_LS,  σ²_ε / (T_LS · Var[y2]))
+        μ_{t+1} = μ_t + η_{μ,t},   η_{μ,t} ~ N(0, σ²_μ)
+        γ_{t+1} = γ_t + η_{γ,t},   η_{γ,t} ~ N(0, σ²_γ)
 
-    Parameters
-    ----------
-    alpha : float
-        Hyper-paramètre α — ratio variabilité des états / variabilité du spread.
-        Palomar utilise α=1e-5 (basic) et α=1e-6 (avec momentum).
-        Valeurs typiques : 1e-6 à 1e-4.
-    ls_window : int
-        Nombre de barres utilisées pour l'initialisation LS.
-        Si None, utilise la série entière (cohérent avec le walk-forward :
-        passer la fenêtre de train depuis l'engine).
+    The hedge ratio returned by :meth:`fit` is the one-step-ahead predictive
+    γ_{t|t−1}, free of lookahead bias. The normalised spread is:
+
+        z_t = (y_t − γ_{t|t−1} · x_t − μ_{t|t−1}) / (1 + γ_{t|t−1})
+
+    Hyperparameters are initialised via an OLS bootstrap on the first
+    ``ls_window`` bars (Palomar, §15.6.3):
+
+        σ²_ε = Var[ε^OLS],   σ²_μ = α · σ²_ε,   σ²_γ = α · σ²_ε / Var[x]
+
+    :param float alpha: Controls state noise relative to observation noise.
+        Smaller values → slower adaptation of μ and γ. Typical range: 1e-6 to 1e-4.
+        Palomar uses 1e-5 for this model.
+    :param Optional[int] ls_window: Number of bars for the OLS initialisation.
+        None uses the entire series (recommended: pass ``train_size`` from the engine).
     """
 
     def __init__(

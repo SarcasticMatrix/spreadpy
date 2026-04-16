@@ -14,14 +14,13 @@ from spreadpy.data.priceTimeSeries import PriceTimeSeries
 
 class DataLoader:
     """
-    Loads price time series from CSV files or in-memory DataFrames.
+    Loads price time series from CSV, Parquet, or Feather files.
 
-    Convention: each CSV has a DatetimeIndex column + one or more price columns.
+    File lookup is by name: ``base_path/<name>.<ext>`` where ``<ext>``
+    is tried in order ``.csv``, ``.parquet``, ``.feather``. All loaded
+    series are returned as :class:`PriceTimeSeries` objects.
 
-    Example usage
-    -------------
-    loader = DataLoader(base_path="data/")
-    crack = loader.load_pair("crude_oil", "heating_oil", date_col="Date", price_col="Close")
+    :param Union[str, Path] base_path: Root directory that contains the data files.
     """
 
     SUPPORTED_FORMATS = {".csv", ".parquet", ".feather"}
