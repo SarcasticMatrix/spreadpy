@@ -111,7 +111,7 @@ class KalmanFilterWithVelocity(HedgeRatioEstimator):
         params = self._init_params(yv, xv)
         self.params_ = params
 
-        mu_filt, gam_filt, dgam_filt, gam_pred, mu_pred, S_inn = self._run_filter(
+        mu_filt, _, dgam_filt, gam_pred, mu_pred, _ = self._run_filter(
             yv, xv, params
         )
 
@@ -181,9 +181,9 @@ class KalmanFilterWithVelocity(HedgeRatioEstimator):
         yv: np.ndarray,
         xv: np.ndarray,
         p:  KalmanFilterWithVelocityParams,
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
-        Retourne (mu_filt, gam_filt, dgam_filt, gam_pred, mu_pred).
+        Retourne (mu_filt, gam_filt, dgam_filt, gam_pred, mu_pred, S_inn).
         Les *_pred sont les prédictifs α_{t|t-1} (no lookahead).
         """
         n   = len(yv)
