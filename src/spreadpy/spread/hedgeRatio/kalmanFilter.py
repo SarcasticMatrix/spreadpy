@@ -75,8 +75,10 @@ class KalmanFilter(HedgeRatioEstimator):
 
         # Exposés après fit()
         self.params_: Optional[KalmanFilterParams] = None
-        self.mu_ts_:  Optional[pd.Series] = None   # série μ_{t|t}
+        self.mu_ts_:             Optional[pd.Series] = None
         self.normalized_spread_: Optional[pd.Series] = None
+        self.innovations_ts_:    Optional[pd.Series] = None   # ν_t
+        self.innovation_var_ts_: Optional[pd.Series] = None   # S_t
 
     # ------------------------------------------------------------------
     # HedgeRatioEstimator interface
@@ -111,10 +113,12 @@ class KalmanFilter(HedgeRatioEstimator):
         params = self._init_params(yv, xv)
         self.params_ = params
 
-        mu_filt, gam_filt, gam_pred, mu_pred = self._run_filter(yv, xv, params)
+        mu_filt, gam_filt, gam_pred, mu_pred, innovations, S_inn = self._run_filter(yv, xv, params)
 
         index = y_al.index
-        self.mu_ts_ = pd.Series(mu_filt, index=index, name="mu")
+        self.mu_ts_             = pd.Series(mu_filt,     index=index, name="mu")
+        self.innovations_ts_    = pd.Series(innovations, index=index, name="innovation")
+        self.innovation_var_ts_ = pd.Series(S_inn,       index=index, name="innovation_var")
 
         # Spread normalisé (Palomar eq. après 15.3) — exposé pour le signal
         self.normalized_spread_ = pd.Series(
@@ -232,10 +236,12 @@ class KalmanFilter(HedgeRatioEstimator):
         R = p.sigma2_eps                        # bruit d'observation (scalaire)
 
         # Stockage
-        mu_filt  = np.empty(n)
-        gam_filt = np.empty(n)
-        mu_pred  = np.empty(n)
-        gam_pred = np.empty(n)
+        mu_filt     = np.empty(n)
+        gam_filt    = np.empty(n)
+        mu_pred     = np.empty(n)
+        gam_pred    = np.empty(n)
+        innovations = np.empty(n)
+        S_inn       = np.empty(n)
 
         # État initial
         s = np.array([p.mu0, p.gam0])   # [μ₁, γ₁]
@@ -254,14 +260,14 @@ class KalmanFilter(HedgeRatioEstimator):
             # Vecteur d'observation H_t = [1, y2_t]
             H = np.array([1.0, xv[t]])
 
-            innovation = yv[t] - H @ s_pred          # scalaire
-            S_inn      = H @ P_pred @ H + R           # variance innovation
-            K          = (P_pred @ H) / S_inn         # gain de Kalman (2×1)
+            innovations[t] = yv[t] - H @ s_pred
+            S_inn[t]       = H @ P_pred @ H + R
+            K              = (P_pred @ H) / S_inn[t]
 
-            s = s_pred + K * innovation
+            s = s_pred + K * innovations[t]
             P = (np.eye(2) - np.outer(K, H)) @ P_pred
 
             mu_filt[t]  = s[0]
             gam_filt[t] = s[1]
 
-        return mu_filt, gam_filt, gam_pred, mu_pred
+        return mu_filt, gam_filt, gam_pred, mu_pred, innovations, S_inn

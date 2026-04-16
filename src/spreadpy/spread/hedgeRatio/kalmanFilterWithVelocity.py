@@ -84,9 +84,11 @@ class KalmanFilterWithVelocity(HedgeRatioEstimator):
 
         # Exposés après fit()
         self.params_: Optional[KalmanFilterWithVelocityParams] = None
-        self.mu_ts_:       Optional[pd.Series] = None
-        self.velocity_ts_: Optional[pd.Series] = None
+        self.mu_ts_:             Optional[pd.Series] = None
+        self.velocity_ts_:       Optional[pd.Series] = None
         self.normalized_spread_: Optional[pd.Series] = None
+        self.innovations_ts_:    Optional[pd.Series] = None   # ν_t
+        self.innovation_var_ts_: Optional[pd.Series] = None   # S_t
 
     # Matrice de transition F (3×3) — constante
     _F = np.array([
@@ -129,13 +131,15 @@ class KalmanFilterWithVelocity(HedgeRatioEstimator):
         params = self._init_params(yv, xv)
         self.params_ = params
 
-        mu_filt, _, dgam_filt, gam_pred, mu_pred, _ = self._run_filter(
+        mu_filt, _, dgam_filt, gam_pred, mu_pred, S_inn, innovations = self._run_filter(
             yv, xv, params
         )
 
         index = y_al.index
-        self.mu_ts_       = pd.Series(mu_filt,   index=index, name="mu")
-        self.velocity_ts_ = pd.Series(dgam_filt, index=index, name="velocity")
+        self.mu_ts_             = pd.Series(mu_filt,            index=index, name="mu")
+        self.velocity_ts_       = pd.Series(dgam_filt,          index=index, name="velocity")
+        self.innovations_ts_    = pd.Series(innovations,        index=index, name="innovation")
+        self.innovation_var_ts_ = pd.Series(S_inn,              index=index, name="innovation_var")
 
         # Spread normalisé — exposé pour ZScoreSignal / CopulaSignal
         self.normalized_spread_ = pd.Series(
@@ -268,12 +272,13 @@ class KalmanFilterWithVelocity(HedgeRatioEstimator):
         Q   = np.diag([p.sigma2_mu, p.sigma2_gam, p.sigma2_dgam])
         R   = p.sigma2_eps
 
-        mu_filt   = np.empty(n)
-        gam_filt  = np.empty(n)
-        dgam_filt = np.empty(n)
-        mu_pred   = np.empty(n)
-        gam_pred  = np.empty(n)
-        S_inn = np.empty(n)
+        mu_filt     = np.empty(n)
+        gam_filt    = np.empty(n)
+        dgam_filt   = np.empty(n)
+        mu_pred     = np.empty(n)
+        gam_pred    = np.empty(n)
+        S_inn       = np.empty(n)
+        innovations = np.empty(n)
 
         # État initial :  s = [μ₁, γ₁, γ̇₁=0]
         s = np.array([p.mu0, p.gam0, 0.0])
@@ -292,15 +297,15 @@ class KalmanFilterWithVelocity(HedgeRatioEstimator):
             # H_t = [1, y2_t, 0]  →  observation = μ_t + γ_t·y2_t
             H = np.array([1.0, xv[t], 0.0])
 
-            innovation = yv[t] - H @ s_pred
-            S_inn[t]      = H @ P_pred @ H + R
+            innovations[t] = yv[t] - H @ s_pred
+            S_inn[t]       = H @ P_pred @ H + R
             K          = (P_pred @ H) / S_inn[t]   # (3,)
 
-            s = s_pred + K * innovation
+            s = s_pred + K * innovations[t]
             P = (np.eye(3) - np.outer(K, H)) @ P_pred
 
             mu_filt[t]   = s[0]
             gam_filt[t]  = s[1]
             dgam_filt[t] = s[2]
 
-        return mu_filt, gam_filt, dgam_filt, gam_pred, mu_pred, S_inn
+        return mu_filt, gam_filt, dgam_filt, gam_pred, mu_pred, S_inn, innovations
