@@ -31,6 +31,29 @@ class ConstantOLS(HedgeRatioEstimator):
         self.r_squared_: Optional[float] = None
 
     def fit(self, y: PriceTimeSeries, x: PriceTimeSeries) -> pd.Series:
+        """
+        Estimate a single hedge ratio β via full-sample OLS and return it
+        as a constant series.
+
+        **With intercept** (default): solves the normal equations
+
+            [β, α]^T = (X^T X)^{-1} X^T y,   X = [x | 1]
+
+        **Without intercept**: uses the closed-form projection
+
+            β = (x^T y) / (x^T x)
+
+        After fitting, ``beta_``, ``alpha_``, and ``r_squared_`` are set.
+        The coefficient of determination is:
+
+            R² = 1 − SS_res / SS_tot,   SS_res = ||y − β·x − α||²,
+                                         SS_tot = ||y − ȳ||²
+
+        :param PriceTimeSeries y: Dependent-leg price series.
+        :param PriceTimeSeries x: Independent-leg price series.
+        :returns: Constant hedge ratio β broadcast over ``y.index``.
+        :rtype: pd.Series
+        """
         y_al, x_al = y.align(x)
         yv, xv = y_al.values, x_al.values
 

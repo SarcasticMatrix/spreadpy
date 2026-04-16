@@ -101,7 +101,26 @@ class KalmanFilterWithVelocity(HedgeRatioEstimator):
 
     def fit(self, y: PriceTimeSeries, x: PriceTimeSeries) -> pd.Series:
         """
-        Ajuste le filtre et retourne γ_{t|t-1} (prédictif, sans lookahead).
+        Run the Kalman filter on (y, x) and return the one-step-ahead
+        predictive hedge ratio γ_{t|t−1}.
+
+        Using the predictive state rather than the filtered state γ_{t|t}
+        ensures no lookahead bias: at bar t, γ_{t|t−1} is computed from
+        observations {(y_s, x_s) : s ≤ t − 1} only.
+
+        After calling this method the following attributes are set:
+
+        - ``params_`` — fitted :class:`KalmanFilterWithVelocityParams`
+        - ``mu_ts_`` — filtered intercept series μ_{t|t}
+        - ``velocity_ts_`` — filtered velocity series γ̇_{t|t}
+        - ``normalized_spread_`` — lookahead-free normalised spread
+
+            z_t = (y_t − γ_{t|t−1} · x_t − μ_{t|t−1}) / (1 + γ_{t|t−1})
+
+        :param PriceTimeSeries y: Dependent-leg price series.
+        :param PriceTimeSeries x: Independent-leg price series.
+        :returns: Predictive hedge ratio series γ_{t|t−1} aligned with ``y.index``.
+        :rtype: pd.Series
         """
         y_al, x_al = y.align(x)
         yv = y_al.values.astype(float)
@@ -134,6 +153,30 @@ class KalmanFilterWithVelocity(HedgeRatioEstimator):
     def _init_params(
         self, yv: np.ndarray, xv: np.ndarray
     ) -> KalmanFilterWithVelocityParams:
+        """
+        Bootstrap filter hyperparameters from OLS on the first T_ls bars.
+
+        Extends the 2-state bootstrap (Palomar, §15.6.3) with an additional
+        noise term for the velocity state γ̇_t:
+
+            σ²_ε   = Var[ε^{OLS}]
+            σ²_μ   = α      · σ²_ε
+            σ²_γ   = α      · σ²_ε / Var[x]
+            σ²_γ̇  = α_dgam · σ²_ε / Var[x]   (α_dgam < α ⟹ slow velocity)
+
+        The initial state covariance P₀ is 3 × 3 diagonal:
+
+            P₀ = diag(σ²_ε / T_ls,   σ²_ε / (T_ls · Var[x]),   σ²_γ)
+
+        The third diagonal entry initialises uncertainty on the unknown
+        velocity γ̇₁ at the level of the hedge-ratio process noise σ²_γ,
+        reflecting that the initial trend is completely unknown.
+
+        :param np.ndarray yv: Dependent-leg values, shape (T,).
+        :param np.ndarray xv: Independent-leg values, shape (T,).
+        :returns: Fitted :class:`KalmanFilterWithVelocityParams` dataclass.
+        :rtype: KalmanFilterWithVelocityParams
+        """
         T_ls = min(
             self.ls_window if self.ls_window is not None else len(yv),
             len(yv),
@@ -182,8 +225,43 @@ class KalmanFilterWithVelocity(HedgeRatioEstimator):
         p:  KalmanFilterWithVelocityParams,
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
-        Retourne (mu_filt, gam_filt, dgam_filt, gam_pred, mu_pred, S_inn).
-        Les *_pred sont les prédictifs α_{t|t-1} (no lookahead).
+        Execute the forward Kalman recursion for the 3-state model.
+
+        State vector: α_t = [μ_t, γ_t, γ̇_t]^T.
+
+        Transition matrix (locally-linear trend on γ):
+
+            F = [[1, 0, 0],
+                 [0, 1, 1],
+                 [0, 0, 1]]
+
+        State noise: Q = diag(σ²_μ, σ²_γ, σ²_γ̇).
+        Observation vector at bar t: H_t = [1, x_t, 0].
+
+        For t = 1, …, T:
+
+        **Predict**::
+
+            α_{t|t−1} = F · α_{t−1|t−1}
+            P_{t|t−1} = F · P_{t−1|t−1} · F^T + Q
+
+        which gives γ_{t|t−1} = γ_{t−1|t−1} + γ̇_{t−1|t−1} (trend extrapolation).
+
+        **Update**::
+
+            ν_t  = y_t − H_t · α_{t|t−1}                 (innovation, scalar)
+            S_t  = H_t · P_{t|t−1} · H_t^T + σ²_ε        (innovation variance)
+            K_t  = P_{t|t−1} · H_t^T / S_t                (Kalman gain, 3×1)
+            α_{t|t} = α_{t|t−1} + K_t · ν_t
+            P_{t|t} = (I − K_t · H_t^T) · P_{t|t−1}
+
+        :param np.ndarray yv: Dependent-leg values, shape (T,).
+        :param np.ndarray xv: Independent-leg values, shape (T,).
+        :param KalmanFilterWithVelocityParams p: Hyperparameters.
+        :returns: Tuple
+            ``(μ_{t|t}, γ_{t|t}, γ̇_{t|t}, γ_{t|t−1}, μ_{t|t−1}, S_t)``,
+            each an ndarray of shape (T,).
+        :rtype: tuple[np.ndarray, ...]
         """
         n   = len(yv)
         F   = self._F

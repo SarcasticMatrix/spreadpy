@@ -67,9 +67,25 @@ class SpreadSeries:
 
     def half_life(self) -> float:
         """
-        Ornstein-Uhlenbeck half-life via OLS regression of:
-            Δspread_t = λ * spread_{t-1} + ε
-        half_life = -ln(2) / λ
+        Estimate the mean-reversion half-life of the spread via an
+        Ornstein-Uhlenbeck OLS regression.
+
+        The discrete-time OU model is:
+
+            Δs_t = λ · s_{t−1} + c + ε_t,   ε_t ~ N(0, σ²)
+
+        where λ < 0 indicates mean-reversion. The half-life is the time
+        (in bars) for a deviation from equilibrium to decay by half:
+
+            τ_{1/2} = −ln 2 / λ
+
+        λ is estimated by regressing Δs_t on s_{t−1} (with constant)
+        using OLS. If λ ≥ 0, the spread is non-stationary and the method
+        returns ``float('inf')`` with a warning.
+
+        :returns: Mean-reversion half-life in bars. ``float('inf')`` if the
+            spread does not mean-revert.
+        :rtype: float
         """
         spread = self._residuals.dropna()
         delta = spread.diff().dropna()
@@ -91,7 +107,24 @@ class SpreadSeries:
         return -np.log(2) / lam
 
     def adf_statistic(self) -> Tuple[float, float]:
-        """Returns (ADF test statistic, p-value). Requires statsmodels."""
+        """
+        Compute the Augmented Dickey-Fuller test statistic for the spread.
+
+        Tests the null hypothesis H₀ of a unit root (non-stationarity)
+        against the alternative H₁ of stationarity (mean-reversion).
+        The ADF regression with one lag is:
+
+            Δs_t = ρ · s_{t−1} + c + δ · Δs_{t−1} + ε_t
+
+        A t-statistic on ρ that is sufficiently negative (p-value < 0.05)
+        rejects H₀ and supports cointegration of the pair.
+
+        Requires ``statsmodels``.
+
+        :returns: Tuple ``(adf_statistic, p_value)``.
+        :rtype: Tuple[float, float]
+        :raises ImportError: If ``statsmodels`` is not installed.
+        """
         try:
             from statsmodels.tsa.stattools import adfuller
             result = adfuller(self._residuals.dropna(), maxlags=1)
@@ -100,13 +133,41 @@ class SpreadSeries:
             raise ImportError("statsmodels required for ADF test: pip install statsmodels")
 
     def rolling_zscore(self, window: int) -> pd.Series:
-        """Z-score of spread over a rolling window (no lookahead)."""
+        """
+        Compute a rolling z-score of the spread with no lookahead.
+
+        At each bar t, the z-score standardises s_t using statistics
+        estimated over the preceding window of w bars:
+
+            μ_{t,w} = (1/w) · Σ_{j=0}^{w−1} s_{t−j}
+            σ_{t,w} = std(s_{t−w+1}, …, s_t)   (sample std, ddof=1)
+            z_t     = (s_t − μ_{t,w}) / σ_{t,w}
+
+        Bars t < w are set to NaN (insufficient history). This is the
+        signal used by :class:`ZScoreSignal`.
+
+        :param int window: Rolling window length w (in bars).
+        :returns: z-score series aligned with ``self.index``.
+        :rtype: pd.Series
+        """
         mu = self._residuals.rolling(window).mean()
         sigma = self._residuals.rolling(window).std()
         return ((self._residuals - mu) / sigma).rename("zscore")
 
     def slice(self, start, end) -> "SpreadSeries":
-        """Return a SpreadSeries restricted to [start, end]."""
+        """
+        Return a new :class:`SpreadSeries` restricted to the closed
+        interval [start, end].
+
+        The underlying y, x, and β_t series are all sliced consistently,
+        so the returned object is a self-contained SpreadSeries over the
+        sub-period with no reference to the original data outside [start, end].
+
+        :param start: Inclusive start timestamp (pd.Timestamp or compatible).
+        :param end: Inclusive end timestamp (pd.Timestamp or compatible).
+        :returns: Spread sub-series over [start, end].
+        :rtype: SpreadSeries
+        """
         mask = (self.index >= start) & (self.index <= end)
         sub_idx = self.index[mask]
         new_y = PriceTimeSeries(self.y.series.loc[sub_idx], name=self.y.name)

@@ -29,6 +29,27 @@ class RollingOLS(HedgeRatioEstimator):
         self.add_intercept = add_intercept
 
     def fit(self, y: PriceTimeSeries, x: PriceTimeSeries) -> pd.Series:
+        """
+        Estimate a time-varying hedge ratio β_t via rolling OLS.
+
+        At each bar t ≥ w − 1, the hedge ratio is the OLS slope over the
+        most recent w observations:
+
+            β_t = argmin_{β,α} Σ_{s=t−w+1}^{t} (y_s − α − β·x_s)²
+
+        whose solution is:
+
+            β_t = Cov_w[x, y] / Var_w[x]
+
+        where Cov_w and Var_w denote the sample covariance and variance
+        over the rolling window. For the first w − 1 bars (warm-up), the
+        first available estimate is forward-filled.
+
+        :param PriceTimeSeries y: Dependent-leg price series.
+        :param PriceTimeSeries x: Independent-leg price series.
+        :returns: Time series of hedge ratios β_t aligned with ``y.index``.
+        :rtype: pd.Series
+        """
         y_al, x_al = y.align(x)
         yv, xv = y_al.values.astype(float), x_al.values.astype(float)
         n = len(yv)
