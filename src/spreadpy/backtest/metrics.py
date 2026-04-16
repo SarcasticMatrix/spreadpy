@@ -111,6 +111,28 @@ class RiskMetrics:
         below = dd[dd < 0]
         return float(below.mean()) if len(below) > 0 else 0.0
 
+    def conditional_drawdown(self, alpha: float = 0.05) -> float:
+        """
+        Conditional Drawdown at Risk (CDaR) at level alpha.
+
+        Average of the worst alpha-fraction of drawdown observations:
+
+            CDaR_α = E[DD_t | DD_t ≤ VaR_α(DD)]
+
+        where VaR_α is the alpha-quantile of the drawdown distribution.
+        Returns a negative value (same sign convention as max_drawdown).
+
+        :param float alpha: Tail level (default 0.05 = worst 5%).
+        :returns: Mean drawdown in the worst alpha fraction of bars.
+        :rtype: float
+        """
+        dd = self.drawdown_series()
+        if len(dd) == 0:
+            return 0.0
+        threshold = dd.quantile(alpha)          # α-quantile (≤ 0)
+        tail = dd[dd <= threshold]
+        return float(tail.mean()) if len(tail) > 0 else 0.0
+
     def win_rate(self, trades: List["Trade"]) -> float:
         """Fraction of round-trip trades with positive P&L."""
         round_trips = self._compute_round_trips(trades)
@@ -154,6 +176,7 @@ class RiskMetrics:
             "sortino":            self.sortino(periods_per_year),
             "max_drawdown":       self.max_drawdown(),
             "avg_drawdown":       self.avg_drawdown(),
+            "cdar_5":             self.conditional_drawdown(alpha=0.05),
             "calmar":             self.calmar(periods_per_year),
         }
         if trades is not None:
