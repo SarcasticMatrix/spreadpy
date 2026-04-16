@@ -55,7 +55,7 @@ class TransactionCosts:
 
         notional = abs(fill_price * qty)
         commission = max(
-            self.commission_per_unit * abs(qty) + notional * self.commission_bps/100,
+            self.commission_per_unit * abs(qty) + notional * self.commission_bps / 10_000,
             self.min_commission,
         )
         total_cost = abs(slip * qty) + commission

@@ -56,6 +56,8 @@ class RiskMetrics:
         if n < 2:
             return 0.0
         total = self.total_return()
+        if 1 + total <= 0:
+            return -1.0          # total wipeout or worse — CAGR undefined
         return float((1 + total) ** (periods_per_year / n) - 1)
 
     def volatility(self, periods_per_year: int = 252) -> float:
