@@ -14,7 +14,7 @@ import pandas as pd
 from spreadpy.data import PriceTimeSeries
 from spreadpy.spread import HedgeRatioEstimator, SpreadSeries
 from spreadpy.signal import Direction, Signal, SignalGenerator
-from spreadpy.sizing import PositionSizer
+from spreadpy.sizing import LinearSizer
 from spreadpy.backtest.costs import TransactionCosts
 from spreadpy.backtest.portfolio import Portfolio
 from spreadpy.backtest.metrics import RiskMetrics
@@ -38,7 +38,7 @@ class BacktestEngine:
         (e.g. :class:`KalmanFilterWithVelocity`).
     :param SignalGenerator signal_gen: Signal generator
         (e.g. :class:`ZScoreSignal`).
-    :param PositionSizer sizer: Position sizing model.
+    :param LinearSizer sizer: Position sizing model.
     :param Optional[TransactionCosts] costs: Transaction cost model.
         Defaults to 2 bps slippage + 1 bps commission.
     :param float initial_capital: Starting equity in monetary units.
@@ -50,18 +50,24 @@ class BacktestEngine:
         The remainder ``1 − train_frac − val_frac`` forms the test set.
     :param int periods_per_year: Bars per year for annualisation
         (252 for daily, 252 × 23 ≈ 5796 for hourly futures).
+    :param bool log_prices: If ``True``, log-transform prices before passing
+        them to the hedge ratio estimator and signal generator. The Kalman
+        filter then operates on log-prices, which better satisfies the
+        constant observation-noise assumption (σ²_ε homoscedastic).
+        Position sizing and P&L accounting always use the original prices.
     """
 
     def __init__(
         self,
         estimator: HedgeRatioEstimator,
         signal_gen: SignalGenerator,
-        sizer: PositionSizer,
+        sizer: LinearSizer,
         costs: Optional[TransactionCosts] = None,
         initial_capital: float = 1_000_000.0,
         train_frac: float = 0.6,
         val_frac: float = 0.2,
         periods_per_year: int = 252,
+        log_prices: bool = False,
     ) -> None:
         if not 0.0 <= val_frac < 1.0:
             raise ValueError("val_frac must be in [0, 1)")
@@ -75,6 +81,7 @@ class BacktestEngine:
         self.train_frac = train_frac
         self.val_frac = val_frac
         self.periods_per_year = periods_per_year
+        self.log_prices = log_prices
 
     # ------------------------------------------------------------------
     # Main entry point
@@ -100,21 +107,26 @@ class BacktestEngine:
         val_dates   = y_al.index[val_idx] if len(val_idx) else None
         test_dates  = y_al.index[test_idx]
 
-        y_train = y_al.slice(train_dates[0], train_dates[-1])
-        x_train = x_al.slice(train_dates[0], train_dates[-1])
+        # Signal series: optionally log-transformed for Kalman / spread / z-score.
+        # Trading series: always original prices for sizing and P&L.
+        y_sig = self._signal_series(y_al)
+        x_sig = self._signal_series(x_al)
+
+        y_train_sig = y_sig.slice(train_dates[0], train_dates[-1])
+        x_train_sig = x_sig.slice(train_dates[0], train_dates[-1])
 
         # Fit estimator on train; re-run over full range for Kalman continuity
         estimator = copy.deepcopy(self.estimator)
-        estimator.fit(y_train, x_train)
+        estimator.fit(y_train_sig, x_train_sig)
 
-        y_full  = y_al.slice(train_dates[0], test_dates[-1])
-        x_full  = x_al.slice(train_dates[0], test_dates[-1])
-        beta_full = estimator.fit(y_full, x_full)
+        y_full_sig = y_sig.slice(train_dates[0], test_dates[-1])
+        x_full_sig = x_sig.slice(train_dates[0], test_dates[-1])
+        beta_full  = estimator.fit(y_full_sig, x_full_sig)
 
         # Fit signal generator on the training spread
-        beta_train  = beta_full.loc[train_dates[0]:train_dates[-1]]
+        beta_train   = beta_full.loc[train_dates[0]:train_dates[-1]]
         spread_train = SpreadSeries(
-            y_train, x_train, beta_train,
+            y_train_sig, x_train_sig, beta_train,
             estimator_name=estimator.__class__.__name__,
         )
         signal_gen = copy.deepcopy(self.signal_gen)
@@ -122,11 +134,11 @@ class BacktestEngine:
 
         val_result = (
             self._run_split("val", val_dates, train_dates,
-                            y_al, x_al, beta_full, signal_gen, estimator)
+                            y_al, x_al, y_sig, x_sig, beta_full, signal_gen, estimator)
             if val_dates is not None else None
         )
         test_result = self._run_split("test", test_dates, train_dates,
-                                      y_al, x_al, beta_full, signal_gen, estimator)
+                                      y_al, x_al, y_sig, x_sig, beta_full, signal_gen, estimator)
 
         return val_result, test_result
 
@@ -139,19 +151,23 @@ class BacktestEngine:
         split: str,
         eval_dates: pd.DatetimeIndex,
         train_dates: pd.DatetimeIndex,
-        y_al: PriceTimeSeries,
+        y_al: PriceTimeSeries,       # original prices  — trading / P&L
         x_al: PriceTimeSeries,
+        y_sig_al: PriceTimeSeries,   # signal prices    — Kalman / spread
+        x_sig_al: PriceTimeSeries,
         beta_full: pd.Series,
         signal_gen: SignalGenerator,
         estimator: HedgeRatioEstimator,
     ) -> BacktestResult:
 
-        y_eval    = y_al.slice(eval_dates[0], eval_dates[-1])
-        x_eval    = x_al.slice(eval_dates[0], eval_dates[-1])
-        beta_eval = beta_full.loc[eval_dates[0]:eval_dates[-1]]
+        y_eval     = y_al.slice(eval_dates[0], eval_dates[-1])
+        x_eval     = x_al.slice(eval_dates[0], eval_dates[-1])
+        y_eval_sig = y_sig_al.slice(eval_dates[0], eval_dates[-1])
+        x_eval_sig = x_sig_al.slice(eval_dates[0], eval_dates[-1])
+        beta_eval  = beta_full.loc[eval_dates[0]:eval_dates[-1]]
 
         spread = SpreadSeries(
-            y_eval, x_eval, beta_eval,
+            y_eval_sig, x_eval_sig, beta_eval,
             estimator_name=estimator.__class__.__name__,
         )
         signals = signal_gen.generate(spread)
@@ -160,11 +176,12 @@ class BacktestEngine:
         prev_direction = Direction.FLAT
 
         for i, (ts, sig) in enumerate(signals.items()):
-            price_y     = float(y_eval.series.iloc[i])
+            price_y     = float(y_eval.series.iloc[i])    # actual price for trading
             price_x     = float(x_eval.series.iloc[i])
             hedge_ratio = float(beta_eval.iloc[i]) if i < len(beta_eval) else 1.0
 
-            qty_y, qty_x = self.sizer.size(sig, price_y, price_x, hedge_ratio)
+            qty_y, qty_x = self.sizer.size(sig, price_y, price_x, hedge_ratio,
+                                           capital=portfolio.current_equity)
 
             if sig.direction != prev_direction:
                 portfolio.fill(ts, sig, qty_y, qty_x, price_y, price_x)
@@ -198,6 +215,12 @@ class BacktestEngine:
     # ------------------------------------------------------------------
     # Split generation
     # ------------------------------------------------------------------
+
+    def _signal_series(self, pts: PriceTimeSeries) -> PriceTimeSeries:
+        """Return pts log-transformed when log_prices=True, else pts unchanged."""
+        if self.log_prices:
+            return PriceTimeSeries(np.log(pts.series), name=pts.name)
+        return pts
 
     def _split(
         self,

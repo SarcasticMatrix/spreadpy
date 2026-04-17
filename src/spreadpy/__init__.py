@@ -1,6 +1,6 @@
 from .data import DataLoader, PriceTimeSeries
 from .signal import Signal, ZScoreSignal, CopulaSignal
-from .sizing import PositionSizer
+from .sizing import LinearSizer, KellySizer
 from .spread import SpreadSeries
 from .backtest import (
     TransactionCosts,
@@ -20,7 +20,8 @@ __all__ = [
     "ZScoreSignal",
     "CopulaSignal",
     # Sizing
-    "PositionSizer",
+    "LinearSizer",
+    "KellySizer"
     # Spread
     "SpreadSeries",
     # Backtest

@@ -22,20 +22,20 @@ statistical mispricings between the two legs.
            v_t = F̂_x(x_t) via empirical ranks (Hazen formula).
         2. Estimate Kendall's τ and invert to copula parameter θ:
                Gaussian:  θ = sin(π/2 · τ)
-               Clayton:   θ = 2τ / (1 − τ)   (θ > 0)
-               Gumbel:    θ = 1 / (1 − τ)    (θ ≥ 1)
+               Clayton:   θ = 2τ / (1 - τ)   (θ > 0)
+               Gumbel:    θ = 1 / (1 - τ)    (θ ≥ 1)
 
     Entry logic (out-of-sample):
         LONG  if C(u_t | v_t) < entry_prob         (y cheap relative to x)
-        SHORT if C(u_t | v_t) > 1 − entry_prob     (y expensive relative to x)
+        SHORT if C(u_t | v_t) > 1 - entry_prob     (y expensive relative to x)
 
     Exit uses the rolling z-score: FLAT when |z| < exit_zscore or |z| > stop_zscore.
-    The z-score is also passed to the :class:`PositionSizer` for sizing.
+    The z-score is also passed to the :class:`LinearSizer` for sizing.
 
     :param str family: Copula family — ``'gaussian'``, ``'clayton'``, or ``'gumbel'``.
     :param int window: Rolling window for the z-score computation (position sizing only).
     :param float entry_prob: Tail probability threshold for entry (default 0.10).
-        Fires when the conditional CDF is below ``entry_prob`` or above ``1 − entry_prob``.
+        Fires when the conditional CDF is below ``entry_prob`` or above ``1 - entry_prob``.
     :param float exit_zscore: Exit position when |z| drops below this value.
     :param float stop_zscore: Stop-loss when |z| exceeds this value.
     """

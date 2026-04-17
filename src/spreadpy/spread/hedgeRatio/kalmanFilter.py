@@ -63,6 +63,14 @@ class KalmanFilter(HedgeRatioEstimator):
         Palomar uses 1e-5 for this model.
     :param Optional[int] ls_window: Number of bars for the OLS initialisation.
         None uses the entire series (recommended: pass ``train_size`` from the engine).
+
+    .. note::
+        **Use log-prices.** The filter assumes constant observation noise σ²_ε.
+        With raw prices, σ²_ε ∝ price², making the Kalman gain K_t systematically
+        mis-calibrated when prices drift. Passing ``log(y)``, ``log(x)`` makes
+        σ²_ε approximately homoscedastic and gives more stable hedge ratio estimates.
+        In :class:`BacktestEngine`, set ``log_prices=True`` to apply this
+        automatically while keeping actual prices for P&L accounting.
     """
 
     def __init__(

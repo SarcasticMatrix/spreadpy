@@ -247,6 +247,15 @@ class Portfolio:
     def positions(self) -> Dict[str, Dict]:
         return self._positions
 
+    @property
+    def current_equity(self) -> float:
+        """Current mark-to-market equity using the most recently seen prices."""
+        unrealised = 0.0
+        for leg, pos in self._positions.items():
+            if abs(pos["qty"]) > 1e-9:
+                unrealised += pos["qty"] * (self._current_prices[leg] - pos["avg_price"])
+        return self._cash + unrealised
+
     def reset(self) -> None:
         """Reset portfolio to initial state (used between walk-forward folds)."""
         self.__init__(self.initial_capital, self.costs)
