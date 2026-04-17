@@ -2,8 +2,9 @@
 grid_search.py — Grid search over entry_threshold and revert_threshold.
 
 Pipeline:
-    1. Download ~6 years of CL=F / HO=F hourly data once (3 × 730-day chunks)
-    2. Run BacktestEngine for each (entry, revert) combination
+    1. Download CL=F / HO=F price data
+    2. Run BacktestEngine with log_prices=True (Kalman on log-prices,
+       trading on actual prices) for each (entry, revert) combination
     3. Print pivot tables (Sharpe, MaxDD, CDaR 5%, # trades)
     4. Plot heatmaps
 """
@@ -24,7 +25,7 @@ from utils import fetch_history
 from spreadpy.data import PriceTimeSeries
 from spreadpy.spread import KalmanFilterWithVelocity
 from spreadpy.signal import ZScoreSignal
-from spreadpy.sizing import PositionSizer
+from spreadpy.sizing import KellySizer, LinearSizer
 from spreadpy.backtest import TransactionCosts, BacktestEngine
 
 
@@ -35,7 +36,7 @@ REVERT_THRESHOLDS = [0.0, 0.1, 0.2, 0.3, 0.5]
 # Metrics to pivot / plot  →  (display label, colormap, higher-is-better)
 METRICS = [
     ("sharpe",       "Sharpe ratio",      "RdYlGn",   True),
-    ("max_drawdown", "Max drawdown",       "RdYlGn",   True),   # less negative = better
+    ("max_drawdown", "Max drawdown",      "RdYlGn",   True),   # less negative = better
     ("cdar_5",       "CDaR 5%",           "RdYlGn",   True),   # idem
     ("n_trades",     "# trades",          "Blues",    None),   # informational
 ]
@@ -45,8 +46,8 @@ if __name__ == "__main__":
 
     # ── 1. Data (downloaded once) ─────────────────────────────────────────────
     print("Downloading data…")
-    cl = PriceTimeSeries(fetch_history("CL=F"), name="crude_oil")
-    ho = PriceTimeSeries(fetch_history("HO=F"), name="heating_oil")
+    cl = PriceTimeSeries(fetch_history("CC=F", period="730d", interval="1h"), name="crude_oil")
+    ho = PriceTimeSeries(fetch_history("KC=F", period="730d", interval="1h"), name="heating_oil")
 
     # ── 2. Grid search ────────────────────────────────────────────────────────
     combos = [
@@ -67,12 +68,13 @@ if __name__ == "__main__":
                 entry_threshold=entry,
                 revert_threshold=revert,
             ),
-            sizer=PositionSizer(max_notional=50_000),
-            costs=TransactionCosts(slippage_bps=0, commission_bps=0),
+            sizer=KellySizer(z0=entry, z_revert=revert),
+            costs=TransactionCosts(slippage_bps=1, commission_bps=1),
             initial_capital=500_000,
             train_frac=0.7,
             val_frac=0.0,
-            periods_per_year=252 * 23,
+            periods_per_year=252 * 10,
+            log_prices=True,
         )
 
         _, result = engine.run(cl, ho)
@@ -103,7 +105,7 @@ if __name__ == "__main__":
 
     # ── 4. Heatmaps ───────────────────────────────────────────────────────────
     n_metrics = sum(1 for k, *_ in METRICS if k in results_df.columns)
-    fig, axes = plt.subplots(1, n_metrics, figsize=(4 * n_metrics, 4))
+    fig, axes = plt.subplots(1, n_metrics, figsize=(4 * n_metrics, 4), sharey=True)
     if n_metrics == 1:
         axes = [axes]
 
@@ -148,6 +150,6 @@ if __name__ == "__main__":
                             ha="center", va="center", fontsize=7,
                             color="black")
 
-    fig.suptitle("Grid search — entry_threshold × revert_threshold", fontsize=10)
+    fig.suptitle("Grid search — entry_threshold × revert_threshold  (log-prices)", fontsize=10)
     plt.tight_layout()
     plt.show()
