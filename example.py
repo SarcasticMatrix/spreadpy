@@ -19,9 +19,9 @@ import matplotlib.ticker as mticker
 
 from utils import fetch_history
 from spreadpy.data import PriceTimeSeries
-from spreadpy.spread import KalmanFilterWithVelocity
+from spreadpy.spread import KalmanFilterWithVelocity, KalmanFilter
 from spreadpy.signal import ZScoreSignal
-from spreadpy.sizing import PositionSizer
+from spreadpy.sizing import KellySizer, LinearSizer
 from spreadpy.backtest import TransactionCosts, BacktestEngine
 
 
@@ -31,21 +31,23 @@ if __name__ == "__main__":
     print("=" * 60)
 
     # ── 1. Data ──────────────────────────────────────────────────────────
-    cl = PriceTimeSeries(fetch_history("CL=F", period="7d", interval="1m"), name="crude_oil")
-    ho = PriceTimeSeries(fetch_history("HO=F", period="7d", interval="1m"), name="heating_oil")
+    cl = PriceTimeSeries(fetch_history("CC=F", period="730d", interval="1h"), name="crude_oil")
+    ho = PriceTimeSeries(fetch_history("KC=F", period="730d", interval="1h"), name="heating_oil")
 
     # ── 2. Backtest ──────────────────────────────────────────────────────
-    entry_threshold  = 2
-    revert_threshold = 0
+    entry_threshold  = 1
+    revert_threshold = 0.5
+    f_max = 0.25
     engine = BacktestEngine(
         estimator=KalmanFilterWithVelocity(alpha=1e-6),
         signal_gen=ZScoreSignal(window=60, entry_threshold=entry_threshold, revert_threshold=revert_threshold),
-        sizer=PositionSizer(max_notional=50_000),
-        costs=TransactionCosts(slippage_bps=0, commission_bps=0),
+        sizer=KellySizer(z0=entry_threshold, z_revert=revert_threshold, f_max=f_max),
+        costs=TransactionCosts(slippage_bps=1.0, commission_bps=1.0),
         initial_capital=500_000,
         train_frac=0.7,
         val_frac=0.0,           # pas de validation, train/test seulement
-        periods_per_year=252 * 23 * 60,
+        periods_per_year=252 * 10,
+        log_prices=True,        # Kalman on log-prices (homoscedastic σ²_ε)
     )
 
     _, result = engine.run(cl, ho)   # val_result is None (val_frac=0)
@@ -150,5 +152,77 @@ if __name__ == "__main__":
         ax.spines[["top", "right"]].set_visible(False)
         ax.tick_params(labelsize=8)
 
+    plt.tight_layout()
+    plt.show()
+
+
+
+    # ── 4. Spread comparison: β_t (dynamic) vs β_entry (frozen) ─────────
+    # result.spread is in log-space (log_prices=True):
+    #   s_t = log(y_t) − β_t · log(x_t)
+    spread_bt = result.spread.residuals
+    beta_t    = result.spread.hedge_ratio_ts
+    y_ser     = result.spread.y.series   # log(y)
+    x_ser     = result.spread.x.series   # log(x)
+
+    # Reconstruct β_entry: β frozen when entering a position, NaN while flat
+    dirs_full = dirs.reindex(spread_bt.index, fill_value=0)
+    active_beta = np.nan
+    prev_dir    = 0
+    beta_entry_vals = []
+    for ts, d in dirs_full.items():
+        d = int(d)
+        if d != 0 and (prev_dir == 0 or d != prev_dir):   # entry or flip
+            active_beta = float(beta_t.loc[ts])
+        elif d == 0:                                        # back to flat
+            active_beta = np.nan
+        beta_entry_vals.append(active_beta)
+        prev_dir = d
+
+    # ffill so the last known β_entry is always visible (even when flat)
+    beta_entry_ts = pd.Series(beta_entry_vals, index=spread_bt.index).ffill().fillna(beta_t)
+    spread_entry  = y_ser - beta_entry_ts * x_ser
+
+    fig2, axes2 = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
+
+    # Panel 1 — both spreads overlaid
+    ax2 = axes2[0]
+    ax2.plot(xi(spread_bt.index),    xv(spread_bt),    color="#378ADD", linewidth=1.0,
+             alpha=0.9, label="β_t  (dynamic)")
+    ax2.plot(xi(spread_entry.index), xv(spread_entry), color="#9B59B6", linewidth=1.0,
+             alpha=0.7, label="β_entry (frozen)")
+    ax2.grid(linestyle="--", dashes=(5, 10), color="gray", linewidth=0.5)
+
+
+    sp_at_bt = spread_bt.reindex(zs.index)
+    ax2.scatter(xi(zs.index[long_idx]),  xv(sp_at_bt[long_idx]),
+                marker="^", color="#1D9E75", s=80, zorder=5, label="Long entry")
+    ax2.scatter(xi(zs.index[short_idx]), xv(sp_at_bt[short_idx]),
+                marker="v", color="#E24B4A", s=80, zorder=5, label="Short entry")
+    ax2.scatter(xi(zs.index[flat_idx]),  xv(sp_at_bt[flat_idx]),
+                marker="s", color="#888780", s=50, zorder=5, label="Exit")
+    ax2.set_ylabel("log(y) − β·log(x)")
+    ax2.set_title("Log-spread — β_t (dynamic) vs β_entry (frozen at entry)", fontsize=9)
+    ax2.legend(fontsize=8, ncol=5)
+    ax2.spines[["top", "right"]].set_visible(False)
+    ax2.tick_params(labelsize=8)
+
+    # Panel 2 — β_t vs β_entry (divergence)
+    ax2 = axes2[1]
+    ax2.plot(xi(beta_t.index),         xv(beta_t),         color="#378ADD", linewidth=1.0,
+             alpha=0.9, label="β_t  (dynamic)")
+    ax2.plot(xi(beta_entry_ts.index),  xv(beta_entry_ts),  color="#9B59B6", linewidth=1.0,
+             alpha=0.7, label="β_entry (frozen)")
+    ax2.set_ylabel("β")
+    ax2.set_title("Hedge ratio — β_t vs β_entry", fontsize=9)
+    ax2.legend(fontsize=8, ncol=2)
+    ax2.spines[["top", "right"]].set_visible(False)
+    ax2.tick_params(labelsize=8)
+    ax2.grid(linestyle="--", dashes=(5, 10), color="gray", linewidth=0.5)
+
+    axes2[-1].xaxis.set_major_formatter(mticker.FuncFormatter(_date_fmt))
+    axes2[-1].xaxis.set_major_locator(mticker.MaxNLocator(integer=True, nbins=8))
+
+    fig2.suptitle("β drift effect — spread & hedge ratio comparison", fontsize=10)
     plt.tight_layout()
     plt.show()
