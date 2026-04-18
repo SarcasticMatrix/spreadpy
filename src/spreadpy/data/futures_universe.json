@@ -1,0 +1,38 @@
+{
+  "energy": {
+    "CL=F": "Crude Oil (WTI)",
+    "BZ=F": "Brent Crude Oil",
+    "NG=F": "Natural Gas",
+    "HO=F": "Heating Oil",
+    "RB=F": "RBOB Gasoline"
+  },
+  "metals": {
+    "GC=F": "Gold",
+    "SI=F": "Silver",
+    "HG=F": "Copper",
+    "PL=F": "Platinum",
+    "PA=F": "Palladium"
+  },
+  "grains": {
+    "ZC=F": "Corn",
+    "ZO=F": "Oats",
+    "KE=F": "Wheat (HRW)",
+    "ZW=F": "Wheat (SRW)",
+    "ZR=F": "Rough Rice",
+    "ZS=F": "Soybeans",
+    "ZM=F": "Soybean Meal",
+    "ZL=F": "Soybean Oil"
+  },
+  "softs": {
+    "CC=F": "Cocoa",
+    "KC=F": "Coffee",
+    "CT=F": "Cotton",
+    "SB=F": "Sugar #11",
+    "OJ=F": "Orange Juice"
+  },
+  "livestock": {
+    "GF=F": "Feeder Cattle",
+    "HE=F": "Lean Hogs",
+    "LE=F": "Live Cattle"
+  }
+}

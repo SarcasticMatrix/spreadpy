@@ -1,7 +1,6 @@
 from .dataLoader import DataLoader
 from .priceTimeSeries import PriceTimeSeries
+from .universe import load_futures_universe, get_all_tickers
 
-# Backward-compat: TransactionCosts a été déplacé dans spreadpy.backtest
-from spreadpy.backtest.costs import TransactionCosts  # noqa: F401
 
-__all__ = ["DataLoader", "PriceTimeSeries", "TransactionCosts"]
+__all__ = ["DataLoader", "PriceTimeSeries", "TransactionCosts", "load_futures_universe", "get_all_tickers"]
