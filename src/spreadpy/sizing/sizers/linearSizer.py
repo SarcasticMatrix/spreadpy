@@ -56,7 +56,7 @@ class LinearSizer(PositionSizer):
         Compute absolute quantities for each leg.
 
         The ``capital`` parameter is accepted for interface compatibility with
-        :class:`KellySizer` but is not used here.
+        :class:`KellyTruncatedEntry` but is not used here.
 
         Returns
         -------

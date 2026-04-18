@@ -25,7 +25,7 @@ from utils import fetch_history
 from spreadpy.data import PriceTimeSeries
 from spreadpy.spread import KalmanFilterWithVelocity
 from spreadpy.signal import ZScoreSignal
-from spreadpy.sizing import KellySizer, LinearSizer
+from spreadpy.sizing import KellyTruncatedEntry, LinearSizer
 from spreadpy.backtest import TransactionCosts, BacktestEngine
 
 
@@ -68,7 +68,7 @@ if __name__ == "__main__":
                 entry_threshold=entry,
                 revert_threshold=revert,
             ),
-            sizer=KellySizer(z0=entry, z_revert=revert),
+            sizer=KellyTruncatedEntry(z_entry=entry, z_revert=revert),
             costs=TransactionCosts(slippage_bps=1, commission_bps=1),
             initial_capital=500_000,
             train_frac=0.7,

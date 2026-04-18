@@ -1,5 +1,16 @@
 from .positionSizer import PositionSizer
-from .sizers import LinearSizer, KellySizer, kelly_fraction
+from .sizers import (
+    LinearSizer,
+    KellyTruncatedEntry,
+    KellyTruncatedExit,
+    KellyTruncatedBoth,
+)
 
 
-__all__ = ["PositionSizer", "LinearSizer", "KellySizer", "kelly_fraction"]
+__all__ = [
+    "PositionSizer",
+    "LinearSizer",
+    "KellyTruncatedEntry",
+    "KellyTruncatedExit",
+    "KellyTruncatedBoth",
+]

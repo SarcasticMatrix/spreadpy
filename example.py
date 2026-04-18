@@ -21,7 +21,7 @@ from utils import fetch_history
 from spreadpy.data import PriceTimeSeries
 from spreadpy.spread import KalmanFilterWithVelocity, KalmanFilter
 from spreadpy.signal import ZScoreSignal
-from spreadpy.sizing import KellySizer, LinearSizer
+from spreadpy.sizing import KellyTruncatedEntry, KellyTruncatedExit, KellyTruncatedBoth
 from spreadpy.backtest import TransactionCosts, BacktestEngine
 
 
@@ -31,8 +31,8 @@ if __name__ == "__main__":
     print("=" * 60)
 
     # ── 1. Data ──────────────────────────────────────────────────────────
-    cl = PriceTimeSeries(fetch_history("CC=F", period="730d", interval="1h"), name="crude_oil")
-    ho = PriceTimeSeries(fetch_history("KC=F", period="730d", interval="1h"), name="heating_oil")
+    cl = PriceTimeSeries(fetch_history("CL=F", period="730d", interval="1h"), name="crude_oil")
+    ho = PriceTimeSeries(fetch_history("HO=F", period="730d", interval="1h"), name="heating_oil")
 
     # ── 2. Backtest ──────────────────────────────────────────────────────
     entry_threshold  = 1
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     engine = BacktestEngine(
         estimator=KalmanFilterWithVelocity(alpha=1e-6),
         signal_gen=ZScoreSignal(window=60, entry_threshold=entry_threshold, revert_threshold=revert_threshold),
-        sizer=KellySizer(z0=entry_threshold, z_revert=revert_threshold, f_max=f_max),
+        sizer=KellyTruncatedExit(z_revert=revert_threshold, f_max=f_max),
         costs=TransactionCosts(slippage_bps=1.0, commission_bps=1.0),
         initial_capital=500_000,
         train_frac=0.7,

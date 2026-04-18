@@ -1,6 +1,12 @@
 from .data import DataLoader, PriceTimeSeries
+from .research import PairFinder
 from .signal import Signal, ZScoreSignal, CopulaSignal
-from .sizing import LinearSizer, KellySizer
+from .sizing import (
+    LinearSizer,
+    KellyTruncatedEntry,
+    KellyTruncatedExit,
+    KellyTruncatedBoth,
+)
 from .spread import SpreadSeries
 from .backtest import (
     TransactionCosts,
@@ -15,13 +21,16 @@ __all__ = [
     # Data
     "DataLoader",
     "PriceTimeSeries",
+    "PairFinder",
     # Signal
     "Signal",
     "ZScoreSignal",
     "CopulaSignal",
     # Sizing
     "LinearSizer",
-    "KellySizer"
+    "KellyTruncatedEntry",
+    "KellyTruncatedExit",
+    "KellyTruncatedBoth",
     # Spread
     "SpreadSeries",
     # Backtest

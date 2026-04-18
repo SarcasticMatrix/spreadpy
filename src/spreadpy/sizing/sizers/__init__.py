@@ -1,5 +1,14 @@
-from .kellySizer import KellySizer, kelly_fraction
+from .kellySizers import (
+    KellyTruncatedEntry,
+    KellyTruncatedExit,
+    KellyTruncatedBoth,
+)
 from .linearSizer import LinearSizer
 
 
-__all__ = ["LinearSizer", "KellySizer", "kelly_fraction"]
+__all__ = [
+    "LinearSizer",
+    "KellyTruncatedEntry",
+    "KellyTruncatedExit",
+    "KellyTruncatedBoth",
+]
