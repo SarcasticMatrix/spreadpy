@@ -12,7 +12,8 @@ dependencies = [
     "matplotlib (>=3.10.8,<4.0.0)",
     "scipy (>=1.17.1,<2.0.0)",
     "yfinance (>=1.2.1,<2.0.0)",
-    "statsmodels (>=0.14.6,<0.15.0)"
+    "statsmodels (>=0.14.6,<0.15.0)",
+    "tqdm (>=4.67.3,<5.0.0)",
 ]
 
 
