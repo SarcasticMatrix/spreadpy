@@ -24,8 +24,8 @@ import matplotlib.colors as mcolors
 from utils import fetch_history
 from spreadpy.data import PriceTimeSeries
 from spreadpy.spread import KalmanFilterWithVelocity
-from spreadpy.signal import ZScoreSignal
-from spreadpy.sizing import KellyTruncatedEntry, LinearSizer
+from spreadpy.signal import ZScoreSignal, CopulaSignal
+from spreadpy.sizing import KellyTruncatedEntry, LinearSizer, KellyTruncatedExit
 from spreadpy.backtest import TransactionCosts, BacktestEngine
 
 
@@ -68,12 +68,12 @@ if __name__ == "__main__":
                 entry_threshold=entry,
                 revert_threshold=revert,
             ),
-            sizer=KellyTruncatedEntry(z_entry=entry, z_revert=revert),
-            costs=TransactionCosts(slippage_bps=1, commission_bps=1),
+            sizer=KellyTruncatedExit(z_revert=revert, f_max=0.25),
+            costs=TransactionCosts(slippage_bps=2, commission_bps=3),
             initial_capital=500_000,
-            train_frac=0.7,
+            train_frac=0.01,
             val_frac=0.0,
-            periods_per_year=252 * 10,
+            periods_per_year=252 * 8,
             log_prices=True,
         )
 

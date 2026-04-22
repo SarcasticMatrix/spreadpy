@@ -19,9 +19,9 @@ import matplotlib.ticker as mticker
 
 from utils import fetch_history
 from spreadpy.data import PriceTimeSeries
-from spreadpy.spread import KalmanFilterWithVelocity, KalmanFilter
-from spreadpy.signal import ZScoreSignal
-from spreadpy.sizing import KellyTruncatedEntry, KellyTruncatedExit, KellyTruncatedBoth
+from spreadpy.spread import KalmanFilterWithVelocity, KalmanFilter, ConstantOLS
+from spreadpy.signal import ZScoreSignal, CopulaSignal
+from spreadpy.sizing import KellyTruncatedEntry, KellyTruncatedExit, KellyTruncatedBoth, LinearSizer
 from spreadpy.backtest import TransactionCosts, BacktestEngine
 
 
@@ -44,9 +44,9 @@ if __name__ == "__main__":
         sizer=KellyTruncatedExit(z_revert=revert_threshold, f_max=f_max),
         costs=TransactionCosts(slippage_bps=1.0, commission_bps=1.0),
         initial_capital=500_000,
-        train_frac=0.7,
+        train_frac=0.01,
         val_frac=0.0,           # pas de validation, train/test seulement
-        periods_per_year=252 * 10,
+        periods_per_year=252 * 8,
         log_prices=True,        # Kalman on log-prices (homoscedastic σ²_ε)
     )
 
@@ -130,10 +130,10 @@ if __name__ == "__main__":
 
     axes[3].step(xi_eq, spread_qty, where="post", color="#378ADD", linewidth=1.0)
     axes[3].fill_between(xi_eq, spread_qty, 0,
-                         where=(spread_qty > 0), step="post",
+                         where=(spread_qty >= 0), step="post",
                          color="#1D9E75", alpha=0.3, label="Long spread")
     axes[3].fill_between(xi_eq, spread_qty, 0,
-                         where=(spread_qty < 0), step="post",
+                         where=(spread_qty <= 0), step="post",
                          color="#E24B4A", alpha=0.3, label="Short spread")
     axes[3].axhline(0, color="#888780", linewidth=0.5)
     axes[3].set_ylabel("Spread qty (units of y)")
