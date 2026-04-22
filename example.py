@@ -31,22 +31,22 @@ if __name__ == "__main__":
     print("=" * 60)
 
     # ── 1. Data ──────────────────────────────────────────────────────────
-    cl = PriceTimeSeries(fetch_history("CL=F", period="730d", interval="1h"), name="crude_oil")
-    ho = PriceTimeSeries(fetch_history("HO=F", period="730d", interval="1h"), name="heating_oil")
+    cl = PriceTimeSeries(fetch_history("ZW=F", period="730d", interval="1h"), name="crude_oil")
+    ho = PriceTimeSeries(fetch_history("ZM=F", period="730d", interval="1h"), name="heating_oil")
 
     # ── 2. Backtest ──────────────────────────────────────────────────────
-    entry_threshold  = 1
-    revert_threshold = 0.5
+    entry_threshold  = 0.75
+    revert_threshold = 0.1
     f_max = 0.25
     engine = BacktestEngine(
-        estimator=KalmanFilterWithVelocity(alpha=1e-6),
+        estimator=KalmanFilterWithVelocity(alpha=1e-10),
         signal_gen=ZScoreSignal(window=60, entry_threshold=entry_threshold, revert_threshold=revert_threshold),
         sizer=KellyTruncatedExit(z_revert=revert_threshold, f_max=f_max),
-        costs=TransactionCosts(slippage_bps=1.0, commission_bps=1.0),
+        costs=TransactionCosts(slippage_bps=4.0, commission_bps=3.0),
         initial_capital=500_000,
-        train_frac=0.01,
+        train_frac=0.4,
         val_frac=0.0,           # pas de validation, train/test seulement
-        periods_per_year=252 * 8,
+        periods_per_year=252 * 18,
         log_prices=True,        # Kalman on log-prices (homoscedastic σ²_ε)
     )
 
@@ -54,6 +54,17 @@ if __name__ == "__main__":
     sr  = result.metrics.get("sharpe",       float("nan"))
     mdd = result.metrics.get("max_drawdown", float("nan"))
     eq  = result.equity_curve["equity"]
+
+    # Re-fit Kalman on full log-prices to expose mu and dgamma for plotting.
+    # The engine deep-copies its estimator internally so engine.estimator stays unfitted.
+    _cl_al, _ho_al = cl.align(ho)
+    _kf = KalmanFilterWithVelocity(alpha=1e-10)
+    _kf.fit(
+        PriceTimeSeries(np.log(_cl_al.series), name=_cl_al.name),
+        PriceTimeSeries(np.log(_ho_al.series), name=_ho_al.name),
+    )
+    mu_ts     = _kf.mu_ts_.loc[result.eval_start : result.eval_end]
+    dgamma_ts = _kf.velocity_ts_.loc[result.eval_start : result.eval_end]
 
     result.print_summary()
 
@@ -183,7 +194,7 @@ if __name__ == "__main__":
     beta_entry_ts = pd.Series(beta_entry_vals, index=spread_bt.index).ffill().fillna(beta_t)
     spread_entry  = y_ser - beta_entry_ts * x_ser
 
-    fig2, axes2 = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
+    fig2, axes2 = plt.subplots(4, 1, figsize=(12, 11), sharex=True)
 
     # Panel 1 — both spreads overlaid
     ax2 = axes2[0]
@@ -223,6 +234,26 @@ if __name__ == "__main__":
     axes2[-1].xaxis.set_major_formatter(mticker.FuncFormatter(_date_fmt))
     axes2[-1].xaxis.set_major_locator(mticker.MaxNLocator(integer=True, nbins=8))
 
-    fig2.suptitle("β drift effect — spread & hedge ratio comparison", fontsize=10)
+    # Panel 3 — μ_t (Kalman intercept)
+    ax2 = axes2[2]
+    ax2.plot(xi(mu_ts.index), xv(mu_ts), color="#1D9E75", linewidth=1.0, alpha=0.9)
+    ax2.set_ylabel("μ_t  (intercept)")
+    ax2.set_title("Kalman intercept μ_t", fontsize=9)
+    ax2.legend(fontsize=8)
+    ax2.spines[["top", "right"]].set_visible(False)
+    ax2.tick_params(labelsize=8)
+    ax2.grid(linestyle="--", dashes=(5, 10), color="gray", linewidth=0.5)
+
+    # Panel 4 — γ̇_t (velocity / dgamma)
+    ax2 = axes2[3]
+    ax2.plot(xi(dgamma_ts.index), xv(dgamma_ts), color="#E2A44A", linewidth=1.0, alpha=0.9)
+    ax2.axhline(0, color="#888780", linewidth=0.5)
+    ax2.set_ylabel("γ̇_t  (velocity)")
+    ax2.set_title("Hedge ratio velocity γ̇_t (dgamma)", fontsize=9)
+    ax2.spines[["top", "right"]].set_visible(False)
+    ax2.tick_params(labelsize=8)
+    ax2.grid(linestyle="--", dashes=(5, 10), color="gray", linewidth=0.5)
+
+    fig2.suptitle("β drift effect — spread, hedge ratio, intercept & velocity", fontsize=10)
     plt.tight_layout()
     plt.show()
