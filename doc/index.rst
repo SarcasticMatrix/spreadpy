@@ -78,7 +78,7 @@ from universe scanning to walk-forward backtesting.
 Covered topics by the ``spreadpy`` package:
 
 * **Pair research** — scan a universe of assets and rank cointegrated pairs (Engle-Granger, ADF, half-life, Hurst exponent).
-* **Spread construction** — estimate time-varying hedge ratios β_t: constant OLS, rolling OLS, 2-state and 3-state Kalman filters.
+* **Spread construction** — estimate time-varying hedge ratios $\beta_t$: constant OLS, rolling OLS, 2-state and 3-state Kalman filters.
 * **Signal generation** — z-score entry/exit rules and copula-based conditional CDF signals (Gaussian, Clayton, Gumbel).
 * **Position sizing** — notional-based (linear z-score ramp), inverse-volatility (Markowitz), and Kelly criterion (truncated normal, three variants).
 * **Backtesting** — walk-forward engine with train / validation / test split, transaction costs (slippage + commission), and a full risk metric suite (Sharpe, Sortino, Calmar, CDaR, …).
