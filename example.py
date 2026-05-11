@@ -20,48 +20,55 @@ import matplotlib.ticker as mticker
 from utils import fetch_history
 from spreadpy.data import PriceTimeSeries
 from spreadpy.spread import KalmanFilterWithVelocity, KalmanFilter, ConstantOLS
-from spreadpy.signal import ZScoreSignal, CopulaSignal
-from spreadpy.sizing import KellyTruncatedEntry, KellyTruncatedExit, KellyTruncatedBoth, LinearSizer
+from spreadpy.signal import ZScoreSignal
+from spreadpy.sizing import InverseVolSizer, KellyTruncatedEntry, KellyTruncatedExit, KellyTruncatedBoth, LinearSizer
 from spreadpy.backtest import TransactionCosts, BacktestEngine
 
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("Spread Trading Backtest — CL/HO Crack Spread")
+    print("Spread Trading Backtest — Spread")
     print("=" * 60)
 
     # ── 1. Data ──────────────────────────────────────────────────────────
-    cl = PriceTimeSeries(fetch_history("ZW=F", period="730d", interval="1h"), name="crude_oil")
-    ho = PriceTimeSeries(fetch_history("ZM=F", period="730d", interval="1h"), name="heating_oil")
+    # long = PriceTimeSeries(fetch_history("ZW=F", period="730d", interval="1h"), name="crude_oil")
+    # short = PriceTimeSeries(fetch_history("ZM=F", period="730d", interval="1h"), name="heating_oil")
+    long = PriceTimeSeries(fetch_history("HO=F", period="730d", interval="1h"), name="long")
+    short = PriceTimeSeries(fetch_history("NG=F", period="730d", interval="1h"), name="short")
+    periods_per_year = long._series.groupby(long._series.index.year).count().mean()
 
     # ── 2. Backtest ──────────────────────────────────────────────────────
     entry_threshold  = 0.75
     revert_threshold = 0.1
     f_max = 0.25
+    def scale_fn(abs_z: float) -> float:
+        return 1-float(np.clip((abs_z - entry_threshold) / 3.0, 0.0, 1.0))
     engine = BacktestEngine(
-        estimator=KalmanFilterWithVelocity(alpha=1e-10),
+        estimator=KalmanFilter(alpha=1e-1),
         signal_gen=ZScoreSignal(window=60, entry_threshold=entry_threshold, revert_threshold=revert_threshold),
         sizer=KellyTruncatedExit(z_revert=revert_threshold, f_max=f_max),
-        costs=TransactionCosts(slippage_bps=4.0, commission_bps=3.0),
+        # sizer=LinearSizer(scale_fn=scale_fn),
+        # sizer=InverseVolSizer(window=60, target_vol=0.1, f_max=0.5),
+        costs=TransactionCosts(slippage_bps=0.0, commission_bps=0.0, min_commission=0),
         initial_capital=500_000,
         train_frac=0.4,
         val_frac=0.0,           # pas de validation, train/test seulement
-        periods_per_year=252 * 18,
+        periods_per_year=periods_per_year,
         log_prices=True,        # Kalman on log-prices (homoscedastic σ²_ε)
     )
 
-    _, result = engine.run(cl, ho)   # val_result is None (val_frac=0)
+    _, result = engine.run(long, short)   # val_result is None (val_frac=0)
     sr  = result.metrics.get("sharpe",       float("nan"))
     mdd = result.metrics.get("max_drawdown", float("nan"))
     eq  = result.equity_curve["equity"]
 
     # Re-fit Kalman on full log-prices to expose mu and dgamma for plotting.
     # The engine deep-copies its estimator internally so engine.estimator stays unfitted.
-    _cl_al, _ho_al = cl.align(ho)
+    _long_al, _short_al = long.align(short)
     _kf = KalmanFilterWithVelocity(alpha=1e-10)
     _kf.fit(
-        PriceTimeSeries(np.log(_cl_al.series), name=_cl_al.name),
-        PriceTimeSeries(np.log(_ho_al.series), name=_ho_al.name),
+        PriceTimeSeries(np.log(_long_al.series), name=_long_al.name),
+        PriceTimeSeries(np.log(_short_al.series), name=_short_al.name),
     )
     mu_ts     = _kf.mu_ts_.loc[result.eval_start : result.eval_end]
     dgamma_ts = _kf.velocity_ts_.loc[result.eval_start : result.eval_end]
