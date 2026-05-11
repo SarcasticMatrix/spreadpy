@@ -33,7 +33,7 @@ class TransactionCosts:
     slippage_bps: float = 2.0
     commission_per_unit: float = 0.0
     commission_bps: float = 1.0   # 1 bps
-    min_commission: float = 0.0
+    min_commission: float = 4.90
 
     def apply(self, price: float, qty: float, direction: int) -> Tuple[float, float]:
         """

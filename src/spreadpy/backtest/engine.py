@@ -14,7 +14,7 @@ import pandas as pd
 from spreadpy.data import PriceTimeSeries
 from spreadpy.spread import HedgeRatioEstimator, SpreadSeries
 from spreadpy.signal import Direction, Signal, SignalGenerator
-from spreadpy.sizing import LinearSizer
+from spreadpy.sizing import PositionSizer
 from spreadpy.backtest.costs import TransactionCosts
 from spreadpy.backtest.portfolio import Portfolio
 from spreadpy.backtest.metrics import RiskMetrics
@@ -61,7 +61,7 @@ class BacktestEngine:
         self,
         estimator: HedgeRatioEstimator,
         signal_gen: SignalGenerator,
-        sizer: LinearSizer,
+        sizer: PositionSizer,
         costs: Optional[TransactionCosts] = None,
         initial_capital: float = 1_000_000.0,
         train_frac: float = 0.6,
@@ -172,6 +172,16 @@ class BacktestEngine:
         )
         signals = signal_gen.generate(spread)
 
+        # Fit sizer on train + eval so the rolling window is warmed up from bar 1.
+        sizer = copy.deepcopy(self.sizer)
+        spread_for_sizer = SpreadSeries(
+            y_sig_al.slice(train_dates[0], eval_dates[-1]),
+            x_sig_al.slice(train_dates[0], eval_dates[-1]),
+            beta_full.loc[train_dates[0]:eval_dates[-1]],
+            estimator_name=estimator.__class__.__name__,
+        )
+        sizer.fit(spread_for_sizer)
+
         portfolio = Portfolio(self.initial_capital, self.costs)
         prev_direction = Direction.FLAT
 
@@ -180,8 +190,8 @@ class BacktestEngine:
             price_x     = float(x_eval.series.iloc[i])
             hedge_ratio = float(beta_eval.iloc[i]) if i < len(beta_eval) else 1.0
 
-            qty_y, qty_x = self.sizer.size(sig, price_y, price_x, hedge_ratio,
-                                           capital=portfolio.current_equity)
+            qty_y, qty_x = sizer.size(sig, price_y, price_x, hedge_ratio,
+                                      capital=portfolio.current_equity)
 
             if sig.direction != prev_direction:
                 portfolio.fill(ts, sig, qty_y, qty_x, price_y, price_x)
