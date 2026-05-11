@@ -42,8 +42,8 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
     <script src="../_static/documentation_options.js?v=fa47ad08"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/signal';</script>
@@ -394,283 +394,19 @@
 <p>Signal generation from spread residuals.</p>
 <section id="direction">
 <h2>Direction<a class="headerlink" href="#direction" title="Link to this heading">#</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="spreadpy.signal.signal.Direction">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spreadpy.signal.signal.</span></span><span class="sig-name descname"><span class="pre">Direction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/signal/signal.html#Direction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.signal.Direction" title="Link to this definition">#</a></dt>
-<dd><p>Spread position direction.</p>
-<p><code class="docutils literal notranslate"><span class="pre">LONG</span></code>  (+1): buy y, sell x  — spread expected to rise (revert upward).
-<code class="docutils literal notranslate"><span class="pre">SHORT</span></code> (−1): sell y, buy x  — spread expected to fall (revert downward).
-<code class="docutils literal notranslate"><span class="pre">FLAT</span></code>   (0): no position / exit signal.</p>
-</dd></dl>
-
 </section>
 <section id="id1">
 <h2>Signal<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="spreadpy.signal.signal.Signal">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spreadpy.signal.signal.</span></span><span class="sig-name descname"><span class="pre">Signal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spreadpy.signal.signal.Direction" title="spreadpy.signal.signal.Direction"><span class="pre">Direction</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">zscore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Timestamp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/signal/signal.html#Signal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.signal.Signal" title="Link to this definition">#</a></dt>
-<dd><p>Output of a SignalGenerator at a single bar.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>direction</strong> (<a class="reference internal" href="#spreadpy.signal.signal.Direction" title="spreadpy.signal.signal.Direction"><em>Direction</em></a>) – Desired position direction (LONG, SHORT, or FLAT).</p></li>
-<li><p><strong>zscore</strong> (<em>float</em>) – Z-score of the spread at signal time, used for position sizing.</p></li>
-<li><p><strong>timestamp</strong> (<em>pd.Timestamp</em>) – Bar timestamp.</p></li>
-<li><p><strong>prob</strong> (<em>float</em>) – Conditional mean-reversion probability from a copula signal,
-or <code class="docutils literal notranslate"><span class="pre">nan</span></code> for z-score signals.</p></li>
-<li><p><strong>is_entry</strong> (<em>bool</em>) – True for new position entries; False for holds or exits.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 </section>
 <section id="signalgenerator">
 <h2>SignalGenerator<a class="headerlink" href="#signalgenerator" title="Link to this heading">#</a></h2>
 <p>Abstract base class for all signal generators.</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="spreadpy.signal.signal.SignalGenerator">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spreadpy.signal.signal.</span></span><span class="sig-name descname"><span class="pre">SignalGenerator</span></span><a class="reference internal" href="../_modules/spreadpy/signal/signal.html#SignalGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.signal.SignalGenerator" title="Link to this definition">#</a></dt>
-<dd><p>Abstract base class for signal generators.</p>
-<p>Enforces the fit / generate discipline required for walk-forward backtesting:
-<a class="reference internal" href="#spreadpy.signal.signal.SignalGenerator.fit" title="spreadpy.signal.signal.SignalGenerator.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> is called on in-sample data to calibrate any parameters,
-then <a class="reference internal" href="#spreadpy.signal.signal.SignalGenerator.generate" title="spreadpy.signal.signal.SignalGenerator.generate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">generate()</span></code></a> is called on out-of-sample data to produce signals
-without lookahead.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="spreadpy.signal.signal.SignalGenerator.fit">
-<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><span class="pre">SpreadSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#spreadpy.signal.signal.SignalGenerator" title="spreadpy.signal.signal.SignalGenerator"><span class="pre">SignalGenerator</span></a></span></span><a class="reference internal" href="../_modules/spreadpy/signal/signal.html#SignalGenerator.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.signal.SignalGenerator.fit" title="Link to this definition">#</a></dt>
-<dd><p>Calibrate parameters on in-sample spread data.</p>
-<p>Must be called before <a class="reference internal" href="#spreadpy.signal.signal.SignalGenerator.generate" title="spreadpy.signal.signal.SignalGenerator.generate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">generate()</span></code></a>. Implementations should
-compute any statistics (thresholds, copula parameters, etc.) from
-<code class="docutils literal notranslate"><span class="pre">spread</span></code> and store them as instance attributes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>spread</strong> (<a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><em>SpreadSeries</em></a>) – In-sample spread series used for fitting.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">self</span></code> (for method chaining).</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#spreadpy.signal.signal.SignalGenerator" title="spreadpy.signal.signal.SignalGenerator">SignalGenerator</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spreadpy.signal.signal.SignalGenerator.generate">
-<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><span class="pre">SpreadSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/spreadpy/signal/signal.html#SignalGenerator.generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.signal.SignalGenerator.generate" title="Link to this definition">#</a></dt>
-<dd><p>Generate a <a class="reference internal" href="#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><code class="xref py py-class docutils literal notranslate"><span class="pre">Signal</span></code></a> for each bar of <code class="docutils literal notranslate"><span class="pre">spread</span></code>.</p>
-<p>Should be called after <a class="reference internal" href="#spreadpy.signal.signal.SignalGenerator.fit" title="spreadpy.signal.signal.SignalGenerator.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>. <code class="docutils literal notranslate"><span class="pre">spread</span></code> may be the same
-in-sample series or a disjoint out-of-sample window; in either
-case no lookahead is permitted — signal at bar t may only depend
-on observations up to and including t.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>spread</strong> (<a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><em>SpreadSeries</em></a>) – Spread series to generate signals for.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Series of <a class="reference internal" href="#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><code class="xref py py-class docutils literal notranslate"><span class="pre">Signal</span></code></a> objects indexed by
-<code class="docutils literal notranslate"><span class="pre">spread.index</span></code>.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>pd.Series</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 </section>
 <section id="zscoresignal">
 <h2>ZScoreSignal<a class="headerlink" href="#zscoresignal" title="Link to this heading">#</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="spreadpy.signal.zScoreSignal.ZScoreSignal">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spreadpy.signal.zScoreSignal.</span></span><span class="sig-name descname"><span class="pre">ZScoreSignal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entry_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">revert_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/signal/zScoreSignal.html#ZScoreSignal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.zScoreSignal.ZScoreSignal" title="Link to this definition">#</a></dt>
-<dd><p>Classic z-score entry / exit signal generator.</p>
-<p>At each bar, computes a rolling z-score of the spread residuals:</p>
-<blockquote>
-<div><p>z_t = (s_t − μ̂_t) / σ̂_t</p>
-</div></blockquote>
-<p>where μ̂_t and σ̂_t are the rolling mean and standard deviation over
-the last <code class="docutils literal notranslate"><span class="pre">window</span></code> bars (no lookahead).</p>
-<p>Entry / exit rules:</p>
-<blockquote>
-<div><p>LONG   if z_t &lt; −entry_threshold
-SHORT  if z_t &gt; +entry_threshold
-FLAT   if LONG  and z_t &gt; −revert_threshold  (z reverted back up)
-FLAT   if SHORT and z_t &lt; +revert_threshold  (z reverted back down)</p>
-</div></blockquote>
-<p>Setting <code class="docutils literal notranslate"><span class="pre">revert_threshold=0</span></code> exits at the mean crossing (z crosses 0).
-Setting it to a positive value exits before the mean is fully reached.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>window</strong> (<em>int</em>) – Number of bars for the rolling z-score computation.</p></li>
-<li><p><strong>entry_threshold</strong> (<em>float</em>) – <a href="#id2"><span class="problematic" id="id3">|z|</span></a> level above which a position is opened.</p></li>
-<li><p><strong>revert_threshold</strong> (<em>float</em>) – z level at which mean reversion is considered
-complete and the position is closed. Must be ≤ entry_threshold.
-Use 0.0 to exit at the mean (default).</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="spreadpy.signal.zScoreSignal.ZScoreSignal.fit">
-<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><span class="pre">SpreadSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#spreadpy.signal.zScoreSignal.ZScoreSignal" title="spreadpy.signal.zScoreSignal.ZScoreSignal"><span class="pre">ZScoreSignal</span></a></span></span><a class="reference internal" href="../_modules/spreadpy/signal/zScoreSignal.html#ZScoreSignal.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.zScoreSignal.ZScoreSignal.fit" title="Link to this definition">#</a></dt>
-<dd><p>Compute in-sample mean and standard deviation of the spread residuals.</p>
-<p>These statistics are stored but not used by <a class="reference internal" href="#spreadpy.signal.zScoreSignal.ZScoreSignal.generate" title="spreadpy.signal.zScoreSignal.ZScoreSignal.generate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">generate()</span></code></a>, which
-relies on the rolling estimators instead. Calling <code class="docutils literal notranslate"><span class="pre">fit</span></code> is required
-by the <code class="xref py py-class docutils literal notranslate"><span class="pre">SignalGenerator</span></code> interface.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>spread</strong> (<a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><em>SpreadSeries</em></a>) – In-sample spread series.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#spreadpy.signal.zScoreSignal.ZScoreSignal" title="spreadpy.signal.zScoreSignal.ZScoreSignal">ZScoreSignal</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spreadpy.signal.zScoreSignal.ZScoreSignal.generate">
-<span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><span class="pre">SpreadSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/spreadpy/signal/zScoreSignal.html#ZScoreSignal.generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.zScoreSignal.ZScoreSignal.generate" title="Link to this definition">#</a></dt>
-<dd><p>Compute the rolling z-score and map each bar to a <code class="xref py py-class docutils literal notranslate"><span class="pre">Signal</span></code>.</p>
-<p>At each bar t the z-score is:</p>
-<blockquote>
-<div><p>z_t = (s_t − μ̂_{t,w}) / σ̂_{t,w}</p>
-</div></blockquote>
-<p>where μ̂_{t,w} and σ̂_{t,w} are the rolling mean and standard deviation
-over the previous <code class="docutils literal notranslate"><span class="pre">window</span></code> bars (no lookahead). Bars with fewer than
-<code class="docutils literal notranslate"><span class="pre">window</span></code> predecessors yield <code class="docutils literal notranslate"><span class="pre">Direction.FLAT</span></code> with <code class="docutils literal notranslate"><span class="pre">zscore=NaN</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>spread</strong> (<a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><em>SpreadSeries</em></a>) – Spread series to generate signals for
-(may be out-of-sample).</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Series of <code class="xref py py-class docutils literal notranslate"><span class="pre">Signal</span></code> objects indexed by <code class="docutils literal notranslate"><span class="pre">spread.index</span></code>.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>pd.Series</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 </section>
 <section id="copulasignal">
 <h2>CopulaSignal<a class="headerlink" href="#copulasignal" title="Link to this heading">#</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="spreadpy.signal.copulaSignal.CopulaSignal">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spreadpy.signal.copulaSignal.</span></span><span class="sig-name descname"><span class="pre">CopulaSignal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">family</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gaussian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entry_prob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">revert_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_zscore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/signal/copulaSignal.html#CopulaSignal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.copulaSignal.CopulaSignal" title="Link to this definition">#</a></dt>
-<dd><blockquote>
-<div><p>Copula-based entry / exit signal generator.</p>
-<p>Uses the conditional CDF of a fitted bivariate copula to detect</p>
-</div></blockquote>
-<p>statistical mispricings between the two legs.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>In-sample fitting:</dt><dd><ol class="arabic simple">
-<li><p>Convert prices to pseudo-observations u_t = F̂_y(y_t),
-v_t = F̂_x(x_t) via empirical ranks (Hazen formula).</p></li>
-<li><dl class="simple">
-<dt>Estimate Kendall’s τ and invert to copula parameter θ:</dt><dd><p>Gaussian:  θ = sin(π/2 · τ)
-Clayton:   θ = 2τ / (1 - τ)   (θ &gt; 0)
-Gumbel:    θ = 1 / (1 - τ)    (θ ≥ 1)</p>
-</dd>
-</dl>
-</li>
-</ol>
-</dd>
-<dt>Entry logic (out-of-sample):</dt><dd><p>LONG  if C(u_t | v_t) &lt; entry_prob         (y cheap relative to x)
-SHORT if C(u_t | v_t) &gt; 1 - entry_prob     (y expensive relative to x)</p>
-</dd>
-</dl>
-<p>Exit uses the rolling z-score: FLAT when <a href="#id4"><span class="problematic" id="id5">|z|</span></a> &lt; exit_zscore or <a href="#id6"><span class="problematic" id="id7">|z|</span></a> &gt; stop_zscore.
-The z-score is also passed to the <code class="xref py py-class docutils literal notranslate"><span class="pre">LinearSizer</span></code> for sizing.</p>
-<dl class="field-list simple">
-<dt class="field-odd">param str family<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Copula family — <code class="docutils literal notranslate"><span class="pre">'gaussian'</span></code>, <code class="docutils literal notranslate"><span class="pre">'clayton'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'gumbel'</span></code>.</p>
-</dd>
-<dt class="field-even">param int window<span class="colon">:</span></dt>
-<dd class="field-even"><p>Rolling window for the z-score computation (position sizing only).</p>
-</dd>
-<dt class="field-odd">param float entry_prob<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Tail probability threshold for entry (default 0.10).
-Fires when the conditional CDF is below <code class="docutils literal notranslate"><span class="pre">entry_prob</span></code> or above <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">entry_prob</span></code>.</p>
-</dd>
-<dt class="field-even">param float revert_threshold<span class="colon">:</span></dt>
-<dd class="field-even"><p>Exit position when <a href="#id8"><span class="problematic" id="id9">|z|</span></a> drops below this value.</p>
-</dd>
-<dt class="field-odd">param float stop_zscore<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Stop-loss when <a href="#id10"><span class="problematic" id="id11">|z|</span></a> exceeds this value.</p>
-</dd>
-</dl>
-</div></blockquote>
-<dl class="py method">
-<dt class="sig sig-object py" id="spreadpy.signal.copulaSignal.CopulaSignal.fit">
-<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><span class="pre">SpreadSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#spreadpy.signal.copulaSignal.CopulaSignal" title="spreadpy.signal.copulaSignal.CopulaSignal"><span class="pre">CopulaSignal</span></a></span></span><a class="reference internal" href="../_modules/spreadpy/signal/copulaSignal.html#CopulaSignal.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.copulaSignal.CopulaSignal.fit" title="Link to this definition">#</a></dt>
-<dd><p>Calibrate the copula parameter θ from in-sample data.</p>
-<p>Estimates Kendall’s τ from the in-sample price pair (y, x) and
-inverts it to the copula parameter θ via the family-specific
-mapping described in the class docstring.</p>
-<p>After fitting, <code class="docutils literal notranslate"><span class="pre">_theta</span></code> and <code class="docutils literal notranslate"><span class="pre">_kendall_tau</span></code> are set.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>spread</strong> (<a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><em>SpreadSeries</em></a>) – In-sample spread (exposes <code class="docutils literal notranslate"><span class="pre">spread.y</span></code>
-and <code class="docutils literal notranslate"><span class="pre">spread.x</span></code> as <code class="xref py py-class docutils literal notranslate"><span class="pre">PriceTimeSeries</span></code>).</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#spreadpy.signal.copulaSignal.CopulaSignal" title="spreadpy.signal.copulaSignal.CopulaSignal">CopulaSignal</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spreadpy.signal.copulaSignal.CopulaSignal.generate">
-<span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><span class="pre">SpreadSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/spreadpy/signal/copulaSignal.html#CopulaSignal.generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.copulaSignal.CopulaSignal.generate" title="Link to this definition">#</a></dt>
-<dd><p>Generate copula-based entry / exit signals for each bar.</p>
-<p>For each bar t, the pseudo-observations u_t = F̂_y(y_t) and
-v_t = F̂_x(x_t) are computed via the empirical CDF (Hazen formula)
-over the full out-of-sample window. The conditional CDF
-C(u_t | v_t) = ∂C(u_t, v_t) / ∂v_t is then evaluated using the
-fitted copula parameter θ.</p>
-<p>Entry / exit rules:</p>
-<blockquote>
-<div><p>LONG   if C(u_t | v_t) &lt; entry_prob               (y cheap)
-SHORT  if C(u_t | v_t) &gt; 1 − entry_prob           (y expensive)
-FLAT   if in position and <a href="#id12"><span class="problematic" id="id13">|z_t|</span></a> &lt; revert_threshold (mean-reverted)
-FLAT   if in position and <a href="#id14"><span class="problematic" id="id15">|z_t|</span></a> &gt; stop_zscore      (stop-loss)</p>
-</div></blockquote>
-<p>The rolling z-score (same <code class="docutils literal notranslate"><span class="pre">window</span></code> as the class parameter) is
-computed in parallel and stored in each <code class="xref py py-class docutils literal notranslate"><span class="pre">Signal</span></code> for downstream
-position sizing.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>spread</strong> (<a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><em>SpreadSeries</em></a>) – Spread series to generate signals for
-(may be out-of-sample). Must have been fitted first via
-<a class="reference internal" href="#spreadpy.signal.copulaSignal.CopulaSignal.fit" title="spreadpy.signal.copulaSignal.CopulaSignal.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Series of <code class="xref py py-class docutils literal notranslate"><span class="pre">Signal</span></code> objects indexed by <code class="docutils literal notranslate"><span class="pre">spread.index</span></code>.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>pd.Series</p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>RuntimeError</strong> – If <a class="reference internal" href="#spreadpy.signal.copulaSignal.CopulaSignal.fit" title="spreadpy.signal.copulaSignal.CopulaSignal.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> has not been called.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 </section>
 </section>
 
@@ -721,38 +457,11 @@ position sizing.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#direction">Direction</a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.signal.signal.Direction"><code class="docutils literal notranslate"><span class="pre">Direction</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Signal</a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.signal.signal.Signal"><code class="docutils literal notranslate"><span class="pre">Signal</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#signalgenerator">SignalGenerator</a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.signal.signal.SignalGenerator"><code class="docutils literal notranslate"><span class="pre">SignalGenerator</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.signal.signal.SignalGenerator.fit"><code class="docutils literal notranslate"><span class="pre">SignalGenerator.fit()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.signal.signal.SignalGenerator.generate"><code class="docutils literal notranslate"><span class="pre">SignalGenerator.generate()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#zscoresignal">ZScoreSignal</a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.signal.zScoreSignal.ZScoreSignal"><code class="docutils literal notranslate"><span class="pre">ZScoreSignal</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.signal.zScoreSignal.ZScoreSignal.fit"><code class="docutils literal notranslate"><span class="pre">ZScoreSignal.fit()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.signal.zScoreSignal.ZScoreSignal.generate"><code class="docutils literal notranslate"><span class="pre">ZScoreSignal.generate()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copulasignal">CopulaSignal</a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.signal.copulaSignal.CopulaSignal"><code class="docutils literal notranslate"><span class="pre">CopulaSignal</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.signal.copulaSignal.CopulaSignal.fit"><code class="docutils literal notranslate"><span class="pre">CopulaSignal.fit()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.signal.copulaSignal.CopulaSignal.generate"><code class="docutils literal notranslate"><span class="pre">CopulaSignal.generate()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#direction">Direction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Signal</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#signalgenerator">SignalGenerator</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#zscoresignal">ZScoreSignal</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copulasignal">CopulaSignal</a></li>
 </ul>
   </nav></div>
 
@@ -799,7 +508,7 @@ position sizing.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

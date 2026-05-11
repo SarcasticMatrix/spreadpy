@@ -42,8 +42,8 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
     <script src="../_static/documentation_options.js?v=fa47ad08"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/data';</script>
@@ -394,266 +394,9 @@
 <p>Primitives for loading and representing price time series.</p>
 <section id="dataloader">
 <h2>DataLoader<a class="headerlink" href="#dataloader" title="Link to this heading">#</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="spreadpy.data.dataLoader.DataLoader">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spreadpy.data.dataLoader.</span></span><span class="sig-name descname"><span class="pre">DataLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'.'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/data/dataLoader.html#DataLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.data.dataLoader.DataLoader" title="Link to this definition">#</a></dt>
-<dd><p>Loads price time series from CSV, Parquet, or Feather files.</p>
-<p>File lookup is by name: <code class="docutils literal notranslate"><span class="pre">base_path/&lt;name&gt;.&lt;ext&gt;</span></code> where <code class="docutils literal notranslate"><span class="pre">&lt;ext&gt;</span></code>
-is tried in order <code class="docutils literal notranslate"><span class="pre">.csv</span></code>, <code class="docutils literal notranslate"><span class="pre">.parquet</span></code>, <code class="docutils literal notranslate"><span class="pre">.feather</span></code>. All loaded
-series are returned as <code class="xref py py-class docutils literal notranslate"><span class="pre">PriceTimeSeries</span></code> objects.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>base_path</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>Path</em><em>]</em>) – Root directory that contains the data files.</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="spreadpy.data.dataLoader.DataLoader.load">
-<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Date'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Close'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></span><a class="reference internal" href="../_modules/spreadpy/data/dataLoader.html#DataLoader.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.data.dataLoader.DataLoader.load" title="Link to this definition">#</a></dt>
-<dd><p>Load a single asset by name, auto-detecting csv / parquet / feather.</p>
-<p>The file is searched under <code class="docutils literal notranslate"><span class="pre">base_path/&lt;name&gt;.&lt;ext&gt;</span></code> where <code class="docutils literal notranslate"><span class="pre">&lt;ext&gt;</span></code>
-is tried in order <code class="docutils literal notranslate"><span class="pre">.csv</span></code>, <code class="docutils literal notranslate"><span class="pre">.parquet</span></code>, <code class="docutils literal notranslate"><span class="pre">.feather</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<em>str</em>) – Asset identifier used as the file stem and series name.</p></li>
-<li><p><strong>date_col</strong> (<em>str</em>) – Column (or index) that contains the timestamps.</p></li>
-<li><p><strong>price_col</strong> (<em>str</em>) – Column that contains the price series.</p></li>
-<li><p><strong>freq</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – If given, the series is resampled to this
-pandas offset alias (e.g. <code class="docutils literal notranslate"><span class="pre">'W'</span></code>, <code class="docutils literal notranslate"><span class="pre">'ME'</span></code>) using the last price.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Cleaned price series for the asset.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries">PriceTimeSeries</a></p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>FileNotFoundError</strong> – If no file matching <code class="docutils literal notranslate"><span class="pre">name</span></code> is found.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spreadpy.data.dataLoader.DataLoader.load_from_dataframe">
-<span class="sig-name descname"><span class="pre">load_from_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Date'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Close'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></span><a class="reference internal" href="../_modules/spreadpy/data/dataLoader.html#DataLoader.load_from_dataframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.data.dataLoader.DataLoader.load_from_dataframe" title="Link to this definition">#</a></dt>
-<dd><p>Load a price series directly from an existing DataFrame.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">date_col</span></code> is a column of <code class="docutils literal notranslate"><span class="pre">df</span></code>, it is set as the index.
-Otherwise <code class="docutils literal notranslate"><span class="pre">df.index</span></code> is assumed to already be the DatetimeIndex.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pd.DataFrame</em>) – Source DataFrame.</p></li>
-<li><p><strong>name</strong> (<em>str</em>) – Label assigned to the resulting series.</p></li>
-<li><p><strong>date_col</strong> (<em>str</em>) – Column name holding timestamps (ignored if already
-the index).</p></li>
-<li><p><strong>price_col</strong> (<em>str</em>) – Column name holding the price series.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Cleaned price series.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries">PriceTimeSeries</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spreadpy.data.dataLoader.DataLoader.load_from_series">
-<span class="sig-name descname"><span class="pre">load_from_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></span><a class="reference internal" href="../_modules/spreadpy/data/dataLoader.html#DataLoader.load_from_series"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.data.dataLoader.DataLoader.load_from_series" title="Link to this definition">#</a></dt>
-<dd><p>Wrap an existing pandas Series as a <code class="xref py py-class docutils literal notranslate"><span class="pre">PriceTimeSeries</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>series</strong> (<em>pd.Series</em>) – Raw price series with a DatetimeIndex (or
-an index coercible to DatetimeIndex).</p></li>
-<li><p><strong>name</strong> (<em>str</em>) – Label assigned to the series.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Cleaned price series.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries">PriceTimeSeries</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spreadpy.data.dataLoader.DataLoader.load_pair">
-<span class="sig-name descname"><span class="pre">load_pair</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Date'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Close'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/spreadpy/data/dataLoader.html#DataLoader.load_pair"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.data.dataLoader.DataLoader.load_pair" title="Link to this definition">#</a></dt>
-<dd><p>Load two assets and align them on their common timestamps.</p>
-<p>Each asset is loaded via <a class="reference internal" href="#spreadpy.data.dataLoader.DataLoader.load" title="spreadpy.data.dataLoader.DataLoader.load"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load()</span></code></a> then the two series are inner-joined
-on their DatetimeIndex, so the returned pair shares an identical index
-with no missing observations.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name_y</strong> (<em>str</em>) – File stem for the dependent leg y.</p></li>
-<li><p><strong>name_x</strong> (<em>str</em>) – File stem for the independent leg x.</p></li>
-<li><p><strong>date_col</strong> (<em>str</em>) – Column (or index) that contains the timestamps.</p></li>
-<li><p><strong>price_col</strong> (<em>str</em>) – Column that contains the price series.</p></li>
-<li><p><strong>freq</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – If given, each series is resampled before
-alignment.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Aligned pair <code class="docutils literal notranslate"><span class="pre">(ts_y,</span> <span class="pre">ts_x)</span></code> sharing a common DatetimeIndex.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Tuple[<a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries">PriceTimeSeries</a>, <a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries">PriceTimeSeries</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spreadpy.data.dataLoader.DataLoader.validate">
-<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_obs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">252</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/spreadpy/data/dataLoader.html#DataLoader.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.data.dataLoader.DataLoader.validate" title="Link to this definition">#</a></dt>
-<dd><p>Run basic sanity checks on a loaded series.</p>
-<p>Raises <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code> if any of the following conditions hold:</p>
-<ul class="simple">
-<li><p>Fewer than <code class="docutils literal notranslate"><span class="pre">min_obs</span></code> observations.</p></li>
-<li><p>Non-positive prices (prices ≤ 0).</p></li>
-<li><p>Duplicate timestamps.</p></li>
-</ul>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ts</strong> (<a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><em>PriceTimeSeries</em></a>) – Series to validate.</p></li>
-<li><p><strong>min_obs</strong> (<em>int</em>) – Minimum number of observations required (default 252).</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If any sanity check fails.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 </section>
 <section id="pricetimeseries">
 <h2>PriceTimeSeries<a class="headerlink" href="#pricetimeseries" title="Link to this heading">#</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="spreadpy.data.priceTimeSeries.PriceTimeSeries">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spreadpy.data.priceTimeSeries.</span></span><span class="sig-name descname"><span class="pre">PriceTimeSeries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ffill'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/data/priceTimeSeries.html#PriceTimeSeries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="Link to this definition">#</a></dt>
-<dd><p>Thin wrapper around a pandas Series for price data.</p>
-<p>Guarantees a clean, well-formed series at construction time:
-sorted DatetimeIndex, no NaN values, and a consistent name.
-NaNs are either forward-filled or dropped depending on <code class="docutils literal notranslate"><span class="pre">fill_method</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>prices</strong> (<em>pd.Series</em>) – Raw price series. A non-DatetimeIndex is coerced
-to DatetimeIndex automatically.</p></li>
-<li><p><strong>name</strong> (<em>str</em>) – Optional label for the series (used in repr and downstream labelling).</p></li>
-<li><p><strong>fill_method</strong> (<em>str</em>) – NaN handling strategy — <code class="docutils literal notranslate"><span class="pre">'ffill'</span></code> (forward-fill, then drop
-any leading NaNs) or <code class="docutils literal notranslate"><span class="pre">'drop'</span></code> (remove all NaN rows entirely).</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="spreadpy.data.priceTimeSeries.PriceTimeSeries.align">
-<span class="sig-name descname"><span class="pre">align</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/spreadpy/data/priceTimeSeries.html#PriceTimeSeries.align"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries.align" title="Link to this definition">#</a></dt>
-<dd><p>Inner-join two series on their common timestamps.</p>
-<p>Only observations present in <strong>both</strong> series are kept.  The resulting
-pair shares an identical DatetimeIndex with no missing values.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><em>PriceTimeSeries</em></a>) – Second price series to align with.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Pair <code class="docutils literal notranslate"><span class="pre">(self_aligned,</span> <span class="pre">other_aligned)</span></code> restricted to the
-intersection of their DatetimeIndex.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Tuple[<a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries">PriceTimeSeries</a>, <a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries">PriceTimeSeries</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spreadpy.data.priceTimeSeries.PriceTimeSeries.log_returns">
-<span class="sig-name descname"><span class="pre">log_returns</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/spreadpy/data/priceTimeSeries.html#PriceTimeSeries.log_returns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries.log_returns" title="Link to this definition">#</a></dt>
-<dd><p>Compute continuously compounded log-returns.</p>
-<p>The log-return at bar t is defined as:</p>
-<blockquote>
-<div><p>r_t = log(P_t / P_{t−1})</p>
-</div></blockquote>
-<p>The first observation is dropped (NaN from the lag).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Log-return series aligned with <code class="docutils literal notranslate"><span class="pre">self.index[1:]</span></code>.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>pd.Series</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spreadpy.data.priceTimeSeries.PriceTimeSeries.resample">
-<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></span><a class="reference internal" href="../_modules/spreadpy/data/priceTimeSeries.html#PriceTimeSeries.resample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries.resample" title="Link to this definition">#</a></dt>
-<dd><p>Resample to a lower frequency, keeping the last price in each period.</p>
-<p>Uses <code class="docutils literal notranslate"><span class="pre">pd.Series.resample(freq).last()</span></code> then drops any resulting NaN
-bins (e.g. empty periods).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>freq</strong> (<em>str</em>) – Pandas offset alias for the target frequency
-(e.g. <code class="docutils literal notranslate"><span class="pre">'W'</span></code> for weekly, <code class="docutils literal notranslate"><span class="pre">'ME'</span></code> for month-end).</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Resampled price series.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries">PriceTimeSeries</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spreadpy.data.priceTimeSeries.PriceTimeSeries.returns">
-<span class="sig-name descname"><span class="pre">returns</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/spreadpy/data/priceTimeSeries.html#PriceTimeSeries.returns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries.returns" title="Link to this definition">#</a></dt>
-<dd><p>Compute simple (arithmetic) returns.</p>
-<p>The return at bar t is defined as:</p>
-<blockquote>
-<div><p>r_t = (P_t − P_{t−1}) / P_{t−1}</p>
-</div></blockquote>
-<p>The first observation is dropped (NaN from the lag).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Simple return series aligned with <code class="docutils literal notranslate"><span class="pre">self.index[1:]</span></code>.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>pd.Series</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spreadpy.data.priceTimeSeries.PriceTimeSeries.slice">
-<span class="sig-name descname"><span class="pre">slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></span><a class="reference internal" href="../_modules/spreadpy/data/priceTimeSeries.html#PriceTimeSeries.slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries.slice" title="Link to this definition">#</a></dt>
-<dd><p>Extract a sub-series over the closed interval [start, end].</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>start</strong> – Inclusive start timestamp (<code class="docutils literal notranslate"><span class="pre">pd.Timestamp</span></code> or any value
-accepted by pandas label-based indexing).</p></li>
-<li><p><strong>end</strong> – Inclusive end timestamp.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Price sub-series restricted to [start, end].</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries">PriceTimeSeries</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 </section>
 </section>
 
@@ -704,28 +447,8 @@ accepted by pandas label-based indexing).</p></li>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dataloader">DataLoader</a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.data.dataLoader.DataLoader"><code class="docutils literal notranslate"><span class="pre">DataLoader</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.data.dataLoader.DataLoader.load"><code class="docutils literal notranslate"><span class="pre">DataLoader.load()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.data.dataLoader.DataLoader.load_from_dataframe"><code class="docutils literal notranslate"><span class="pre">DataLoader.load_from_dataframe()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.data.dataLoader.DataLoader.load_from_series"><code class="docutils literal notranslate"><span class="pre">DataLoader.load_from_series()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.data.dataLoader.DataLoader.load_pair"><code class="docutils literal notranslate"><span class="pre">DataLoader.load_pair()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.data.dataLoader.DataLoader.validate"><code class="docutils literal notranslate"><span class="pre">DataLoader.validate()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pricetimeseries">PriceTimeSeries</a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries"><code class="docutils literal notranslate"><span class="pre">PriceTimeSeries</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries.align"><code class="docutils literal notranslate"><span class="pre">PriceTimeSeries.align()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries.log_returns"><code class="docutils literal notranslate"><span class="pre">PriceTimeSeries.log_returns()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries.resample"><code class="docutils literal notranslate"><span class="pre">PriceTimeSeries.resample()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries.returns"><code class="docutils literal notranslate"><span class="pre">PriceTimeSeries.returns()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries.slice"><code class="docutils literal notranslate"><span class="pre">PriceTimeSeries.slice()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dataloader">DataLoader</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pricetimeseries">PriceTimeSeries</a></li>
 </ul>
   </nav></div>
 
@@ -772,7 +495,7 @@ accepted by pandas label-based indexing).</p></li>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>
