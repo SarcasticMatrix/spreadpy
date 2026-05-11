@@ -105,6 +105,24 @@ class Portfolio:
         price_y: float,
         price_x: float,
     ) -> List[Trade]:
+        """Execute fills for both legs based on the signal direction.
+
+        If the signal is ``FLAT``, all open positions are closed at the current
+        prices. If the signal implies a direction change, the existing position
+        is first closed before the new position is opened. Transaction costs
+        are applied to every fill via :meth:`TransactionCosts.apply`.
+
+        :param pd.Timestamp timestamp: Current bar timestamp.
+        :param Signal signal: Signal directing the trade.
+        :param float qty_y: Absolute quantity to trade for the y leg (from sizer).
+        :param float qty_x: Absolute quantity to trade for the x leg (from sizer).
+        :param float price_y: Mid price of the y leg at signal time.
+        :param float price_x: Mid price of the x leg at signal time.
+
+        :returns: List of :class:`Trade` records generated (one per leg filled,
+            two per leg on direction reversal).
+        :rtype: List[Trade]
+        """
         if signal.direction == Direction.FLAT:
             return self._close_all(timestamp, signal, price_y, price_x)
 
@@ -203,9 +221,20 @@ class Portfolio:
         self._total_costs += trade.cost
 
     def mark(self, timestamp: pd.Timestamp, price_y: float, price_x: float) -> float:
-        """
-        Mark-to-market: compute current equity and record it.
-        Should be called at every bar (even when no trade occurs).
+        """Mark positions to market and record the equity snapshot.
+
+        Computes and stores bar-level equity:
+
+            equity_t = cash_t + Σ_{leg ∈ {y, x}}  qty_leg · (price_leg − avg_fill_leg)
+
+        Should be called at every bar, whether or not a trade occurred.
+
+        :param pd.Timestamp timestamp: Current bar timestamp.
+        :param float price_y: Current mid price of the y leg.
+        :param float price_x: Current mid price of the x leg.
+
+        :returns: Current mark-to-market equity in monetary units.
+        :rtype: float
         """
         unrealised = 0.0
         for leg, price in [("y", price_y), ("x", price_x)]:
@@ -230,7 +259,15 @@ class Portfolio:
     # ------------------------------------------------------------------
 
     def equity_curve(self) -> pd.DataFrame:
-        """Return the full equity curve as a DataFrame."""
+        """Return the full bar-level equity curve as a DataFrame.
+
+        Each row corresponds to one :meth:`mark` call.  Columns:
+        ``equity``, ``cash``, ``unrealised_pnl``, ``realised_pnl``,
+        ``total_costs``.
+
+        :returns: Equity curve indexed by timestamp.
+        :rtype: pd.DataFrame
+        """
         df = pd.DataFrame(self._equity_records).set_index("timestamp")
         df.index = pd.to_datetime(df.index)
         return df
@@ -257,5 +294,10 @@ class Portfolio:
         return self._cash + unrealised
 
     def reset(self) -> None:
-        """Reset portfolio to initial state (used between walk-forward folds)."""
+        """Reset the portfolio to its initial state.
+
+        Clears all positions, trades, equity records, and P&L accumulators,
+        restoring cash to ``initial_capital``. Useful when reusing the same
+        portfolio object across walk-forward folds.
+        """
         self.__init__(self.initial_capital, self.costs)

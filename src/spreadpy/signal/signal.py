@@ -73,12 +73,31 @@ class SignalGenerator(ABC):
 
     @abstractmethod
     def fit(self, spread: SpreadSeries) -> "SignalGenerator":
-        """Calibrate parameters on in-sample spread."""
+        """Calibrate parameters on in-sample spread data.
+
+        Must be called before :meth:`generate`. Implementations should
+        compute any statistics (thresholds, copula parameters, etc.) from
+        ``spread`` and store them as instance attributes.
+
+        :param SpreadSeries spread: In-sample spread series used for fitting.
+
+        :returns: ``self`` (for method chaining).
+        :rtype: SignalGenerator
+        """
 
     @abstractmethod
     def generate(self, spread: SpreadSeries) -> pd.Series:
-        """
-        Generate signals on (possibly out-of-sample) spread.
-        Returns pd.Series of Signal objects, indexed by spread.index.
+        """Generate a :class:`Signal` for each bar of ``spread``.
+
+        Should be called after :meth:`fit`. ``spread`` may be the same
+        in-sample series or a disjoint out-of-sample window; in either
+        case no lookahead is permitted — signal at bar t may only depend
+        on observations up to and including t.
+
+        :param SpreadSeries spread: Spread series to generate signals for.
+
+        :returns: Series of :class:`Signal` objects indexed by
+            ``spread.index``.
+        :rtype: pd.Series
         """
 

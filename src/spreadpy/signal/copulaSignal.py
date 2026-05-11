@@ -67,9 +67,19 @@ statistical mispricings between the two legs.
     # ------------------------------------------------------------------
 
     def fit(self, spread: SpreadSeries) -> "CopulaSignal":
-        """
-        Calibrate copula parameter θ from in-sample data using
-        Kendall's τ inversion method.
+        """Calibrate the copula parameter θ from in-sample data.
+
+        Estimates Kendall's τ from the in-sample price pair (y, x) and
+        inverts it to the copula parameter θ via the family-specific
+        mapping described in the class docstring.
+
+        After fitting, ``_theta`` and ``_kendall_tau`` are set.
+
+        :param SpreadSeries spread: In-sample spread (exposes ``spread.y``
+            and ``spread.x`` as :class:`PriceTimeSeries`).
+
+        :returns: ``self``.
+        :rtype: CopulaSignal
         """
         y_vals = spread.y.values.astype(float)
         x_vals = spread.x.values.astype(float)
@@ -80,7 +90,19 @@ statistical mispricings between the two legs.
         return self
 
     def _tau_to_theta(self, tau: float) -> float:
-        """Convert Kendall's τ to copula parameter θ."""
+        """Convert Kendall's τ to the copula parameter θ via moment matching.
+
+        Family-specific inversion formulas:
+
+        - **Gaussian**: θ = sin(π/2 · τ)  (Pearson ρ via Greiner's relation)
+        - **Clayton**: θ = 2τ / (1 − τ),  θ > 0  (clipped to 0.01 if τ ≤ 0)
+        - **Gumbel**: θ = 1 / (1 − τ),   θ ≥ 1  (clipped to 100 if τ → 1)
+
+        :param float tau: Sample Kendall's τ ∈ (−1, 1).
+
+        :returns: Copula parameter θ.
+        :rtype: float
+        """
         if self.family == "gaussian":
             # θ = sin(π/2 * τ)
             return float(np.sin(np.pi / 2 * tau))
@@ -101,6 +123,33 @@ statistical mispricings between the two legs.
     # ------------------------------------------------------------------
 
     def generate(self, spread: SpreadSeries) -> pd.Series:
+        """Generate copula-based entry / exit signals for each bar.
+
+        For each bar t, the pseudo-observations u_t = F̂_y(y_t) and
+        v_t = F̂_x(x_t) are computed via the empirical CDF (Hazen formula)
+        over the full out-of-sample window. The conditional CDF
+        C(u_t | v_t) = ∂C(u_t, v_t) / ∂v_t is then evaluated using the
+        fitted copula parameter θ.
+
+        Entry / exit rules:
+
+            LONG   if C(u_t | v_t) < entry_prob               (y cheap)
+            SHORT  if C(u_t | v_t) > 1 − entry_prob           (y expensive)
+            FLAT   if in position and |z_t| < revert_threshold (mean-reverted)
+            FLAT   if in position and |z_t| > stop_zscore      (stop-loss)
+
+        The rolling z-score (same ``window`` as the class parameter) is
+        computed in parallel and stored in each :class:`Signal` for downstream
+        position sizing.
+
+        :param SpreadSeries spread: Spread series to generate signals for
+            (may be out-of-sample). Must have been fitted first via
+            :meth:`fit`.
+
+        :returns: Series of :class:`Signal` objects indexed by ``spread.index``.
+        :rtype: pd.Series
+        :raises RuntimeError: If :meth:`fit` has not been called.
+        """
         if self._theta is None:
             raise RuntimeError("Call fit() before generate()")
 
@@ -166,16 +215,41 @@ statistical mispricings between the two legs.
     # ------------------------------------------------------------------
 
     def _empirical_cdf(self, x: np.ndarray) -> np.ndarray:
-        """Empirical CDF via fractional ranks, Hazen formula."""
+        """Empirical CDF via fractional ranks (Hazen formula).
+
+        For each observation x_i the pseudo-observation is:
+
+            u_i = (rank(x_i) − 0.5) / n
+
+        ensuring u_i ∈ (0, 1) with no values exactly at 0 or 1.
+
+        :param np.ndarray x: 1-D array of observations, shape (n,).
+
+        :returns: Pseudo-observations in (0, 1), shape (n,).
+        :rtype: np.ndarray
+        """
         n = len(x)
         ranks = stats.rankdata(x)
         return (ranks - 0.5) / n
 
     def _conditional_cdf(self, u: float, v: float) -> float:
-        """
-        C(u | v) = ∂C(u,v)/∂v  (h-function of the copula).
-        Computed numerically for Clayton and Gumbel;
-        analytically for Gaussian.
+        """Evaluate the copula h-function C(u | v) = ∂C(u, v) / ∂v.
+
+        Family-specific implementations:
+
+        - **Gaussian**: Φ((Φ⁻¹(u) − ρ · Φ⁻¹(v)) / √(1 − ρ²))
+        - **Clayton**: v^(−θ−1) · (u^{−θ} + v^{−θ} − 1)^{−1−1/θ}
+        - **Gumbel**: numerical central difference of :meth:`_gumbel_cdf`
+          w.r.t. v with step 10⁻⁵.
+
+        Both u and v are clipped to (10⁻⁹, 1 − 10⁻⁹) for numerical
+        stability.
+
+        :param float u: Pseudo-observation for the y leg ∈ (0, 1).
+        :param float v: Pseudo-observation for the x leg ∈ (0, 1).
+
+        :returns: Conditional probability C(u | v) ∈ [0, 1].
+        :rtype: float
         """
         eps = 1e-9
         u = np.clip(u, eps, 1 - eps)
@@ -208,7 +282,18 @@ statistical mispricings between the two legs.
         raise ValueError(f"Unknown family: {self.family}")
 
     def _gumbel_cdf(self, u: float, v: float) -> float:
-        """Bivariate Gumbel copula CDF."""
+        """Evaluate the bivariate Gumbel copula CDF.
+
+        The Gumbel copula is:
+
+            C(u, v; θ) = exp(−((−log u)^θ + (−log v)^θ)^{1/θ}),   θ ≥ 1
+
+        :param float u: First pseudo-observation ∈ (0, 1).
+        :param float v: Second pseudo-observation ∈ (0, 1).
+
+        :returns: C(u, v) ∈ (0, 1).
+        :rtype: float
+        """
         eps = 1e-9
         u = np.clip(u, eps, 1 - eps)
         v = np.clip(v, eps, 1 - eps)

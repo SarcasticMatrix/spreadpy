@@ -39,7 +39,21 @@ class DataLoader:
         price_col: str = "Close",
         freq: Optional[str] = None,
     ) -> PriceTimeSeries:
-        """Load a single asset by name (auto-detects csv/parquet/feather)."""
+        """Load a single asset by name, auto-detecting csv / parquet / feather.
+
+        The file is searched under ``base_path/<name>.<ext>`` where ``<ext>``
+        is tried in order ``.csv``, ``.parquet``, ``.feather``.
+
+        :param str name: Asset identifier used as the file stem and series name.
+        :param str date_col: Column (or index) that contains the timestamps.
+        :param str price_col: Column that contains the price series.
+        :param Optional[str] freq: If given, the series is resampled to this
+            pandas offset alias (e.g. ``'W'``, ``'ME'``) using the last price.
+
+        :returns: Cleaned price series for the asset.
+        :rtype: PriceTimeSeries
+        :raises FileNotFoundError: If no file matching ``name`` is found.
+        """
         path = self._find_file(name)
         df = self._read_file(path, date_col)
         series = df[price_col].rename(name)
@@ -55,12 +69,34 @@ class DataLoader:
         date_col: str = "Date",
         price_col: str = "Close",
     ) -> PriceTimeSeries:
-        """Load directly from an existing DataFrame."""
+        """Load a price series directly from an existing DataFrame.
+
+        If ``date_col`` is a column of ``df``, it is set as the index.
+        Otherwise ``df.index`` is assumed to already be the DatetimeIndex.
+
+        :param pd.DataFrame df: Source DataFrame.
+        :param str name: Label assigned to the resulting series.
+        :param str date_col: Column name holding timestamps (ignored if already
+            the index).
+        :param str price_col: Column name holding the price series.
+
+        :returns: Cleaned price series.
+        :rtype: PriceTimeSeries
+        """
         df = df.set_index(date_col) if date_col in df.columns else df
         series = df[price_col].rename(name)
         return PriceTimeSeries(series)
 
     def load_from_series(self, series: pd.Series, name: str) -> PriceTimeSeries:
+        """Wrap an existing pandas Series as a :class:`PriceTimeSeries`.
+
+        :param pd.Series series: Raw price series with a DatetimeIndex (or
+            an index coercible to DatetimeIndex).
+        :param str name: Label assigned to the series.
+
+        :returns: Cleaned price series.
+        :rtype: PriceTimeSeries
+        """
         return PriceTimeSeries(series, name=name)
 
     def load_pair(
@@ -71,7 +107,22 @@ class DataLoader:
         price_col: str = "Close",
         freq: Optional[str] = None,
     ) -> Tuple[PriceTimeSeries, PriceTimeSeries]:
-        """Load and align two assets (y = dependent, x = independent leg)."""
+        """Load two assets and align them on their common timestamps.
+
+        Each asset is loaded via :meth:`load` then the two series are inner-joined
+        on their DatetimeIndex, so the returned pair shares an identical index
+        with no missing observations.
+
+        :param str name_y: File stem for the dependent leg y.
+        :param str name_x: File stem for the independent leg x.
+        :param str date_col: Column (or index) that contains the timestamps.
+        :param str price_col: Column that contains the price series.
+        :param Optional[str] freq: If given, each series is resampled before
+            alignment.
+
+        :returns: Aligned pair ``(ts_y, ts_x)`` sharing a common DatetimeIndex.
+        :rtype: Tuple[PriceTimeSeries, PriceTimeSeries]
+        """
         ts_y = self.load(name_y, date_col, price_col, freq)
         ts_x = self.load(name_x, date_col, price_col, freq)
         return ts_y.align(ts_x)
@@ -81,7 +132,19 @@ class DataLoader:
     # ------------------------------------------------------------------
 
     def validate(self, ts: PriceTimeSeries, min_obs: int = 252) -> None:
-        """Basic sanity checks on a loaded series."""
+        """Run basic sanity checks on a loaded series.
+
+        Raises :class:`ValueError` if any of the following conditions hold:
+
+        - Fewer than ``min_obs`` observations.
+        - Non-positive prices (prices ≤ 0).
+        - Duplicate timestamps.
+
+        :param PriceTimeSeries ts: Series to validate.
+        :param int min_obs: Minimum number of observations required (default 252).
+
+        :raises ValueError: If any sanity check fails.
+        """
         if len(ts) < min_obs:
             raise ValueError(
                 f"{ts.name}: only {len(ts)} observations (min={min_obs})"

@@ -79,7 +79,11 @@ class BacktestResult:
         return pd.DataFrame(rows).set_index("Metric")
 
     def print_summary(self) -> None:
-        """Print a formatted metrics table to stdout."""
+        """Print a formatted metrics table to stdout.
+
+        Outputs the split label, evaluation date range, and all metrics
+        from :meth:`summary_df` as an aligned table.
+        """
         sep = "─" * 38
         print(f"\n{sep}")
         print(f"  {self.split.upper()} — "

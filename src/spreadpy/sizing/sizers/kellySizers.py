@@ -70,38 +70,30 @@ def _quantities(
 # ---------------------------------------------------------------------------
 
 class KellyTruncatedEntry(PositionSizer):
-    """
-    Kelly sizer where the **entry level** z is the only random quantity.
+    """Kelly sizer where only the entry level z is random.
 
-    Model
-    -----
-    z ~ N(0,1) truncated to [z_entry, +∞), with density:
+    The entry z-score is modelled as a truncated standard normal:
 
-        p(z) = φ(z) / (1 − Φ(z_entry))  ·  1_{z ≥ z_entry}
+        z ~ N(0, 1) truncated to [z_entry, +∞),   p(z) = φ(z) / (1 − Φ(z_entry))
 
-    The reversion target z_revert is treated as deterministic.
-    Gain: G = z − z_revert.
+    The reversion target z_revert is treated as a deterministic constant.
+    The per-trade gain is G = z − z_revert.
 
-    Moments  (λ₊ = λ₊(z_entry))
-    -----------------------------
+    Moments  (λ₊ = λ₊(z_entry) = φ(z_entry) / (1 − Φ(z_entry))):
+
         E[G]   = λ₊ − z_revert
         Var(z) = 1 − λ₊(λ₊ − z_entry)
         E[G²]  = Var(z) + E[G]²
 
-    Kelly fraction
-    --------------
+    Second-order Kelly fraction:
+
         f* = (λ₊ − z_revert) / (1 − λ₊(λ₊ − z_entry) + (λ₊ − z_revert)²)
 
-    This fraction is constant (does not depend on the observed z_t at entry).
+    The fraction is constant and computed once at construction.
 
-    Parameters
-    ----------
-    z_entry : float
-        Entry threshold; we go short when z_t ≥ z_entry.
-    z_revert : float
-        Deterministic reversion target (default 0.0).
-    f_max : float
-        Hard cap on the Kelly fraction (default 0.5).
+    :param float z_entry: Entry threshold; positions are opened when |z_t| ≥ z_entry.
+    :param float z_revert: Deterministic reversion target (default 0.0, i.e. the mean).
+    :param float f_max: Hard cap on the Kelly fraction (default 0.5).
     """
 
     def __init__(
@@ -134,6 +126,20 @@ class KellyTruncatedEntry(PositionSizer):
         hedge_ratio: float,
         capital: float = 0.0,
     ) -> Tuple[float, float]:
+        """Compute quantities using the constant Kelly fraction f*.
+
+        Returns ``(0, 0)`` when ``signal.direction`` is ``FLAT``,
+        ``signal.zscore`` is NaN, ``capital`` ≤ 0, or f* ≤ 0.
+
+        :param Signal signal: Signal at the current bar.
+        :param float price_y: Current price of the y leg.
+        :param float price_x: Current price of the x leg.
+        :param float hedge_ratio: Hedge ratio β_t (absolute value used).
+        :param float capital: Current mark-to-market equity in monetary units.
+
+        :returns: ``(qty_y, qty_x)`` — absolute quantities for each leg.
+        :rtype: Tuple[float, float]
+        """
         if signal.direction == Direction.FLAT or np.isnan(signal.zscore):
             return 0.0, 0.0
         if capital <= 0.0 or self._frac <= 0.0:
@@ -146,41 +152,33 @@ class KellyTruncatedEntry(PositionSizer):
 # ---------------------------------------------------------------------------
 
 class KellyTruncatedExit(PositionSizer):
-    """
-    Kelly sizer where the **reversion level** z̃ is the random quantity.
+    """Kelly sizer where only the reversion level z̃ is random.
 
-    Model
-    -----
-    The effective exit level z̃ ~ N(0,1) truncated to (−∞, z_revert], with density:
+    The exit z-score is modelled as a truncated standard normal:
 
-        p(z̃) = φ(z̃) / Φ(z_revert)  ·  1_{z̃ ≤ z_revert}
+        z̃ ~ N(0, 1) truncated to (−∞, z_revert],   p(z̃) = φ(z̃) / Φ(z_revert)
 
-    The observed entry z_t is treated as deterministic.
-    Gain: G = z_t − z̃.
+    The observed entry z_t is treated as a deterministic constant.
+    The per-trade gain is G = z_t − z̃.
 
-    Moments  (λ₋ = λ₋(z_revert))
-    -----------------------------
-        E[z̃]     = −λ₋
-        E[G]      = z_t + λ₋
-        Var(z̃)   = 1 − λ₋(λ₋ + z_revert)
-        E[G²]     = Var(z̃) + E[G]²
+    Moments  (λ₋ = λ₋(z_revert) = φ(z_revert) / Φ(z_revert)):
 
-    Kelly fraction
-    --------------
+        E[z̃]   = −λ₋
+        E[G]    = z_t + λ₋
+        Var(z̃) = 1 − λ₋(λ₋ + z_revert)
+        E[G²]  = Var(z̃) + E[G]²
+
+    Second-order Kelly fraction (function of the observed z_t):
+
         f*(z_t) = (z_t + λ₋) / (1 − λ₋(λ₋ + z_revert) + (z_t + λ₋)²)
 
-    By symmetry of N(0,1), long entries (signal.zscore ≤ −z_entry) use
-    z_t = |signal.zscore|: the gain z̃ − z_t for a long trade has identical
-    moments to the short gain with the reflected z-score.
+    By symmetry of N(0,1), a LONG entry with z_t = −|z| is equivalent to a
+    SHORT entry with the reflected |z|, so ``|signal.zscore|`` is used for
+    both directions. The fraction is recomputed at each bar.
 
-    This fraction is recomputed at each date using the observed |z_t|.
-
-    Parameters
-    ----------
-    z_revert : float
-        Right-truncation point for the exit distribution (default 0.0).
-    f_max : float
-        Hard cap on the Kelly fraction (default 0.5).
+    :param float z_revert: Right-truncation point for the exit distribution
+        (default 0.0, i.e. exit at the mean).
+    :param float f_max: Hard cap on the Kelly fraction (default 0.5).
     """
 
     def __init__(
@@ -210,6 +208,20 @@ class KellyTruncatedExit(PositionSizer):
         hedge_ratio: float,
         capital: float = 0.0,
     ) -> Tuple[float, float]:
+        """Compute quantities using the bar-dependent Kelly fraction f*(|z_t|).
+
+        Returns ``(0, 0)`` when ``signal.direction`` is ``FLAT``,
+        ``signal.zscore`` is NaN, ``capital`` ≤ 0, or f*(|z_t|) ≤ 0.
+
+        :param Signal signal: Signal at the current bar.
+        :param float price_y: Current price of the y leg.
+        :param float price_x: Current price of the x leg.
+        :param float hedge_ratio: Hedge ratio β_t (absolute value used).
+        :param float capital: Current mark-to-market equity in monetary units.
+
+        :returns: ``(qty_y, qty_x)`` — absolute quantities for each leg.
+        :rtype: Tuple[float, float]
+        """
         if signal.direction == Direction.FLAT or np.isnan(signal.zscore):
             return 0.0, 0.0
         if capital <= 0.0:
@@ -225,40 +237,34 @@ class KellyTruncatedExit(PositionSizer):
 # ---------------------------------------------------------------------------
 
 class KellyTruncatedBoth(PositionSizer):
-    """
-    Kelly sizer where **both** the entry z and the reversion z̃ are random and
-    independent.
+    """Kelly sizer where both entry z and exit z̃ are random and independent.
 
-    Model
-    -----
+    Entry and exit z-scores are modelled as independent truncated normals:
+
         z  ~ N(0,1) truncated to [z_entry, +∞)   — entry level
         z̃ ~ N(0,1) truncated to (−∞, z_revert]   — exit level
         z ⊥ z̃
 
-    Gain: G = z − z̃.
+    The per-trade gain is G = z − z̃.
 
-    Moments  (λ₊ = λ₊(z_entry),  λ₋ = λ₋(z_revert))
-    ---------------------------------------------------
-        E[G]      = λ₊ + λ₋
-        Var(z)    = 1 − λ₊(λ₊ − z_entry)
-        Var(z̃)   = 1 − λ₋(λ₋ + z_revert)
-        Var(G)    = Var(z) + Var(z̃)          (by independence)
-        E[G²]     = Var(G) + E[G]²
+    Moments  (λ₊ = λ₊(z_entry),  λ₋ = λ₋(z_revert)):
 
-    Kelly fraction
-    --------------
+        E[G]    = λ₊ + λ₋
+        Var(z)  = 1 − λ₊(λ₊ − z_entry)
+        Var(z̃) = 1 − λ₋(λ₋ + z_revert)
+        Var(G)  = Var(z) + Var(z̃)          (by independence)
+        E[G²]  = Var(G) + E[G]²
+
+    Second-order Kelly fraction:
+
         f* = (λ₊ + λ₋) / (2 − λ₊(λ₊ − z_entry) − λ₋(λ₋ + z_revert) + (λ₊ + λ₋)²)
 
-    This fraction is constant (does not depend on the observed z_t at entry).
+    The fraction is constant and computed once at construction.
 
-    Parameters
-    ----------
-    z_entry : float
-        Entry threshold; we go short when z_t ≥ z_entry.
-    z_revert : float
-        Right-truncation point for the exit distribution (default 0.0).
-    f_max : float
-        Hard cap on the Kelly fraction (default 0.5).
+    :param float z_entry: Entry threshold; positions are opened when |z_t| ≥ z_entry.
+    :param float z_revert: Right-truncation point for the exit distribution
+        (default 0.0, i.e. exit at the mean).
+    :param float f_max: Hard cap on the Kelly fraction (default 0.5).
     """
 
     def __init__(
@@ -291,6 +297,20 @@ class KellyTruncatedBoth(PositionSizer):
         hedge_ratio: float,
         capital: float = 0.0,
     ) -> Tuple[float, float]:
+        """Compute quantities using the constant Kelly fraction f*.
+
+        Returns ``(0, 0)`` when ``signal.direction`` is ``FLAT``,
+        ``signal.zscore`` is NaN, ``capital`` ≤ 0, or f* ≤ 0.
+
+        :param Signal signal: Signal at the current bar.
+        :param float price_y: Current price of the y leg.
+        :param float price_x: Current price of the x leg.
+        :param float hedge_ratio: Hedge ratio β_t (absolute value used).
+        :param float capital: Current mark-to-market equity in monetary units.
+
+        :returns: ``(qty_y, qty_x)`` — absolute quantities for each leg.
+        :rtype: Tuple[float, float]
+        """
         if signal.direction == Direction.FLAT or np.isnan(signal.zscore):
             return 0.0, 0.0
         if capital <= 0.0 or self._frac <= 0.0:

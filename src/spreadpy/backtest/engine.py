@@ -92,13 +92,24 @@ class BacktestEngine:
         y: PriceTimeSeries,
         x: PriceTimeSeries,
     ) -> Tuple[Optional[BacktestResult], BacktestResult]:
-        """
-        Fit on train, evaluate on validation and test.
+        """Fit the pipeline on the training period and evaluate on validation and test.
 
-        Returns
-        -------
-        (val_result, test_result)
-            val_result is None when val_frac=0.0.
+        Pipeline:
+
+        1. Align ``y`` and ``x`` and split into train / val / test.
+        2. Fit the hedge ratio estimator on the training set, then re-run it
+           over the full train + val + test range for Kalman filter state
+           continuity.
+        3. Fit the signal generator on the training spread.
+        4. Evaluate on val (if ``val_frac > 0``) and on test, calling
+           :meth:`_run_split` for each.
+
+        :param PriceTimeSeries y: Dependent-leg price series.
+        :param PriceTimeSeries x: Independent-leg price series.
+
+        :returns: ``(val_result, test_result)`` where ``val_result`` is ``None``
+            when ``val_frac = 0.0``.
+        :rtype: Tuple[Optional[BacktestResult], BacktestResult]
         """
         y_al, x_al = y.align(x)
         train_idx, val_idx, test_idx = self._split(y_al)
@@ -227,7 +238,18 @@ class BacktestEngine:
     # ------------------------------------------------------------------
 
     def _signal_series(self, pts: PriceTimeSeries) -> PriceTimeSeries:
-        """Return pts log-transformed when log_prices=True, else pts unchanged."""
+        """Return the price series used for spread and signal computation.
+
+        When ``log_prices=True``, returns ``log(pts)``; this makes the
+        observation noise σ²_ε approximately homoscedastic, which is required
+        by the Kalman filter models. P&L accounting always uses the original
+        prices regardless.
+
+        :param PriceTimeSeries pts: Original price series.
+
+        :returns: Log-transformed or original price series.
+        :rtype: PriceTimeSeries
+        """
         if self.log_prices:
             return PriceTimeSeries(np.log(pts.series), name=pts.name)
         return pts
@@ -236,7 +258,23 @@ class BacktestEngine:
         self,
         y: PriceTimeSeries,
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """Return (train_idx, val_idx, test_idx) index arrays."""
+        """Partition bar indices into train / val / test ranges.
+
+        Splits ``n = len(y)`` bars as:
+
+            train: [0,         floor(n · train_frac))
+            val:   [floor(n · train_frac), floor(n · (train_frac + val_frac)))
+            test:  [floor(n · (train_frac + val_frac)),  n)
+
+        The val array is empty when ``val_frac = 0.0``.
+
+        :param PriceTimeSeries y: Aligned price series whose length defines n.
+
+        :returns: ``(train_idx, val_idx, test_idx)`` — integer index arrays.
+        :rtype: Tuple[np.ndarray, np.ndarray, np.ndarray]
+        :raises ValueError: If there is insufficient data for the requested
+            split fractions.
+        """
         n         = len(y)
         train_end = int(n * self.train_frac)
         val_end   = int(n * (self.train_frac + self.val_frac))

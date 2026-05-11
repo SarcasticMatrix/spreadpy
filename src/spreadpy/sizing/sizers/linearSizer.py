@@ -52,16 +52,20 @@ class LinearSizer(PositionSizer):
         hedge_ratio: float,
         capital: float = 0.0,
     ) -> Tuple[float, float]:
-        """
-        Compute absolute quantities for each leg.
+        """Compute absolute quantities proportional to the z-score magnitude.
 
-        The ``capital`` parameter is accepted for interface compatibility with
-        :class:`KellyTruncatedEntry` but is not used here.
+        Returns ``(0, 0)`` when ``signal.direction`` is ``FLAT`` or
+        ``signal.zscore`` is NaN. The ``capital`` parameter is accepted for
+        interface compatibility but is not used by this sizer.
 
-        Returns
-        -------
-        qty_y : Quantity of asset y (direction determined by signal)
-        qty_x : Quantity of asset x (direction is opposite to y, scaled by β)
+        :param Signal signal: Signal at the current bar.
+        :param float price_y: Current price of the y leg.
+        :param float price_x: Current price of the x leg.
+        :param float hedge_ratio: Hedge ratio β_t (absolute value used).
+        :param float capital: Ignored (notional-based sizer).
+
+        :returns: ``(qty_y, qty_x)`` — absolute quantities for each leg.
+        :rtype: Tuple[float, float]
         """
         if signal.direction == Direction.FLAT or np.isnan(signal.zscore):
             return 0.0, 0.0

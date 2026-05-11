@@ -50,17 +50,38 @@ class ZScoreSignal(SignalGenerator):
         self._sigma: Optional[float] = None
 
     def fit(self, spread: SpreadSeries) -> "ZScoreSignal":
-        """Compute in-sample mean and std for normalisation."""
+        """Compute in-sample mean and standard deviation of the spread residuals.
+
+        These statistics are stored but not used by :meth:`generate`, which
+        relies on the rolling estimators instead. Calling ``fit`` is required
+        by the :class:`SignalGenerator` interface.
+
+        :param SpreadSeries spread: In-sample spread series.
+
+        :returns: ``self``.
+        :rtype: ZScoreSignal
+        """
         residuals = spread.residuals.dropna()
         self._mu = float(residuals.mean())
         self._sigma = float(residuals.std())
         return self
 
     def generate(self, spread: SpreadSeries) -> pd.Series:
-        """
-        Compute rolling z-score and map to Signal objects.
-        Uses rolling statistics (no lookahead) regardless of fit().
-        fit() stats can optionally be used as a fallback.
+        """Compute the rolling z-score and map each bar to a :class:`Signal`.
+
+        At each bar t the z-score is:
+
+            z_t = (s_t − μ̂_{t,w}) / σ̂_{t,w}
+
+        where μ̂_{t,w} and σ̂_{t,w} are the rolling mean and standard deviation
+        over the previous ``window`` bars (no lookahead). Bars with fewer than
+        ``window`` predecessors yield ``Direction.FLAT`` with ``zscore=NaN``.
+
+        :param SpreadSeries spread: Spread series to generate signals for
+            (may be out-of-sample).
+
+        :returns: Series of :class:`Signal` objects indexed by ``spread.index``.
+        :rtype: pd.Series
         """
         residuals = spread.residuals
 

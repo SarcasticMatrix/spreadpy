@@ -36,19 +36,27 @@ class TransactionCosts:
     min_commission: float = 4.90
 
     def apply(self, price: float, qty: float, direction: int) -> Tuple[float, float]:
-        """
-        Compute fill price and cost for a single leg.
+        """Compute the fill price and total cost for a single leg fill.
 
-        Parameters
-        ----------
-        price     : Mid price at signal time
-        qty       : Absolute quantity
-        direction : +1 (buy) or -1 (sell)
+        The fill price incorporates one-way adverse slippage:
 
-        Returns
-        -------
-        fill_price : Price after slippage
-        cost       : Total monetary cost (always positive)
+            fill_price = price · (1 + direction · slippage_bps / 10 000)
+
+        The total monetary cost is:
+
+            slippage   = |fill_price − price| · qty
+            commission = max(commission_per_unit · qty
+                             + |fill_price · qty| · commission_bps / 10 000,
+                             min_commission)
+            total_cost = slippage + commission
+
+        :param float price: Mid price at signal time.
+        :param float qty: Absolute quantity (always positive).
+        :param int direction: Fill direction: +1 (buy) or −1 (sell).
+
+        :returns: ``(fill_price, total_cost)`` where ``total_cost`` is always
+            positive.
+        :rtype: Tuple[float, float]
         """
         slip = price * (self.slippage_bps / 10_000) * direction
         fill_price = price + slip

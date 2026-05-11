@@ -77,7 +77,17 @@ class PriceTimeSeries:
     # ------------------------------------------------------------------
 
     def align(self, other: "PriceTimeSeries") -> Tuple["PriceTimeSeries", "PriceTimeSeries"]:
-        """Inner-join two series on timestamps."""
+        """Inner-join two series on their common timestamps.
+
+        Only observations present in **both** series are kept.  The resulting
+        pair shares an identical DatetimeIndex with no missing values.
+
+        :param PriceTimeSeries other: Second price series to align with.
+
+        :returns: Pair ``(self_aligned, other_aligned)`` restricted to the
+            intersection of their DatetimeIndex.
+        :rtype: Tuple[PriceTimeSeries, PriceTimeSeries]
+        """
         s1, s2 = self._series.align(other._series, join="inner")
         return (
             PriceTimeSeries(s1, name=self.name),
@@ -85,16 +95,57 @@ class PriceTimeSeries:
         )
 
     def resample(self, freq: str) -> "PriceTimeSeries":
-        """Resample to a lower frequency using last price."""
+        """Resample to a lower frequency, keeping the last price in each period.
+
+        Uses ``pd.Series.resample(freq).last()`` then drops any resulting NaN
+        bins (e.g. empty periods).
+
+        :param str freq: Pandas offset alias for the target frequency
+            (e.g. ``'W'`` for weekly, ``'ME'`` for month-end).
+
+        :returns: Resampled price series.
+        :rtype: PriceTimeSeries
+        """
         resampled = self._series.resample(freq).last().dropna()
         return PriceTimeSeries(resampled, name=self.name)
 
     def log_returns(self) -> pd.Series:
+        """Compute continuously compounded log-returns.
+
+        The log-return at bar t is defined as:
+
+            r_t = log(P_t / P_{t−1})
+
+        The first observation is dropped (NaN from the lag).
+
+        :returns: Log-return series aligned with ``self.index[1:]``.
+        :rtype: pd.Series
+        """
         return np.log(self._series / self._series.shift(1)).dropna()
 
     def slice(self, start, end) -> "PriceTimeSeries":
+        """Extract a sub-series over the closed interval [start, end].
+
+        :param start: Inclusive start timestamp (``pd.Timestamp`` or any value
+            accepted by pandas label-based indexing).
+        :param end: Inclusive end timestamp.
+
+        :returns: Price sub-series restricted to [start, end].
+        :rtype: PriceTimeSeries
+        """
         return PriceTimeSeries(self._series.loc[start:end], name=self.name)
 
     def returns(self) -> pd.Series:
+        """Compute simple (arithmetic) returns.
+
+        The return at bar t is defined as:
+
+            r_t = (P_t − P_{t−1}) / P_{t−1}
+
+        The first observation is dropped (NaN from the lag).
+
+        :returns: Simple return series aligned with ``self.index[1:]``.
+        :rtype: pd.Series
+        """
         return self._series.pct_change().dropna()
 
