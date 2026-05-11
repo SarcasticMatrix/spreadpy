@@ -36,7 +36,7 @@ statistical mispricings between the two legs.
     :param int window: Rolling window for the z-score computation (position sizing only).
     :param float entry_prob: Tail probability threshold for entry (default 0.10).
         Fires when the conditional CDF is below ``entry_prob`` or above ``1 - entry_prob``.
-    :param float exit_zscore: Exit position when |z| drops below this value.
+    :param float revert_threshold: Exit position when |z| drops below this value.
     :param float stop_zscore: Stop-loss when |z| exceeds this value.
     """
 
@@ -47,7 +47,7 @@ statistical mispricings between the two legs.
         family: str = "gaussian",
         window: int = 60,
         entry_prob: float = 0.10,
-        exit_zscore: float = 0.5,
+        revert_threshold: float = 0.5,
         stop_zscore: float = 4.0,
     ) -> None:
         if family not in self.SUPPORTED_FAMILIES:
@@ -55,7 +55,7 @@ statistical mispricings between the two legs.
         self.family = family
         self.window = window
         self.entry_prob = entry_prob
-        self.exit_zscore = exit_zscore
+        self.revert_threshold = revert_threshold
         self.stop_zscore = stop_zscore
 
         # Calibrated attributes
