@@ -9,6 +9,10 @@ class PositionSizer(ABC):
     Converts a Signal into (qty_y, qty_x) absolute quantities.
     """
 
+    def fit(self, spread: "SpreadSeries") -> "PositionSizer":  # type: ignore[name-defined]
+        """Calibrate the sizer on a spread series. No-op by default."""
+        return self
+
     @abstractmethod
     def size(
         self,
