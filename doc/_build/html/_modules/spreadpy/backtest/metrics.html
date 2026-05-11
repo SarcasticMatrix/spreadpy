@@ -1,0 +1,831 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spreadpy.backtest.metrics &#8212; spreadpy v0.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=af91de31" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../../_static/documentation_options.js?v=fa47ad08"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spreadpy/backtest/metrics';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../../_static/searchtools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/logo-light-no-bg.png" class="logo__image only-light" alt="spreadpy v0.1.0 documentation - Home"/>
+    <img src="../../../_static/logo-light-no-bg.png" class="logo__image only-dark pst-js-only" alt="spreadpy v0.1.0 documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Example
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/SarcasticMatrix/spreadpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Example
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/SarcasticMatrix/spreadpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">spreadpy.backtest.metrics</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for spreadpy.backtest.metrics</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">backtest/metrics.py — Risk metrics</span>
+<span class="sd">RiskMetrics</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.backtest.portfolio</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trade</span>
+
+
+<div class="viewcode-block" id="RiskMetrics">
+<a class="viewcode-back" href="../../../api/backtest.html#spreadpy.backtest.metrics.RiskMetrics">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RiskMetrics</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stateless risk metric calculator for a backtest equity curve.</span>
+
+<span class="sd">    All methods operate on the equity series supplied at construction</span>
+<span class="sd">    and return scalar values. Annualisation uses the ``periods_per_year``</span>
+<span class="sd">    argument passed to each method.</span>
+
+<span class="sd">    Key metrics:</span>
+
+<span class="sd">        Sharpe  = E[r − r_f] / σ[r] · √T</span>
+<span class="sd">        Sortino = (CAGR − r_f) / σ_down · √T     (downside std below MAR)</span>
+<span class="sd">        Calmar  = CAGR / |MaxDD|</span>
+<span class="sd">        MaxDD   = min_t  (equity_t / max_{s≤t} equity_s  − 1)</span>
+
+<span class="sd">    :param pd.Series equity: Bar-level or daily equity curve (NaNs are dropped).</span>
+<span class="sd">    :param float risk_free_rate: Annual risk-free rate r_f (e.g. 0.04 for 4%).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">equity</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">risk_free_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">equity</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="n">equity</span> <span class="o">=</span> <span class="n">equity</span><span class="p">[</span><span class="s2">&quot;equity&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">equity</span> <span class="o">=</span> <span class="n">equity</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rfr</span> <span class="o">=</span> <span class="n">risk_free_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_returns</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">equity</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+    <span class="c1"># ------------------------------------------------------------------</span>
+    <span class="c1"># Core metrics</span>
+    <span class="c1"># ------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="RiskMetrics.total_return">
+<a class="viewcode-back" href="../../../api/backtest.html#spreadpy.backtest.metrics.RiskMetrics.total_return">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">total_return</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the total (cumulative) return over the evaluation period.</span>
+
+<span class="sd">        Defined as:</span>
+
+<span class="sd">            R = equity_T / equity_0 − 1</span>
+
+<span class="sd">        :returns: Total return as a fraction (e.g. 0.12 for +12%).</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">equity</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">equity</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">equity</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RiskMetrics.annualised_return">
+<a class="viewcode-back" href="../../../api/backtest.html#spreadpy.backtest.metrics.RiskMetrics.annualised_return">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">annualised_return</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">periods_per_year</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">252</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the Compound Annual Growth Rate (CAGR).</span>
+
+<span class="sd">        Defined as:</span>
+
+<span class="sd">            CAGR = (1 + R)^{T / n} − 1</span>
+
+<span class="sd">        where R is the total return, n the number of bars, and T =</span>
+<span class="sd">        ``periods_per_year``.</span>
+
+<span class="sd">        :param int periods_per_year: Number of bars per year (252 for daily).</span>
+
+<span class="sd">        :returns: Annualised return as a fraction. Returns −1 if total equity</span>
+<span class="sd">            is non-positive.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_returns</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_return</span><span class="p">()</span>
+        <span class="k">if</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">total</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mf">1.0</span>          <span class="c1"># total wipeout or worse — CAGR undefined</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">total</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="n">periods_per_year</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RiskMetrics.volatility">
+<a class="viewcode-back" href="../../../api/backtest.html#spreadpy.backtest.metrics.RiskMetrics.volatility">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">volatility</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">periods_per_year</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">252</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the annualised volatility of bar-level returns.</span>
+
+<span class="sd">        Defined as σ_ann = σ_bar · √T where σ_bar is the sample standard</span>
+<span class="sd">        deviation of simple returns and T = ``periods_per_year``.</span>
+
+<span class="sd">        :param int periods_per_year: Number of bars per year (252 for daily).</span>
+
+<span class="sd">        :returns: Annualised volatility as a fraction.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_returns</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">periods_per_year</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="RiskMetrics.sharpe">
+<a class="viewcode-back" href="../../../api/backtest.html#spreadpy.backtest.metrics.RiskMetrics.sharpe">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sharpe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">periods_per_year</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">252</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the annualised Sharpe ratio.</span>
+
+<span class="sd">        Defined as:</span>
+
+<span class="sd">            Sharpe = E[r_t / T] / σ_bar · √T</span>
+
+<span class="sd">        where r_t is the bar-level return,</span>
+<span class="sd">        T = ``periods_per_year``, and σ_bar the sample standard deviation of</span>
+<span class="sd">        bar returns.</span>
+
+<span class="sd">        :param int periods_per_year: Number of bars per year (252 for daily).</span>
+
+<span class="sd">        :returns: Annualised Sharpe ratio. Returns 0 if volatility is zero.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">volatility</span><span class="p">(</span><span class="n">periods_per_year</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">vol</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+        <span class="n">excess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_returns</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">rfr</span> <span class="o">/</span> <span class="n">periods_per_year</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">excess</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_returns</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">periods_per_year</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="RiskMetrics.sortino">
+<a class="viewcode-back" href="../../../api/backtest.html#spreadpy.backtest.metrics.RiskMetrics.sortino">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sortino</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">periods_per_year</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">252</span><span class="p">,</span> <span class="n">mar</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the annualised Sortino ratio.</span>
+
+<span class="sd">        Uses downside deviation below the minimum acceptable return (MAR)</span>
+<span class="sd">        as the risk denominator:</span>
+
+<span class="sd">            σ_down = √(E[min(r_t − mar, 0)²]) · √T</span>
+<span class="sd">            Sortino = (CAGR − r_f) / σ_down</span>
+
+<span class="sd">        :param int periods_per_year: Number of bars per year (252 for daily).</span>
+<span class="sd">        :param float mar: Minimum acceptable return per bar (default 0.0).</span>
+
+<span class="sd">        :returns: Annualised Sortino ratio. Returns ``+inf`` if there are no</span>
+<span class="sd">            returns below ``mar``.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">downside</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_returns</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_returns</span> <span class="o">&lt;</span> <span class="n">mar</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">downside</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+        <span class="n">downside_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">downside</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">periods_per_year</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">downside_std</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+        <span class="n">excess_return</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">annualised_return</span><span class="p">(</span><span class="n">periods_per_year</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">rfr</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">excess_return</span> <span class="o">/</span> <span class="n">downside_std</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RiskMetrics.max_drawdown">
+<a class="viewcode-back" href="../../../api/backtest.html#spreadpy.backtest.metrics.RiskMetrics.max_drawdown">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max_drawdown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the maximum peak-to-trough drawdown.</span>
+
+<span class="sd">        Defined as:</span>
+
+<span class="sd">            MDD = min_t ( equity_t / max_{s ≤ t} equity_s  − 1 )</span>
+
+<span class="sd">        :returns: Maximum drawdown as a negative fraction (e.g. −0.15 for −15%).</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">roll_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">equity</span><span class="o">.</span><span class="n">cummax</span><span class="p">()</span>
+        <span class="n">drawdown</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">equity</span> <span class="o">-</span> <span class="n">roll_max</span><span class="p">)</span> <span class="o">/</span> <span class="n">roll_max</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">drawdown</span><span class="o">.</span><span class="n">min</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="RiskMetrics.calmar">
+<a class="viewcode-back" href="../../../api/backtest.html#spreadpy.backtest.metrics.RiskMetrics.calmar">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calmar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">periods_per_year</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">252</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the Calmar ratio.</span>
+
+<span class="sd">        Defined as:</span>
+
+<span class="sd">            Calmar = CAGR / |MDD|</span>
+
+<span class="sd">        :param int periods_per_year: Number of bars per year (252 for daily).</span>
+
+<span class="sd">        :returns: Calmar ratio. Returns ``+inf`` if max drawdown is zero.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mdd</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_drawdown</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">mdd</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annualised_return</span><span class="p">(</span><span class="n">periods_per_year</span><span class="p">)</span> <span class="o">/</span> <span class="n">mdd</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RiskMetrics.drawdown_series">
+<a class="viewcode-back" href="../../../api/backtest.html#spreadpy.backtest.metrics.RiskMetrics.drawdown_series">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">drawdown_series</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the full drawdown time series.</span>
+
+<span class="sd">        At each bar t:</span>
+
+<span class="sd">            DD_t = equity_t / max_{s ≤ t} equity_s  − 1</span>
+
+<span class="sd">        :returns: Drawdown series (values ≤ 0) aligned with ``self.equity.index``.</span>
+<span class="sd">        :rtype: pd.Series</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">roll_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">equity</span><span class="o">.</span><span class="n">cummax</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">equity</span> <span class="o">-</span> <span class="n">roll_max</span><span class="p">)</span> <span class="o">/</span> <span class="n">roll_max</span></div>
+
+
+<div class="viewcode-block" id="RiskMetrics.avg_drawdown">
+<a class="viewcode-back" href="../../../api/backtest.html#spreadpy.backtest.metrics.RiskMetrics.avg_drawdown">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">avg_drawdown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the average drawdown over all sub-zero drawdown bars.</span>
+
+<span class="sd">        :returns: Mean drawdown as a negative fraction, or 0 if no bar is</span>
+<span class="sd">            in drawdown.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drawdown_series</span><span class="p">()</span>
+        <span class="n">below</span> <span class="o">=</span> <span class="n">dd</span><span class="p">[</span><span class="n">dd</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">below</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">below</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span></div>
+
+
+<div class="viewcode-block" id="RiskMetrics.conditional_drawdown">
+<a class="viewcode-back" href="../../../api/backtest.html#spreadpy.backtest.metrics.RiskMetrics.conditional_drawdown">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditional_drawdown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Conditional Drawdown at Risk (CDaR) at level alpha.</span>
+
+<span class="sd">        Average of the worst alpha-fraction of drawdown observations:</span>
+
+<span class="sd">            CDaR_α = E[DD_t | DD_t ≤ VaR_α(DD)]</span>
+
+<span class="sd">        where VaR_α is the alpha-quantile of the drawdown distribution.</span>
+<span class="sd">        Returns a negative value (same sign convention as max_drawdown).</span>
+
+<span class="sd">        :param float alpha: Tail level (default 0.05 = worst 5%).</span>
+<span class="sd">        :returns: Mean drawdown in the worst alpha fraction of bars.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drawdown_series</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+        <span class="n">threshold</span> <span class="o">=</span> <span class="n">dd</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>          <span class="c1"># α-quantile (≤ 0)</span>
+        <span class="n">tail</span> <span class="o">=</span> <span class="n">dd</span><span class="p">[</span><span class="n">dd</span> <span class="o">&lt;=</span> <span class="n">threshold</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">tail</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tail</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span></div>
+
+
+<div class="viewcode-block" id="RiskMetrics.win_rate">
+<a class="viewcode-back" href="../../../api/backtest.html#spreadpy.backtest.metrics.RiskMetrics.win_rate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">win_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trades</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Trade&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the fraction of round-trip trades with positive P&amp;L.</span>
+
+<span class="sd">        Round trips are matched FIFO per leg via :meth:`_compute_round_trips`.</span>
+
+<span class="sd">        :param List[Trade] trades: List of leg fills from :attr:`Portfolio.trades`.</span>
+
+<span class="sd">        :returns: Win rate ∈ [0, 1], or NaN if no round trips exist.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">round_trips</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_round_trips</span><span class="p">(</span><span class="n">trades</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">round_trips</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)</span>
+        <span class="n">wins</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">pnl</span> <span class="ow">in</span> <span class="n">round_trips</span> <span class="k">if</span> <span class="n">pnl</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">wins</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">round_trips</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RiskMetrics.profit_factor">
+<a class="viewcode-back" href="../../../api/backtest.html#spreadpy.backtest.metrics.RiskMetrics.profit_factor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">profit_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trades</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Trade&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the profit factor (gross profits divided by gross losses).</span>
+
+<span class="sd">        Defined as:</span>
+
+<span class="sd">            PF = Σ_{winning trades} P&amp;L / |Σ_{losing trades} P&amp;L|</span>
+
+<span class="sd">        :param List[Trade] trades: List of leg fills from :attr:`Portfolio.trades`.</span>
+
+<span class="sd">        :returns: Profit factor &gt; 1 indicates net profitability. Returns</span>
+<span class="sd">            ``+inf`` if there are no losing trades.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">round_trips</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_round_trips</span><span class="p">(</span><span class="n">trades</span><span class="p">)</span>
+        <span class="n">gains</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">pnl</span> <span class="k">for</span> <span class="n">pnl</span> <span class="ow">in</span> <span class="n">round_trips</span> <span class="k">if</span> <span class="n">pnl</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">losses</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">pnl</span> <span class="k">for</span> <span class="n">pnl</span> <span class="ow">in</span> <span class="n">round_trips</span> <span class="k">if</span> <span class="n">pnl</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">gains</span> <span class="o">/</span> <span class="n">losses</span> <span class="k">if</span> <span class="n">losses</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RiskMetrics.turnover">
+<a class="viewcode-back" href="../../../api/backtest.html#spreadpy.backtest.metrics.RiskMetrics.turnover">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">turnover</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trades</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Trade&quot;</span><span class="p">],</span> <span class="n">periods_per_year</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">252</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute annualised portfolio turnover.</span>
+
+<span class="sd">        Defined as:</span>
+
+<span class="sd">            turnover = (Σ |notional_i|) · T / (n · equity_avg)</span>
+
+<span class="sd">        where n is the number of bars in the equity series, T =</span>
+<span class="sd">        ``periods_per_year``, and equity_avg is the mean equity over the period.</span>
+
+<span class="sd">        :param List[Trade] trades: List of leg fills from :attr:`Portfolio.trades`.</span>
+<span class="sd">        :param int periods_per_year: Number of bars per year (252 for daily).</span>
+
+<span class="sd">        :returns: Annualised turnover as a multiple of average equity.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">trades</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+        <span class="n">total_notional</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">notional</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">trades</span><span class="p">)</span>
+        <span class="n">avg_equity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">equity</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">avg_equity</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">total_notional</span> <span class="o">*</span> <span class="n">periods_per_year</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">equity</span><span class="p">)</span> <span class="o">/</span> <span class="n">avg_equity</span><span class="p">)</span></div>
+
+
+    <span class="c1"># ------------------------------------------------------------------</span>
+    <span class="c1"># Summary</span>
+    <span class="c1"># ------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="RiskMetrics.summary">
+<a class="viewcode-back" href="../../../api/backtest.html#spreadpy.backtest.metrics.RiskMetrics.summary">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">summary</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">periods_per_year</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">252</span><span class="p">,</span>
+        <span class="n">trades</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all key risk metrics as a labelled series.</span>
+
+<span class="sd">        Always includes: ``total_return``, ``annualised_return``,</span>
+<span class="sd">        ``volatility``, ``sharpe``, ``sortino``, ``max_drawdown``,</span>
+<span class="sd">        ``avg_drawdown``, ``cdar_5``, ``calmar``.</span>
+
+<span class="sd">        When ``trades`` is provided, also includes: ``win_rate``,</span>
+<span class="sd">        ``profit_factor``, ``n_trades``.</span>
+
+<span class="sd">        :param int periods_per_year: Number of bars per year (252 for daily).</span>
+<span class="sd">        :param Optional[List[Trade]] trades: Leg fills used to compute</span>
+<span class="sd">            trade-level metrics.</span>
+
+<span class="sd">        :returns: Named series of risk metrics.</span>
+<span class="sd">        :rtype: pd.Series</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;total_return&quot;</span><span class="p">:</span>       <span class="bp">self</span><span class="o">.</span><span class="n">total_return</span><span class="p">(),</span>
+            <span class="s2">&quot;annualised_return&quot;</span><span class="p">:</span>  <span class="bp">self</span><span class="o">.</span><span class="n">annualised_return</span><span class="p">(</span><span class="n">periods_per_year</span><span class="p">),</span>
+            <span class="s2">&quot;volatility&quot;</span><span class="p">:</span>         <span class="bp">self</span><span class="o">.</span><span class="n">volatility</span><span class="p">(</span><span class="n">periods_per_year</span><span class="p">),</span>
+            <span class="s2">&quot;sharpe&quot;</span><span class="p">:</span>             <span class="bp">self</span><span class="o">.</span><span class="n">sharpe</span><span class="p">(</span><span class="n">periods_per_year</span><span class="p">),</span>
+            <span class="s2">&quot;sortino&quot;</span><span class="p">:</span>            <span class="bp">self</span><span class="o">.</span><span class="n">sortino</span><span class="p">(</span><span class="n">periods_per_year</span><span class="p">),</span>
+            <span class="s2">&quot;max_drawdown&quot;</span><span class="p">:</span>       <span class="bp">self</span><span class="o">.</span><span class="n">max_drawdown</span><span class="p">(),</span>
+            <span class="s2">&quot;avg_drawdown&quot;</span><span class="p">:</span>       <span class="bp">self</span><span class="o">.</span><span class="n">avg_drawdown</span><span class="p">(),</span>
+            <span class="s2">&quot;cdar_5&quot;</span><span class="p">:</span>             <span class="bp">self</span><span class="o">.</span><span class="n">conditional_drawdown</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">),</span>
+            <span class="s2">&quot;calmar&quot;</span><span class="p">:</span>             <span class="bp">self</span><span class="o">.</span><span class="n">calmar</span><span class="p">(</span><span class="n">periods_per_year</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">trades</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;win_rate&quot;</span><span class="p">]</span>      <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">win_rate</span><span class="p">(</span><span class="n">trades</span><span class="p">)</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;profit_factor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">profit_factor</span><span class="p">(</span><span class="n">trades</span><span class="p">)</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;n_trades&quot;</span><span class="p">]</span>      <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_compute_round_trips</span><span class="p">(</span><span class="n">trades</span><span class="p">))</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+    <span class="c1"># ------------------------------------------------------------------</span>
+    <span class="c1"># Internal helpers</span>
+    <span class="c1"># ------------------------------------------------------------------</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute_round_trips</span><span class="p">(</span><span class="n">trades</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Trade&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pair entry and exit fills per leg to compute round-trip P&amp;L (FIFO).</span>
+
+<span class="sd">        For each leg (y and x), buys (+1) are pushed onto a stack and matched</span>
+<span class="sd">        FIFO against sells (−1). The P&amp;L of each matched pair is:</span>
+
+<span class="sd">            pnl = (exit_fill_price − entry_fill_price) · qty</span>
+
+<span class="sd">        :param List[Trade] trades: List of leg fills from :attr:`Portfolio.trades`.</span>
+
+<span class="sd">        :returns: List of round-trip P&amp;L values in monetary units.</span>
+<span class="sd">        :rtype: List[float]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pnls</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">leg</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">):</span>
+            <span class="n">leg_trades</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">trades</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">leg</span> <span class="o">==</span> <span class="n">leg</span><span class="p">]</span>
+            <span class="n">stack</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">leg_trades</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="o">+</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">fill_price</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">t</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">stack</span><span class="p">:</span>
+                    <span class="n">entry</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">pnls</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">t</span><span class="o">.</span><span class="n">fill_price</span> <span class="o">-</span> <span class="n">entry</span><span class="p">)</span> <span class="o">*</span> <span class="n">t</span><span class="o">.</span><span class="n">qty</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pnls</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Théophile Schmutz.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
