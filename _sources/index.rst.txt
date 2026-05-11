@@ -75,7 +75,7 @@ Key features
 The ``spreadpy`` Python package implements a complete **pairs trading** pipeline,
 from universe scanning to walk-forward backtesting.
 
-Covered topics by the ``spreadpy`` package:
+Covered topics by the ``spreadpy`` package :
 
 * **Pair research** — scan a universe of assets and rank cointegrated pairs (Engle-Granger, ADF, half-life, Hurst exponent).
 * **Spread construction** — estimate time-varying hedge ratios $\beta_t$: constant OLS, rolling OLS, 2-state and 3-state Kalman filters.
