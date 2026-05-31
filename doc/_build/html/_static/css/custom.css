@@ -41,6 +41,13 @@
   display: inline-block !important;
   }
 
+/* -------------------- MATH -------------------- */
+
+div.math {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
 /* -------------------- THEME OVERRIDES -------------------- */
 
 html[data-theme="light"] {
