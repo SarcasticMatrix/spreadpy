@@ -21,6 +21,19 @@ Each post mixes theory, intuition, and concrete code to dig into one specific qu
       +++
       **Topics:** Kalman filter · state-space model · dynamic hedge ratio · lookahead bias
 
+   .. grid-item-card:: Position sizing in pairs trading
+      :link: position_sizing
+      :link-type: doc
+      :shadow: md
+
+      From Markowitz target-volatility to the Kelly criterion. We derive the truncated
+      normal models behind ``spreadpy``'s three Kelly sizers, show how the optimal fraction
+      $f^*$ depends on the entry threshold, and compare all four sizers on a concrete
+      GLD/GDX backtest.
+
+      +++
+      **Topics:** Kelly criterion · inverse volatility · truncated normal · inverse Mills ratio
+
    .. grid-item-card:: Validating a pairs trading strategy
       :link: strategy_validation
       :link-type: doc
@@ -41,4 +54,5 @@ Each post mixes theory, intuition, and concrete code to dig into one specific qu
 
    arbitrage_free
    kalman_filter
+   position_sizing
    strategy_validation

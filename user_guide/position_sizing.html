@@ -1,0 +1,1005 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Position sizing in pairs trading &#8212; spreadpy v0.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=0790524f97105ba85085" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=0790524f97105ba85085" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=c9ade3f5" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=0790524f97105ba85085"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=0790524f97105ba85085" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085" />
+
+    <script src="../_static/documentation_options.js?v=fa47ad08"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/position_sizing';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Validating a pairs trading strategy" href="strategy_validation.html" />
+    <link rel="prev" title="Tracking the hedge ratio with the Kalman filter" href="kalman_filter.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo-light-no-bg.png" class="logo__image only-light" alt="spreadpy v0.1.0 documentation - Home"/>
+    <img src="../_static/logo-light-no-bg.png" class="logo__image only-dark pst-js-only" alt="spreadpy v0.1.0 documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Example
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Explorations
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/SarcasticMatrix/spreadpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Example
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Explorations
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/SarcasticMatrix/spreadpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="kalman_filter.html">Tracking the hedge ratio with the Kalman filter</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Position sizing in pairs trading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="strategy_validation.html">Validating a pairs trading strategy</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Explorations</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Position sizing in pairs trading</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="position-sizing-in-pairs-trading">
+<h1>Position sizing in pairs trading<a class="headerlink" href="#position-sizing-in-pairs-trading" title="Link to this heading">#</a></h1>
+<div class="seealso admonition">
+<p class="admonition-title">Topics</p>
+<p>Position sizing · Kelly criterion · inverse volatility · truncated normal · mean-reversion ·
+modern portfolio optimization</p>
+</div>
+<p>Generating a signal tells you <em>when</em> and <em>in which direction</em> to trade. Position sizing
+answers the equally important question: <em>how much?</em> A strategy with a genuine edge can still
+lose money if positions are systematically too large (blow-ups from adverse moves) or too
+small (alpha is earned but never extracted meaningfully). Sizing is where portfolio theory
+meets execution.</p>
+<p>This note develops the theoretical foundations — from Markowitz to Kelly — and then shows
+how <code class="docutils literal notranslate"><span class="pre">spreadpy</span></code> translates each into a concrete sizer, with comparative results.</p>
+<hr class="docutils" />
+<section id="the-pairs-trade-as-a-single-bet">
+<h2>The pairs trade as a single bet<a class="headerlink" href="#the-pairs-trade-as-a-single-bet" title="Link to this heading">#</a></h2>
+<p>When the z-score <span class="math notranslate nohighlight">\(z_t = (s_t - \mu_t)/\sigma_t\)</span> of the spread <span class="math notranslate nohighlight">\(s_t = y_t - \beta_t x_t\)</span>
+crosses the entry threshold <span class="math notranslate nohighlight">\(z_{\text{entry}}\)</span>, we go short the spread:</p>
+<ul class="simple">
+<li><p>sell <span class="math notranslate nohighlight">\(q_y\)</span> units of <span class="math notranslate nohighlight">\(y\)</span> at price <span class="math notranslate nohighlight">\(p_y\)</span></p></li>
+<li><p>buy <span class="math notranslate nohighlight">\(q_x = |\beta_t| \cdot q_y \cdot p_y / p_x\)</span> units of <span class="math notranslate nohighlight">\(x\)</span> at price <span class="math notranslate nohighlight">\(p_x\)</span></p></li>
+</ul>
+<p>The two legs are linked through the hedge ratio <span class="math notranslate nohighlight">\(\beta_t\)</span> so that, to first order, the
+P&amp;L is driven only by the spread, not by the direction of each individual asset.</p>
+<p>The <strong>notional</strong> of the y-leg is <span class="math notranslate nohighlight">\(N_y = q_y \cdot p_y\)</span>. The x-leg notional is
+<span class="math notranslate nohighlight">\(N_x = q_x \cdot p_x = |\beta_t| \cdot N_y\)</span>. The sizing problem reduces to choosing
+<span class="math notranslate nohighlight">\(N_y\)</span>, or equivalently the <strong>capital fraction</strong></p>
+<div class="math notranslate nohighlight">
+\[
+f_t = \frac{N_y}{\text{capital}_t}.
+\]</div>
+<p>The gain per unit of spread-sigma when the position closes at <span class="math notranslate nohighlight">\(z_{\text{revert}}\)</span> is:</p>
+<div class="math notranslate nohighlight">
+\[
+G = z_t - z_{\text{revert}},
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(z_t\)</span> is the z-score at entry and <span class="math notranslate nohighlight">\(z_{\text{revert}}\)</span> the z-score at exit.</p>
+</section>
+<hr class="docutils" />
+<section id="markowitz-target-volatility-sizing">
+<h2>Markowitz: target-volatility sizing<a class="headerlink" href="#markowitz-target-volatility-sizing" title="Link to this heading">#</a></h2>
+<section id="from-mean-variance-to-inverse-volatility">
+<h3>From mean-variance to inverse volatility<a class="headerlink" href="#from-mean-variance-to-inverse-volatility" title="Link to this heading">#</a></h3>
+<p>Modern Portfolio Theory (Markowitz, 1952) seeks the portfolio that minimises variance for
+a given expected return. In the single-asset case, the optimal allocation is proportional
+to the Sharpe ratio:</p>
+<div class="math notranslate nohighlight">
+\[
+f^{MV} = \frac{\mu}{\gamma \sigma^2},
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mu\)</span> is the expected return, <span class="math notranslate nohighlight">\(\sigma^2\)</span> the variance, and <span class="math notranslate nohighlight">\(\gamma &gt; 0\)</span> the investor’s
+risk-aversion coefficient. The problem is that <span class="math notranslate nohighlight">\(\mu\)</span> and <span class="math notranslate nohighlight">\(\gamma\)</span> are hard to estimate
+reliably. A pragmatic simplification — <strong>target-volatility</strong> sizing — fixes the risk budget
+instead:</p>
+<blockquote>
+<div><p>Allocate as much capital as needed so that a 1-<span class="math notranslate nohighlight">\(\sigma\)</span> adverse move of the spread costs
+exactly a target fraction <span class="math notranslate nohighlight">\(\sigma^*\)</span> of current capital.</p>
+</div></blockquote>
+<p>If the spread residual has rolling standard deviation <span class="math notranslate nohighlight">\(\sigma_t\)</span> (estimated over the last
+<span class="math notranslate nohighlight">\(w\)</span> bars), the resulting capital fraction is:</p>
+<div class="math notranslate nohighlight">
+\[
+f_t = \min\!\left(\frac{\sigma^*}{\sigma_t},\, f_{\max}\right),
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(f_{\max}\)</span> is a hard cap. When the spread is calm (<span class="math notranslate nohighlight">\(\sigma_t\)</span> small), the sizer
+increases the position; when the spread is volatile, it reduces it — a built-in
+<strong>volatility targeting</strong> mechanism.</p>
+<div class="note admonition">
+<p class="admonition-title">Link to the z-score signal</p>
+<p>The rolling <span class="math notranslate nohighlight">\(\sigma_t\)</span> used here is computed over the same window as the z-score in
+<code class="docutils literal notranslate"><span class="pre">ZScoreSignal</span></code>, so the two components are consistent: a position sized for a 1-<span class="math notranslate nohighlight">\(\sigma\)</span>
+adverse move is exactly what the signal threshold parameterises.</p>
+</div>
+</section>
+<section id="inversevolsizer-in-spreadpy">
+<h3><code class="docutils literal notranslate"><span class="pre">InverseVolSizer</span></code> in spreadpy<a class="headerlink" href="#inversevolsizer-in-spreadpy" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.sizing.sizers.inverseVolSizer</span><span class="w"> </span><span class="kn">import</span> <span class="n">InverseVolSizer</span>
+
+<span class="n">sizer</span> <span class="o">=</span> <span class="n">InverseVolSizer</span><span class="p">(</span>
+    <span class="n">window</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>          <span class="c1"># rolling window for σ_t (bars)</span>
+    <span class="n">target_vol</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span>    <span class="c1"># 2% of capital at risk for a 1-σ move</span>
+    <span class="n">f_max</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>          <span class="c1"># never allocate more than 50% of capital</span>
+<span class="p">)</span>
+
+<span class="c1"># fit must be called first to precompute the rolling σ_t</span>
+<span class="n">sizer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">spread</span><span class="p">)</span>
+
+<span class="n">qty_y</span><span class="p">,</span> <span class="n">qty_x</span> <span class="o">=</span> <span class="n">sizer</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">price_y</span><span class="p">,</span> <span class="n">price_x</span><span class="p">,</span> <span class="n">hedge_ratio</span><span class="p">,</span> <span class="n">capital</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The fraction <span class="math notranslate nohighlight">\(f_t\)</span> varies bar by bar. The y-leg notional is <span class="math notranslate nohighlight">\(N_y = f_t \cdot \text{capital}_t\)</span>,
+and the x-leg quantity is automatically hedged via <span class="math notranslate nohighlight">\(\beta_t\)</span>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="the-kelly-criterion">
+<h2>The Kelly criterion<a class="headerlink" href="#the-kelly-criterion" title="Link to this heading">#</a></h2>
+<section id="maximising-expected-log-wealth">
+<h3>Maximising expected log-wealth<a class="headerlink" href="#maximising-expected-log-wealth" title="Link to this heading">#</a></h3>
+<p>The Kelly criterion (Kelly, 1956) answers the question: <em>what fraction <span class="math notranslate nohighlight">\(f\)</span> of capital
+maximises the long-run growth rate of wealth?</em> It derives from maximising the expected
+log-utility of terminal wealth:</p>
+<div class="math notranslate nohighlight">
+\[
+f^* = \operatorname{argmax}_f \; \mathbb{E}[\log(1 + f G)],
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(G\)</span> is the random gain per dollar risked. Under Gaussian returns, this gives the
+celebrated result:</p>
+<div class="math notranslate nohighlight">
+\[
+f^* = \frac{\mathbb{E}[G]}{\mathrm{Var}(G)},
+\]</div>
+<p>which is proportional to the Sharpe ratio of the bet. Full Kelly maximises growth but is
+extremely aggressive — a single bad run can permanently destroy a large fraction of capital.
+In practice, <strong>half-Kelly</strong> (<span class="math notranslate nohighlight">\(f = f^*/2\)</span>) is more common.</p>
+</section>
+<section id="second-order-approximation">
+<h3>Second-order approximation<a class="headerlink" href="#second-order-approximation" title="Link to this heading">#</a></h3>
+<p>For small gains, <span class="math notranslate nohighlight">\(\log(1 + fG) \approx fG - \frac{1}{2}f^2G^2\)</span>, which gives:</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E}[\log(1 + fG)] \approx f\,\mathbb{E}[G] - \frac{f^2}{2}\,\mathbb{E}[G^2].
+\]</div>
+<p>Maximising over <span class="math notranslate nohighlight">\(f\)</span> (first-order condition) yields the <strong>second-order Kelly fraction</strong>:</p>
+<div class="math notranslate nohighlight">
+\[
+f^* \approx \frac{\mathbb{E}[G]}{\mathbb{E}[G^2]} = \frac{\mathbb{E}[G]}{\mathrm{Var}(G) + \mathbb{E}[G]^2},
+\]</div>
+<p>which is well-defined even when <span class="math notranslate nohighlight">\(G\)</span> has a non-Gaussian distribution, and easier to estimate
+than the exact optimum.</p>
+</section>
+<section id="kelly-for-mean-reversion-the-truncated-normal-model">
+<h3>Kelly for mean-reversion: the truncated normal model<a class="headerlink" href="#kelly-for-mean-reversion-the-truncated-normal-model" title="Link to this heading">#</a></h3>
+<p>In pairs trading the spread z-score is approximately standard normal. We introduce two
+fixed <strong>threshold parameters</strong>:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(z_e &gt; 0\)</span> — the entry threshold: a position opens when <span class="math notranslate nohighlight">\(|z_t| \geq z_e\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(z_r \in [0, z_e)\)</span> — the reversion target: the position closes when <span class="math notranslate nohighlight">\(|z_t|\)</span> returns to <span class="math notranslate nohighlight">\(z_r\)</span></p></li>
+</ul>
+<p>The actual z-score values <strong>at the moment</strong> of entry and exit are random variables — we
+do not know in advance at exactly which bar the signal will fire or when the spread will
+revert. Denote:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(z\)</span> — the realized entry z-score (random, <span class="math notranslate nohighlight">\(z \geq z_e\)</span>)</p></li>
+<li><p><span class="math notranslate nohighlight">\(\tilde{z}\)</span> — the realized exit z-score (random, <span class="math notranslate nohighlight">\(\tilde{z} \leq z_r\)</span>)</p></li>
+</ul>
+<p>The per-trade gain per unit of spread-sigma is then:</p>
+<div class="math notranslate nohighlight">
+\[
+G = z - \tilde{z}.
+\]</div>
+<p>Modelling the distributions of <span class="math notranslate nohighlight">\(z\)</span> and <span class="math notranslate nohighlight">\(\tilde{z}\)</span> as truncated normals lets us compute
+<span class="math notranslate nohighlight">\(\mathbb{E}[G]\)</span> and <span class="math notranslate nohighlight">\(\mathrm{Var}(G)\)</span> in closed form.</p>
+<p><strong>Key tool — Inverse Mills ratios.</strong> For a truncated standard normal, the conditional mean
+involves the ratio of the PDF <span class="math notranslate nohighlight">\(\varphi\)</span> to the CDF <span class="math notranslate nohighlight">\(\Phi\)</span>. Define:</p>
+<div class="math notranslate nohighlight">
+\[
+\lambda_+(a) = \frac{\varphi(a)}{1 - \Phi(a)}, \qquad \lambda_-(b) = \frac{\varphi(b)}{\Phi(b)},
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\varphi\)</span> and <span class="math notranslate nohighlight">\(\Phi\)</span> are the standard normal PDF and CDF, <span class="math notranslate nohighlight">\(\lambda_+(a)\)</span> is the
+left-truncation inverse Mills ratio (for a variable conditioned on being <span class="math notranslate nohighlight">\(\geq a\)</span>), and
+<span class="math notranslate nohighlight">\(\lambda_-(b)\)</span> is the right-truncation ratio (conditioned on being <span class="math notranslate nohighlight">\(\leq b\)</span>). Both
+are positive and grow as the truncation point moves into the tail.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="the-three-kelly-sizers-in-spreadpy">
+<h2>The three Kelly sizers in <code class="docutils literal notranslate"><span class="pre">spreadpy</span></code><a class="headerlink" href="#the-three-kelly-sizers-in-spreadpy" title="Link to this heading">#</a></h2>
+<p>The three sizers differ in which of the two unknowns — entry level <span class="math notranslate nohighlight">\(z\)</span> or exit level
+<span class="math notranslate nohighlight">\(\tilde{z}\)</span> — is treated as random.</p>
+<section id="kellytruncatedentry-random-entry-deterministic-exit">
+<h3><code class="docutils literal notranslate"><span class="pre">KellyTruncatedEntry</span></code> — random entry, deterministic exit<a class="headerlink" href="#kellytruncatedentry-random-entry-deterministic-exit" title="Link to this heading">#</a></h3>
+<p>A trade opens at bar <span class="math notranslate nohighlight">\(t\)</span> only when <span class="math notranslate nohighlight">\(z_t \geq z_e\)</span>. Conditioned on this event, the entry
+z-score is a left-truncated standard normal. Setting
+<span class="math notranslate nohighlight">\(\lambda_+ = \lambda_+(z_e) = \varphi(z_e)/(1-\Phi(z_e))\)</span>, the standard result for
+truncated normals gives:</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E}[z_t \mid z_t \geq z_e] = \lambda_+, \qquad
+\mathrm{Var}(z_t \mid z_t \geq z_e) = 1 - \lambda_+(\lambda_+ - z_e).
+\]</div>
+<p>The exit <span class="math notranslate nohighlight">\(z_r\)</span> is treated as a deterministic constant. The per-trade gain
+<span class="math notranslate nohighlight">\(G = z_t - z_r\)</span>, conditioned on a trade having opened, has moments:</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E}[G \mid z_t \geq z_e] = \lambda_+ - z_r, \qquad
+\mathrm{Var}(G \mid z_t \geq z_e) = 1 - \lambda_+(\lambda_+ - z_e).
+\]</div>
+<p>The Kelly objective is maximised conditionally on the trade being active, giving:</p>
+<div class="math notranslate nohighlight">
+\[
+f^* = \frac{\lambda_+ - z_r}{1 - \lambda_+(\lambda_+ - z_e) + (\lambda_+ - z_r)^2}.
+\]</div>
+<p>This fraction is <strong>constant</strong> — computed once at construction from <span class="math notranslate nohighlight">\(z_e\)</span> and <span class="math notranslate nohighlight">\(z_r\)</span>.</p>
+</section>
+<section id="kellytruncatedexit-deterministic-entry-random-exit">
+<h3><code class="docutils literal notranslate"><span class="pre">KellyTruncatedExit</span></code> — deterministic entry, random exit<a class="headerlink" href="#kellytruncatedexit-deterministic-entry-random-exit" title="Link to this heading">#</a></h3>
+<p>The position closes when the spread reverts below <span class="math notranslate nohighlight">\(z_r\)</span>. Conditioned on this event, the
+exit z-score is a right-truncated standard normal. Setting
+<span class="math notranslate nohighlight">\(\lambda_- = \lambda_-(z_r) = \varphi(z_r)/\Phi(z_r)\)</span>, the standard result gives:</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E}[\tilde{z}_t \mid \tilde{z}_t \leq z_r] = -\lambda_-, \qquad
+\mathrm{Var}(\tilde{z}_t \mid \tilde{z}_t \leq z_r) = 1 - \lambda_-(\lambda_- + z_r).
+\]</div>
+<p>The entry z-score <span class="math notranslate nohighlight">\(z_t\)</span> is the value observed when the signal fires — a known constant at
+sizing time. The per-trade gain <span class="math notranslate nohighlight">\(G = z_t - \tilde{z}_t\)</span>, conditioned on the exit event,
+has moments:</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E}[G \mid \tilde{z}_t \leq z_r] = z_t + \lambda_-, \qquad
+\mathrm{Var}(G \mid \tilde{z}_t \leq z_r) = 1 - \lambda_-(\lambda_- + z_r).
+\]</div>
+<p>The Kelly objective is maximised conditionally on the exit being a reversion below <span class="math notranslate nohighlight">\(z_r\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+f^*(z_t) = \frac{z_t + \lambda_-}{1 - \lambda_-(\lambda_- + z_r) + (z_t + \lambda_-)^2}.
+\]</div>
+<p>This fraction <strong>depends on <span class="math notranslate nohighlight">\(z_t\)</span></strong> and is recomputed at each bar: the deeper the observed
+entry z-score, the larger <span class="math notranslate nohighlight">\(\mathbb{E}[G \mid \tilde{z}_t \leq z_r]\)</span>, and the larger the
+allocated fraction.</p>
+</section>
+<section id="kellytruncatedboth-both-random-independent">
+<h3><code class="docutils literal notranslate"><span class="pre">KellyTruncatedBoth</span></code> — both random, independent<a class="headerlink" href="#kellytruncatedboth-both-random-independent" title="Link to this heading">#</a></h3>
+<p>Both the entry and exit z-scores are conditioned on their respective threshold events,
+and modelled as independent:</p>
+<div class="math notranslate nohighlight">
+\[
+z_t \mid z_t \geq z_e \;\perp\; \tilde{z}_t \mid \tilde{z}_t \leq z_r.
+\]</div>
+<p>With <span class="math notranslate nohighlight">\(\lambda_+ = \lambda_+(z_e)\)</span> and <span class="math notranslate nohighlight">\(\lambda_- = \lambda_-(z_r)\)</span>, the per-trade gain
+<span class="math notranslate nohighlight">\(G = z_t - \tilde{z}_t\)</span>, conditioned on both the entry and exit events, has moments:</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E}[G \mid z_t \geq z_e,\, \tilde{z}_t \leq z_r] = \lambda_+ + \lambda_-,
+\]</div>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align*}
+\mathrm{Var}(G \mid z_t \geq z_e,\, \tilde{z}_t \leq z_r)
+&amp;= \mathrm{Var}(z_t \mid z_t \geq z_e) + \mathrm{Var}(\tilde{z}_t \mid \tilde{z}_t \leq z_r) \\
+&amp;= \bigl[1 - \lambda_+(\lambda_+ - z_e)\bigr] + \bigl[1 - \lambda_-(\lambda_- + z_r)\bigr],
+\end{align*}
+\end{split}\]</div>
+<p>where independence allows the conditional variances to add. The Kelly fraction is:</p>
+<div class="math notranslate nohighlight">
+\[
+f^* = \frac{\lambda_+ + \lambda_-}{2 - \lambda_+(\lambda_+ - z_e) - \lambda_-(\lambda_- + z_r) + (\lambda_+ + \lambda_-)^2}.
+\]</div>
+<p>Like <code class="docutils literal notranslate"><span class="pre">KellyTruncatedEntry</span></code>, this fraction is <strong>constant</strong> — both conditioning events are
+fully characterised by the fixed thresholds <span class="math notranslate nohighlight">\(z_e\)</span> and <span class="math notranslate nohighlight">\(z_r\)</span>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="how-f-behaves-as-a-function-of-z-e">
+<h2>How <span class="math notranslate nohighlight">\(f^*\)</span> behaves as a function of <span class="math notranslate nohighlight">\(z_e\)</span><a class="headerlink" href="#how-f-behaves-as-a-function-of-z-e" title="Link to this heading">#</a></h2>
+<p>Setting <span class="math notranslate nohighlight">\(z_r = 0\)</span> (exit at the mean), <span class="math notranslate nohighlight">\(\lambda_- = \lambda_-(0) = \varphi(0)/\Phi(0) \approx 0.80\)</span>
+(fixed), and varying <span class="math notranslate nohighlight">\(z_e\)</span>:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-center"><p><span class="math notranslate nohighlight">\(z_e\)</span></p></th>
+<th class="head text-center"><p><span class="math notranslate nohighlight">\(\lambda_+(z_e)\)</span></p></th>
+<th class="head text-center"><p><span class="math notranslate nohighlight">\(f^*\)</span> (Entry, uncapped)</p></th>
+<th class="head text-center"><p><span class="math notranslate nohighlight">\(f^*\)</span> (Both, uncapped)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-center"><p>0.5</p></td>
+<td class="text-center"><p>1.14</p></td>
+<td class="text-center"><p>0.73</p></td>
+<td class="text-center"><p>0.44</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>1.0</p></td>
+<td class="text-center"><p>1.53</p></td>
+<td class="text-center"><p>0.60</p></td>
+<td class="text-center"><p>0.39</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>1.5</p></td>
+<td class="text-center"><p>1.94</p></td>
+<td class="text-center"><p>0.50</p></td>
+<td class="text-center"><p>0.34</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>2.0</p></td>
+<td class="text-center"><p>2.37</p></td>
+<td class="text-center"><p>0.41</p></td>
+<td class="text-center"><p>0.30</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>2.5</p></td>
+<td class="text-center"><p>2.84</p></td>
+<td class="text-center"><p>0.35</p></td>
+<td class="text-center"><p>0.27</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Values computed from the closed-form formulas; a hard cap <span class="math notranslate nohighlight">\(f_{\max} = 0.5\)</span> would clip the
+first two rows of the Entry column. The <span class="math notranslate nohighlight">\(\lambda_-\)</span> term in the Both column
+pulls <span class="math notranslate nohighlight">\(f^*\)</span> down relative to Entry, because the randomness in the exit adds variance to
+<span class="math notranslate nohighlight">\(G\)</span> without changing <span class="math notranslate nohighlight">\(\mathbb{E}[G]\)</span> proportionally.</p>
+<p>As <span class="math notranslate nohighlight">\(z_e\)</span> increases, <span class="math notranslate nohighlight">\(\lambda_+(z_e)\)</span> grows (the conditional mean of the entry z-score is
+higher), but the variance of the truncated distribution shrinks rapidly, and <span class="math notranslate nohighlight">\(\mathbb{E}[G]^2\)</span>
+dominates the denominator <span class="math notranslate nohighlight">\(\mathbb{E}[G^2]\)</span>. The net effect is that <span class="math notranslate nohighlight">\(f^*\)</span> <strong>decreases</strong>
+with <span class="math notranslate nohighlight">\(z_e\)</span>. Counterintuitively, <strong>waiting for a very large z-score does not justify a
+larger position</strong> — the distribution becomes more concentrated but the probability of
+occurrence drops exponentially, and the optimal fraction shrinks accordingly.</p>
+</section>
+<hr class="docutils" />
+<section id="comparing-the-sizers-in-spreadpy">
+<h2>Comparing the sizers in <code class="docutils literal notranslate"><span class="pre">spreadpy</span></code><a class="headerlink" href="#comparing-the-sizers-in-spreadpy" title="Link to this heading">#</a></h2>
+<section id="setup">
+<h3>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yfinance</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">yf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">PriceTimeSeries</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.spread.hedgeRatio.kalmanFilter</span><span class="w"> </span><span class="kn">import</span> <span class="n">KalmanFilter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.spread</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpreadSeries</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.signal.zScoreSignal</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZScoreSignal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.sizing.sizers.linearSizer</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearSizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.sizing.sizers.inverseVolSizer</span><span class="w"> </span><span class="kn">import</span> <span class="n">InverseVolSizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.sizing.sizers.kellySizers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">KellyTruncatedEntry</span><span class="p">,</span> <span class="n">KellyTruncatedExit</span><span class="p">,</span> <span class="n">KellyTruncatedBoth</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.backtest.engine</span><span class="w"> </span><span class="kn">import</span> <span class="n">BacktestEngine</span>
+
+<span class="n">raw</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">download</span><span class="p">([</span><span class="s2">&quot;GLD&quot;</span><span class="p">,</span> <span class="s2">&quot;GDX&quot;</span><span class="p">],</span> <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2018-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span>
+                  <span class="n">auto_adjust</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="s2">&quot;Close&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">PriceTimeSeries</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">&quot;GLD&quot;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;GLD&quot;</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">PriceTimeSeries</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">&quot;GDX&quot;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;GDX&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="one-signal-four-sizers">
+<h3>One signal, four sizers<a class="headerlink" href="#one-signal-four-sizers" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">estimator</span>  <span class="o">=</span> <span class="n">KalmanFilter</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">)</span>
+<span class="n">signal_gen</span> <span class="o">=</span> <span class="n">ZScoreSignal</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">entry_threshold</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">revert_threshold</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">sizers</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Linear&quot;</span><span class="p">:</span>       <span class="n">LinearSizer</span><span class="p">(</span><span class="n">max_notional</span><span class="o">=</span><span class="mi">50_000</span><span class="p">),</span>
+    <span class="s2">&quot;Inverse-Vol&quot;</span><span class="p">:</span>  <span class="n">InverseVolSizer</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">target_vol</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">f_max</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+    <span class="s2">&quot;Kelly-Entry&quot;</span><span class="p">:</span>  <span class="n">KellyTruncatedEntry</span><span class="p">(</span><span class="n">z_entry</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">z_revert</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">f_max</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+    <span class="s2">&quot;Kelly-Exit&quot;</span><span class="p">:</span>   <span class="n">KellyTruncatedExit</span><span class="p">(</span><span class="n">z_revert</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">f_max</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+    <span class="s2">&quot;Kelly-Both&quot;</span><span class="p">:</span>   <span class="n">KellyTruncatedBoth</span><span class="p">(</span><span class="n">z_entry</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">z_revert</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">f_max</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+<span class="p">}</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">sizer</span> <span class="ow">in</span> <span class="n">sizers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">BacktestEngine</span><span class="p">(</span>
+        <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span>
+        <span class="n">signal_gen</span><span class="o">=</span><span class="n">signal_gen</span><span class="p">,</span>
+        <span class="n">sizer</span><span class="o">=</span><span class="n">sizer</span><span class="p">,</span>
+        <span class="n">initial_capital</span><span class="o">=</span><span class="mi">1_000_000</span><span class="p">,</span>
+        <span class="n">train_frac</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+        <span class="n">val_frac</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">log_prices</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">test</span> <span class="o">=</span> <span class="n">engine</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">metrics</span>
+</pre></div>
+</div>
+</section>
+<section id="reading-the-results">
+<h3>Reading the results<a class="headerlink" href="#reading-the-results" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="n">summary</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;annualised_return&quot;</span><span class="p">,</span> <span class="s2">&quot;volatility&quot;</span><span class="p">,</span> <span class="s2">&quot;sharpe&quot;</span><span class="p">,</span> <span class="s2">&quot;max_drawdown&quot;</span><span class="p">,</span> <span class="s2">&quot;sortino&quot;</span><span class="p">]</span>
+<span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Expected output (illustrative — actual results depend on the period):</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Sizer</p></th>
+<th class="head text-right"><p>Ann. Return</p></th>
+<th class="head text-right"><p>Volatility</p></th>
+<th class="head text-right"><p>Sharpe</p></th>
+<th class="head text-right"><p>Max DD</p></th>
+<th class="head text-right"><p>Sortino</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Linear</p></td>
+<td class="text-right"><p>+6.1%</p></td>
+<td class="text-right"><p>8.4%</p></td>
+<td class="text-right"><p>0.73</p></td>
+<td class="text-right"><p>−9.2%</p></td>
+<td class="text-right"><p>1.02</p></td>
+</tr>
+<tr class="row-odd"><td><p>Inverse-Vol</p></td>
+<td class="text-right"><p>+7.8%</p></td>
+<td class="text-right"><p>7.1%</p></td>
+<td class="text-right"><p>1.10</p></td>
+<td class="text-right"><p>−7.4%</p></td>
+<td class="text-right"><p>1.58</p></td>
+</tr>
+<tr class="row-even"><td><p>Kelly-Entry</p></td>
+<td class="text-right"><p>+8.3%</p></td>
+<td class="text-right"><p>9.2%</p></td>
+<td class="text-right"><p>0.90</p></td>
+<td class="text-right"><p>−10.1%</p></td>
+<td class="text-right"><p>1.31</p></td>
+</tr>
+<tr class="row-odd"><td><p>Kelly-Exit</p></td>
+<td class="text-right"><p>+9.7%</p></td>
+<td class="text-right"><p>10.8%</p></td>
+<td class="text-right"><p>0.90</p></td>
+<td class="text-right"><p>−12.3%</p></td>
+<td class="text-right"><p>1.29</p></td>
+</tr>
+<tr class="row-even"><td><p>Kelly-Both</p></td>
+<td class="text-right"><p>+8.6%</p></td>
+<td class="text-right"><p>9.5%</p></td>
+<td class="text-right"><p>0.91</p></td>
+<td class="text-right"><p>−10.8%</p></td>
+<td class="text-right"><p>1.33</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="what-these-numbers-tell-us">
+<h3>What these numbers tell us<a class="headerlink" href="#what-these-numbers-tell-us" title="Link to this heading">#</a></h3>
+<p><strong>Linear sizer</strong> is the weakest: it sizes by z-score magnitude, ignoring both volatility
+and the probabilistic structure of the trade. It earns alpha but leaves return on the
+table.</p>
+<p><strong>Inverse-vol</strong> achieves the best risk-adjusted metrics (Sharpe, Sortino, drawdown) because
+it explicitly targets a volatility budget. It is the right default for a risk-constrained
+mandate.</p>
+<p><strong>Kelly sizers</strong> maximise expected log-growth, not the Sharpe ratio — so they tend to be
+more aggressive. <code class="docutils literal notranslate"><span class="pre">KellyTruncatedExit</span></code> is the most dynamic: the position size scales
+directly with the observed <span class="math notranslate nohighlight">\(z_t\)</span> at entry, concentrating capital at the most favourable
+opportunities. This boosts raw returns at the cost of higher drawdown.</p>
+<div class="tip admonition">
+<p class="admonition-title">Which sizer to choose?</p>
+<ul class="simple">
+<li><p><strong>Risk-constrained mandate</strong> (target vol, regulatory capital): <code class="docutils literal notranslate"><span class="pre">InverseVolSizer</span></code></p></li>
+<li><p><strong>Growth-oriented mandate</strong> (maximise CAGR): <code class="docutils literal notranslate"><span class="pre">KellyTruncatedBoth</span></code> with <span class="math notranslate nohighlight">\(f_{\max} = 0.3\)</span></p></li>
+<li><p><strong>Dynamic sizing</strong> (position scales with signal strength): <code class="docutils literal notranslate"><span class="pre">KellyTruncatedExit</span></code></p></li>
+<li><p><strong>Baseline / sanity check</strong>: <code class="docutils literal notranslate"><span class="pre">LinearSizer</span></code></p></li>
+</ul>
+<p>In all cases, cap the fraction at <span class="math notranslate nohighlight">\(f_{\max} \leq 0.5\)</span> and combine with a walk-forward
+validation to ensure the assumed distributions (<span class="math notranslate nohighlight">\(z_{\text{entry}}\)</span>, <span class="math notranslate nohighlight">\(z_{\text{revert}}\)</span>)
+match the actual trading behaviour.</p>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Kelly, J. L. (1956). <em>A new interpretation of information rate.</em> Bell System Technical
+Journal, 35(4), 917–926.</p></li>
+<li><p>Markowitz, H. (1952). <em>Portfolio selection.</em> Journal of Finance, 7(1), 77–91.</p></li>
+<li><p>MacLean, L. C., Thorp, E. O. &amp; Ziemba, W. T. (2010). <em>The Kelly Capital Growth
+Investment Criterion.</em> World Scientific.</p></li>
+<li><p>Palomar, D. P. (2024). <em>Portfolio Optimization: Theory and Application.</em> Ch. 15.</p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="kalman_filter.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Tracking the hedge ratio with the Kalman filter</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="strategy_validation.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Validating a pairs trading strategy</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pairs-trade-as-a-single-bet">The pairs trade as a single bet</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#markowitz-target-volatility-sizing">Markowitz: target-volatility sizing</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#from-mean-variance-to-inverse-volatility">From mean-variance to inverse volatility</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inversevolsizer-in-spreadpy"><code class="docutils literal notranslate"><span class="pre">InverseVolSizer</span></code> in spreadpy</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-kelly-criterion">The Kelly criterion</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#maximising-expected-log-wealth">Maximising expected log-wealth</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#second-order-approximation">Second-order approximation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kelly-for-mean-reversion-the-truncated-normal-model">Kelly for mean-reversion: the truncated normal model</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-three-kelly-sizers-in-spreadpy">The three Kelly sizers in <code class="docutils literal notranslate"><span class="pre">spreadpy</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kellytruncatedentry-random-entry-deterministic-exit"><code class="docutils literal notranslate"><span class="pre">KellyTruncatedEntry</span></code> — random entry, deterministic exit</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kellytruncatedexit-deterministic-entry-random-exit"><code class="docutils literal notranslate"><span class="pre">KellyTruncatedExit</span></code> — deterministic entry, random exit</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kellytruncatedboth-both-random-independent"><code class="docutils literal notranslate"><span class="pre">KellyTruncatedBoth</span></code> — both random, independent</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-f-behaves-as-a-function-of-z-e">How <span class="math notranslate nohighlight">\(f^*\)</span> behaves as a function of <span class="math notranslate nohighlight">\(z_e\)</span></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-the-sizers-in-spreadpy">Comparing the sizers in <code class="docutils literal notranslate"><span class="pre">spreadpy</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#one-signal-four-sizers">One signal, four sizers</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reading-the-results">Reading the results</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-these-numbers-tell-us">What these numbers tell us</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/user_guide/position_sizing.md.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=0790524f97105ba85085"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Théophile Schmutz.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.18.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
