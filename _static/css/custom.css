@@ -43,8 +43,7 @@
 
 /* -------------------- MATH -------------------- */
 
-mjx-container[jax="CHTML"][display="true"] {
-    display: block;
+.bd-content div.math mjx-container {
     overflow-x: auto;
     overflow-y: hidden;
 }
