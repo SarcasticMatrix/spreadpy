@@ -147,15 +147,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -254,15 +254,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -386,10 +386,13 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Abstract base class for hedge ratio estimators.</span>
 
-<span class="sd">    Given two price series y (dependent leg) and x (independent leg),</span>
-<span class="sd">    an estimator produces a time series β_t such that the spread</span>
+<span class="sd">    Given two price series :math:`y` (dependent leg) and :math:`x`</span>
+<span class="sd">    (independent leg), an estimator produces a time series :math:`\\beta_t`</span>
+<span class="sd">    such that the spread</span>
 
-<span class="sd">        s_t = y_t − β_t · x_t</span>
+<span class="sd">    .. math::</span>
+
+<span class="sd">        s_t = y_t - \\beta_t \\cdot x_t</span>
 
 <span class="sd">    is (ideally) stationary. All concrete subclasses must implement</span>
 <span class="sd">    :meth:`fit`, which returns a ``pd.Series`` of hedge ratios aligned</span>
@@ -405,11 +408,14 @@
 
 <span class="sd">        The returned series satisfies:</span>
 
-<span class="sd">            s_t = y_t − β_t · x_t</span>
+<span class="sd">        .. math::</span>
 
-<span class="sd">        where s_t is (ideally) stationary. Implementations must ensure</span>
-<span class="sd">        β_t is free of lookahead bias: at each bar t, β_t may only depend</span>
-<span class="sd">        on observations {(y_s, x_s) : s ≤ t}.</span>
+<span class="sd">            s_t = y_t - \\beta_t \\cdot x_t</span>
+
+<span class="sd">        where :math:`s_t` is (ideally) stationary. Implementations must ensure</span>
+<span class="sd">        :math:`\\beta_t` is free of lookahead bias: at each bar :math:`t`,</span>
+<span class="sd">        :math:`\\beta_t` may only depend on observations</span>
+<span class="sd">        :math:`\\{(y_s, x_s) : s \\leq t\\}`.</span>
 
 <span class="sd">        :param PriceTimeSeries y: Dependent-leg price series.</span>
 <span class="sd">        :param PriceTimeSeries x: Independent-leg price series.</span>
@@ -427,7 +433,9 @@
 <span class="sd">        Equivalent to ``SpreadSeries(y, x, self.fit(y, x))``. The spread</span>
 <span class="sd">        is defined bar-by-bar as:</span>
 
-<span class="sd">            s_t = y_t − β_t · x_t</span>
+<span class="sd">        .. math::</span>
+
+<span class="sd">            s_t = y_t - \\beta_t \\cdot x_t</span>
 
 <span class="sd">        :param PriceTimeSeries y: Dependent-leg price series.</span>
 <span class="sd">        :param PriceTimeSeries x: Independent-leg price series.</span>

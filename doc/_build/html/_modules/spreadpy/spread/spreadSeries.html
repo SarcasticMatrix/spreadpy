@@ -147,15 +147,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -254,15 +254,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -372,7 +372,7 @@
 <a class="viewcode-back" href="../../../api/spread.html#spreadpy.spread.spreadSeries.SpreadSeries">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SpreadSeries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Residual spread series s_t = y_t − β_t · x_t.</span>
+<span class="sd">    Residual spread series :math:`s_t = y_t - \\beta_t \\cdot x_t`.</span>
 
 <span class="sd">    Given aligned price series y, x and a time-varying hedge ratio β_t,</span>
 <span class="sd">    the spread is computed bar-by-bar. Provides stationarity diagnostics</span>
@@ -438,16 +438,22 @@
 
 <span class="sd">        The discrete-time OU model is:</span>
 
-<span class="sd">            Δs_t = λ · s_{t−1} + c + ε_t,   ε_t ~ N(0, σ²)</span>
+<span class="sd">        .. math::</span>
 
-<span class="sd">        where λ &lt; 0 indicates mean-reversion. The half-life is the time</span>
-<span class="sd">        (in bars) for a deviation from equilibrium to decay by half:</span>
+<span class="sd">            \\Delta s_t = \\lambda \\cdot s_{t-1} + c + \\varepsilon_t,</span>
+<span class="sd">            \\quad \\varepsilon_t \\sim \\mathcal{N}(0, \\sigma^2)</span>
 
-<span class="sd">            τ_{1/2} = −ln 2 / λ</span>
+<span class="sd">        where :math:`\\lambda &lt; 0` indicates mean-reversion. The half-life</span>
+<span class="sd">        is the time (in bars) for a deviation from equilibrium to decay by half:</span>
 
-<span class="sd">        λ is estimated by regressing Δs_t on s_{t−1} (with constant)</span>
-<span class="sd">        using OLS. If λ ≥ 0, the spread is non-stationary and the method</span>
-<span class="sd">        returns ``float(&#39;inf&#39;)`` with a warning.</span>
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \\tau_{1/2} = -\\frac{\\ln 2}{\\lambda}</span>
+
+<span class="sd">        :math:`\\lambda` is estimated by regressing :math:`\\Delta s_t` on</span>
+<span class="sd">        :math:`s_{t-1}` (with constant) using OLS. If :math:`\\lambda \\geq 0`,</span>
+<span class="sd">        the spread is non-stationary and the method returns ``float(&#39;inf&#39;)``</span>
+<span class="sd">        with a warning.</span>
 
 <span class="sd">        :returns: Mean-reversion half-life in bars. ``float(&#39;inf&#39;)`` if the</span>
 <span class="sd">            spread does not mean-revert.</span>
@@ -479,14 +485,17 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the Augmented Dickey-Fuller test statistic for the spread.</span>
 
-<span class="sd">        Tests the null hypothesis H₀ of a unit root (non-stationarity)</span>
-<span class="sd">        against the alternative H₁ of stationarity (mean-reversion).</span>
+<span class="sd">        Tests the null hypothesis :math:`H_0` of a unit root (non-stationarity)</span>
+<span class="sd">        against the alternative :math:`H_1` of stationarity (mean-reversion).</span>
 <span class="sd">        The ADF regression with one lag is:</span>
 
-<span class="sd">            Δs_t = ρ · s_{t−1} + c + δ · Δs_{t−1} + ε_t</span>
+<span class="sd">        .. math::</span>
 
-<span class="sd">        A t-statistic on ρ that is sufficiently negative (p-value &lt; 0.05)</span>
-<span class="sd">        rejects H₀ and supports cointegration of the pair.</span>
+<span class="sd">            \\Delta s_t = \\rho \\cdot s_{t-1} + c + \\delta \\cdot \\Delta s_{t-1} + \\varepsilon_t</span>
+
+<span class="sd">        A t-statistic on :math:`\\rho` that is sufficiently negative</span>
+<span class="sd">        (p-value &lt; 0.05) rejects :math:`H_0` and supports cointegration of</span>
+<span class="sd">        the pair.</span>
 
 <span class="sd">        Requires ``statsmodels``.</span>
 
@@ -496,7 +505,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.tsa.stattools</span><span class="w"> </span><span class="kn">import</span> <span class="n">adfuller</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="n">adfuller</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_residuals</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">maxlags</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">adfuller</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_residuals</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
             <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;statsmodels required for ADF test: pip install statsmodels&quot;</span><span class="p">)</span></div>
@@ -508,14 +517,16 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute a rolling z-score of the spread with no lookahead.</span>
 
-<span class="sd">        At each bar t, the z-score standardises s_t using statistics</span>
-<span class="sd">        estimated over the preceding window of w bars:</span>
+<span class="sd">        At each bar :math:`t`, the z-score standardises :math:`s_t` using</span>
+<span class="sd">        statistics estimated over the preceding window of :math:`w` bars:</span>
 
-<span class="sd">            μ_{t,w} = (1/w) · Σ_{j=0}^{w−1} s_{t−j}</span>
-<span class="sd">            σ_{t,w} = std(s_{t−w+1}, …, s_t)   (sample std, ddof=1)</span>
-<span class="sd">            z_t     = (s_t − μ_{t,w}) / σ_{t,w}</span>
+<span class="sd">        .. math::</span>
 
-<span class="sd">        Bars t &lt; w are set to NaN (insufficient history). This is the</span>
+<span class="sd">            \\mu_{t,w} &amp;= \\frac{1}{w} \\sum_{j=0}^{w-1} s_{t-j} \\\\</span>
+<span class="sd">            \\sigma_{t,w} &amp;= \\mathrm{std}(s_{t-w+1}, \\ldots, s_t) \\quad (\\mathrm{ddof}=1) \\\\</span>
+<span class="sd">            z_t &amp;= \\frac{s_t - \\mu_{t,w}}{\\sigma_{t,w}}</span>
+
+<span class="sd">        Bars :math:`t &lt; w` are set to NaN (insufficient history). This is the</span>
 <span class="sd">        signal used by :class:`ZScoreSignal`.</span>
 
 <span class="sd">        :param int window: Rolling window length w (in bars).</span>

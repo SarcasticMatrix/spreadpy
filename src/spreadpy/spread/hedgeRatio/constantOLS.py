@@ -12,16 +12,18 @@ class ConstantOLS(HedgeRatioEstimator):
 
     Fits a single linear regression over the entire supplied period:
 
-        y_t = α + β · x_t + ε_t
+    .. math::
 
-    and returns the constant slope β as the hedge ratio for all bars.
+        y_t = \\alpha + \\beta \\cdot x_t + \\varepsilon_t
+
+    and returns the constant slope :math:`\\beta` as the hedge ratio for all bars.
     Suitable as a baseline when the cointegration relationship is stable.
 
     After calling :meth:`fit`, the fitted values are available as
     ``beta_``, ``alpha_``, and ``r_squared_``.
 
-    :param bool add_intercept: If True (default), fits with an intercept α.
-        If False, forces the regression through the origin (α = 0).
+    :param bool add_intercept: If True (default), fits with an intercept :math:`\\alpha`.
+        If False, forces the regression through the origin (:math:`\\alpha = 0`).
     """
 
     def __init__(self, add_intercept: bool = True) -> None:
@@ -32,26 +34,34 @@ class ConstantOLS(HedgeRatioEstimator):
 
     def fit(self, y: PriceTimeSeries, x: PriceTimeSeries) -> pd.Series:
         """
-        Estimate a single hedge ratio β via full-sample OLS and return it
-        as a constant series.
+        Estimate a single hedge ratio :math:`\\beta` via full-sample OLS and
+        return it as a constant series.
 
         **With intercept** (default): solves the normal equations
 
-            [β, α]^T = (X^T X)^{-1} X^T y,   X = [x | 1]
+        .. math::
+
+            [\\beta,\\, \\alpha]^\\top = (X^\\top X)^{-1} X^\\top y,
+            \\quad X = [x \\mid \\mathbf{1}]
 
         **Without intercept**: uses the closed-form projection
 
-            β = (x^T y) / (x^T x)
+        .. math::
+
+            \\beta = \\frac{x^\\top y}{x^\\top x}
 
         After fitting, ``beta_``, ``alpha_``, and ``r_squared_`` are set.
         The coefficient of determination is:
 
-            R² = 1 − SS_res / SS_tot,   SS_res = ||y − β·x − α||²,
-                                         SS_tot = ||y − ȳ||²
+        .. math::
+
+            R^2 = 1 - \\frac{SS_{\\mathrm{res}}}{SS_{\\mathrm{tot}}}, \\quad
+            SS_{\\mathrm{res}} = \\|y - \\hat{\\beta}\\, x - \\hat{\\alpha}\\|^2, \\quad
+            SS_{\\mathrm{tot}} = \\|y - \\bar{y}\\|^2
 
         :param PriceTimeSeries y: Dependent-leg price series.
         :param PriceTimeSeries x: Independent-leg price series.
-        :returns: Constant hedge ratio β broadcast over ``y.index``.
+        :returns: Constant hedge ratio :math:`\\beta` broadcast over ``y.index``.
         :rtype: pd.Series
         """
         y_al, x_al = y.align(x)

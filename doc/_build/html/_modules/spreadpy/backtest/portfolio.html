@@ -147,15 +147,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -254,15 +254,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -428,7 +428,10 @@
 
 <span class="sd">    Mark-to-market equity at each bar:</span>
 
-<span class="sd">        equity_t = cash_t + Σ_leg  qty_leg · (price_leg − avg_fill_leg)</span>
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \\text{equity}_t = \\text{cash}_t</span>
+<span class="sd">        + \\sum_{\\ell \\in \\{y,x\\}} q_\\ell \\cdot (p_\\ell - \\bar{p}_\\ell)</span>
 
 <span class="sd">    where ``cash_t`` accumulates realised P&amp;L net of transaction costs.</span>
 
@@ -597,7 +600,10 @@
 
 <span class="sd">        Computes and stores bar-level equity:</span>
 
-<span class="sd">            equity_t = cash_t + Σ_{leg ∈ {y, x}}  qty_leg · (price_leg − avg_fill_leg)</span>
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \\text{equity}_t = \\text{cash}_t</span>
+<span class="sd">            + \\sum_{\\ell \\in \\{y,x\\}} q_\\ell \\cdot (p_\\ell - \\bar{p}_\\ell)</span>
 
 <span class="sd">        Should be called at every bar, whether or not a trade occurred.</span>
 

@@ -8,7 +8,7 @@ from spreadpy.data.priceTimeSeries import PriceTimeSeries
 
 class SpreadSeries:
     """
-    Residual spread series s_t = y_t − β_t · x_t.
+    Residual spread series :math:`s_t = y_t - \\beta_t \\cdot x_t`.
 
     Given aligned price series y, x and a time-varying hedge ratio β_t,
     the spread is computed bar-by-bar. Provides stationarity diagnostics
@@ -72,16 +72,22 @@ class SpreadSeries:
 
         The discrete-time OU model is:
 
-            Δs_t = λ · s_{t−1} + c + ε_t,   ε_t ~ N(0, σ²)
+        .. math::
 
-        where λ < 0 indicates mean-reversion. The half-life is the time
-        (in bars) for a deviation from equilibrium to decay by half:
+            \\Delta s_t = \\lambda \\cdot s_{t-1} + c + \\varepsilon_t,
+            \\quad \\varepsilon_t \\sim \\mathcal{N}(0, \\sigma^2)
 
-            τ_{1/2} = −ln 2 / λ
+        where :math:`\\lambda < 0` indicates mean-reversion. The half-life
+        is the time (in bars) for a deviation from equilibrium to decay by half:
 
-        λ is estimated by regressing Δs_t on s_{t−1} (with constant)
-        using OLS. If λ ≥ 0, the spread is non-stationary and the method
-        returns ``float('inf')`` with a warning.
+        .. math::
+
+            \\tau_{1/2} = -\\frac{\\ln 2}{\\lambda}
+
+        :math:`\\lambda` is estimated by regressing :math:`\\Delta s_t` on
+        :math:`s_{t-1}` (with constant) using OLS. If :math:`\\lambda \\geq 0`,
+        the spread is non-stationary and the method returns ``float('inf')``
+        with a warning.
 
         :returns: Mean-reversion half-life in bars. ``float('inf')`` if the
             spread does not mean-revert.
@@ -110,14 +116,17 @@ class SpreadSeries:
         """
         Compute the Augmented Dickey-Fuller test statistic for the spread.
 
-        Tests the null hypothesis H₀ of a unit root (non-stationarity)
-        against the alternative H₁ of stationarity (mean-reversion).
+        Tests the null hypothesis :math:`H_0` of a unit root (non-stationarity)
+        against the alternative :math:`H_1` of stationarity (mean-reversion).
         The ADF regression with one lag is:
 
-            Δs_t = ρ · s_{t−1} + c + δ · Δs_{t−1} + ε_t
+        .. math::
 
-        A t-statistic on ρ that is sufficiently negative (p-value < 0.05)
-        rejects H₀ and supports cointegration of the pair.
+            \\Delta s_t = \\rho \\cdot s_{t-1} + c + \\delta \\cdot \\Delta s_{t-1} + \\varepsilon_t
+
+        A t-statistic on :math:`\\rho` that is sufficiently negative
+        (p-value < 0.05) rejects :math:`H_0` and supports cointegration of
+        the pair.
 
         Requires ``statsmodels``.
 
@@ -127,7 +136,7 @@ class SpreadSeries:
         """
         try:
             from statsmodels.tsa.stattools import adfuller
-            result = adfuller(self._residuals.dropna(), maxlags=1)
+            result = adfuller(self._residuals.dropna())
             return float(result[0]), float(result[1])
         except ImportError:
             raise ImportError("statsmodels required for ADF test: pip install statsmodels")
@@ -136,14 +145,16 @@ class SpreadSeries:
         """
         Compute a rolling z-score of the spread with no lookahead.
 
-        At each bar t, the z-score standardises s_t using statistics
-        estimated over the preceding window of w bars:
+        At each bar :math:`t`, the z-score standardises :math:`s_t` using
+        statistics estimated over the preceding window of :math:`w` bars:
 
-            μ_{t,w} = (1/w) · Σ_{j=0}^{w−1} s_{t−j}
-            σ_{t,w} = std(s_{t−w+1}, …, s_t)   (sample std, ddof=1)
-            z_t     = (s_t − μ_{t,w}) / σ_{t,w}
+        .. math::
 
-        Bars t < w are set to NaN (insufficient history). This is the
+            \\mu_{t,w} &= \\frac{1}{w} \\sum_{j=0}^{w-1} s_{t-j} \\\\
+            \\sigma_{t,w} &= \\mathrm{std}(s_{t-w+1}, \\ldots, s_t) \\quad (\\mathrm{ddof}=1) \\\\
+            z_t &= \\frac{s_t - \\mu_{t,w}}{\\sigma_{t,w}}
+
+        Bars :math:`t < w` are set to NaN (insufficient history). This is the
         signal used by :class:`ZScoreSignal`.
 
         :param int window: Rolling window length w (in bars).

@@ -1,6 +1,6 @@
 [project]
 name = "spreadpy"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = [
     {name = "Théo",email = "theophile.schmutz@telecom-sudparis.eu"}
@@ -14,6 +14,7 @@ dependencies = [
     "yfinance (>=1.2.1,<2.0.0)",
     "statsmodels (>=0.14.6,<0.15.0)",
     "tqdm (>=4.67.3,<5.0.0)",
+    "ipykernel (>=7.2.0,<8.0.0)",
 ]
 
 

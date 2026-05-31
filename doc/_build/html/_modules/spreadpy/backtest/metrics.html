@@ -147,15 +147,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -254,15 +254,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -388,10 +388,14 @@
 
 <span class="sd">    Key metrics:</span>
 
-<span class="sd">        Sharpe  = E[r − r_f] / σ[r] · √T</span>
-<span class="sd">        Sortino = (CAGR − r_f) / σ_down · √T     (downside std below MAR)</span>
-<span class="sd">        Calmar  = CAGR / |MaxDD|</span>
-<span class="sd">        MaxDD   = min_t  (equity_t / max_{s≤t} equity_s  − 1)</span>
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \\text{Sharpe}  &amp;= \\frac{\\mathbb{E}[r - r_f]}{\\sigma[r]} \\cdot \\sqrt{T} \\\\</span>
+<span class="sd">        \\text{Sortino} &amp;= \\frac{\\text{CAGR} - r_f}{\\sigma_{\\downarrow}} \\cdot \\sqrt{T}</span>
+<span class="sd">                         \\quad (\\text{downside std below MAR}) \\\\</span>
+<span class="sd">        \\text{Calmar}  &amp;= \\frac{\\text{CAGR}}{|\\text{MaxDD}|} \\\\</span>
+<span class="sd">        \\text{MaxDD}   &amp;= \\min_t\\!\\left(\\frac{\\text{equity}_t}</span>
+<span class="sd">                         {\\max_{s \\leq t}\\, \\text{equity}_s} - 1\\right)</span>
 
 <span class="sd">    :param pd.Series equity: Bar-level or daily equity curve (NaNs are dropped).</span>
 <span class="sd">    :param float risk_free_rate: Annual risk-free rate r_f (e.g. 0.04 for 4%).</span>
@@ -415,7 +419,9 @@
 
 <span class="sd">        Defined as:</span>
 
-<span class="sd">            R = equity_T / equity_0 − 1</span>
+<span class="sd">        .. math::</span>
+
+<span class="sd">            R = \\frac{\\text{equity}_T}{\\text{equity}_0} - 1</span>
 
 <span class="sd">        :returns: Total return as a fraction (e.g. 0.12 for +12%).</span>
 <span class="sd">        :rtype: float</span>
@@ -432,10 +438,12 @@
 
 <span class="sd">        Defined as:</span>
 
-<span class="sd">            CAGR = (1 + R)^{T / n} − 1</span>
+<span class="sd">        .. math::</span>
 
-<span class="sd">        where R is the total return, n the number of bars, and T =</span>
-<span class="sd">        ``periods_per_year``.</span>
+<span class="sd">            \\text{CAGR} = (1 + R)^{T/n} - 1</span>
+
+<span class="sd">        where :math:`R` is the total return, :math:`n` the number of bars,</span>
+<span class="sd">        and :math:`T` = ``periods_per_year``.</span>
 
 <span class="sd">        :param int periods_per_year: Number of bars per year (252 for daily).</span>
 
@@ -457,8 +465,9 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">volatility</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">periods_per_year</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">252</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the annualised volatility of bar-level returns.</span>
 
-<span class="sd">        Defined as σ_ann = σ_bar · √T where σ_bar is the sample standard</span>
-<span class="sd">        deviation of simple returns and T = ``periods_per_year``.</span>
+<span class="sd">        Defined as :math:`\\sigma_{\\text{ann}} = \\sigma_{\\text{bar}} \\cdot \\sqrt{T}`</span>
+<span class="sd">        where :math:`\\sigma_{\\text{bar}}` is the sample standard deviation of</span>
+<span class="sd">        simple returns and :math:`T` = ``periods_per_year``.</span>
 
 <span class="sd">        :param int periods_per_year: Number of bars per year (252 for daily).</span>
 
@@ -475,11 +484,12 @@
 
 <span class="sd">        Defined as:</span>
 
-<span class="sd">            Sharpe = E[r_t / T] / σ_bar · √T</span>
+<span class="sd">        .. math::</span>
 
-<span class="sd">        where r_t is the bar-level return,</span>
-<span class="sd">        T = ``periods_per_year``, and σ_bar the sample standard deviation of</span>
-<span class="sd">        bar returns.</span>
+<span class="sd">            \\text{Sharpe} = \\frac{\\mathbb{E}[r_t - r_f/T]}{\\sigma_{\\text{bar}}} \\cdot \\sqrt{T}</span>
+
+<span class="sd">        where :math:`r_t` is the bar-level return, :math:`T` = ``periods_per_year``,</span>
+<span class="sd">        and :math:`\\sigma_{\\text{bar}}` the sample standard deviation of bar returns.</span>
 
 <span class="sd">        :param int periods_per_year: Number of bars per year (252 for daily).</span>
 
@@ -501,8 +511,11 @@
 <span class="sd">        Uses downside deviation below the minimum acceptable return (MAR)</span>
 <span class="sd">        as the risk denominator:</span>
 
-<span class="sd">            σ_down = √(E[min(r_t − mar, 0)²]) · √T</span>
-<span class="sd">            Sortino = (CAGR − r_f) / σ_down</span>
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \\sigma_{\\downarrow} &amp;= \\sqrt{\\mathbb{E}[\\min(r_t - \\text{mar},\\, 0)^2]}</span>
+<span class="sd">                                  \\cdot \\sqrt{T} \\\\</span>
+<span class="sd">            \\text{Sortino} &amp;= \\frac{\\text{CAGR} - r_f}{\\sigma_{\\downarrow}}</span>
 
 <span class="sd">        :param int periods_per_year: Number of bars per year (252 for daily).</span>
 <span class="sd">        :param float mar: Minimum acceptable return per bar (default 0.0).</span>
@@ -528,7 +541,11 @@
 
 <span class="sd">        Defined as:</span>
 
-<span class="sd">            MDD = min_t ( equity_t / max_{s ≤ t} equity_s  − 1 )</span>
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \\text{MDD} = \\min_t\\!\\left(</span>
+<span class="sd">                \\frac{\\text{equity}_t}{\\max_{s \\leq t}\\, \\text{equity}_s} - 1</span>
+<span class="sd">            \\right)</span>
 
 <span class="sd">        :returns: Maximum drawdown as a negative fraction (e.g. −0.15 for −15%).</span>
 <span class="sd">        :rtype: float</span>
@@ -545,7 +562,9 @@
 
 <span class="sd">        Defined as:</span>
 
-<span class="sd">            Calmar = CAGR / |MDD|</span>
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \\text{Calmar} = \\frac{\\text{CAGR}}{|\\text{MDD}|}</span>
 
 <span class="sd">        :param int periods_per_year: Number of bars per year (252 for daily).</span>
 
@@ -563,9 +582,11 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">drawdown_series</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the full drawdown time series.</span>
 
-<span class="sd">        At each bar t:</span>
+<span class="sd">        At each bar :math:`t`:</span>
 
-<span class="sd">            DD_t = equity_t / max_{s ≤ t} equity_s  − 1</span>
+<span class="sd">        .. math::</span>
+
+<span class="sd">            DD_t = \\frac{\\text{equity}_t}{\\max_{s \\leq t}\\, \\text{equity}_s} - 1</span>
 
 <span class="sd">        :returns: Drawdown series (values ≤ 0) aligned with ``self.equity.index``.</span>
 <span class="sd">        :rtype: pd.Series</span>
@@ -596,10 +617,13 @@
 
 <span class="sd">        Average of the worst alpha-fraction of drawdown observations:</span>
 
-<span class="sd">            CDaR_α = E[DD_t | DD_t ≤ VaR_α(DD)]</span>
+<span class="sd">        .. math::</span>
 
-<span class="sd">        where VaR_α is the alpha-quantile of the drawdown distribution.</span>
-<span class="sd">        Returns a negative value (same sign convention as max_drawdown).</span>
+<span class="sd">            \\text{CDaR}_\\alpha = \\mathbb{E}[DD_t \\mid DD_t \\leq \\text{VaR}_\\alpha(DD)]</span>
+
+<span class="sd">        where :math:`\\text{VaR}_\\alpha` is the :math:`\\alpha`-quantile of the</span>
+<span class="sd">        drawdown distribution. Returns a negative value (same sign convention</span>
+<span class="sd">        as :meth:`max_drawdown`).</span>
 
 <span class="sd">        :param float alpha: Tail level (default 0.05 = worst 5%).</span>
 <span class="sd">        :returns: Mean drawdown in the worst alpha fraction of bars.</span>
@@ -639,7 +663,10 @@
 
 <span class="sd">        Defined as:</span>
 
-<span class="sd">            PF = Σ_{winning trades} P&amp;L / |Σ_{losing trades} P&amp;L|</span>
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \\text{PF} = \\frac{\\sum_{\\text{winning}} \\text{P\\&amp;L}}</span>
+<span class="sd">                               {\\left|\\sum_{\\text{losing}} \\text{P\\&amp;L}\\right|}</span>
 
 <span class="sd">        :param List[Trade] trades: List of leg fills from :attr:`Portfolio.trades`.</span>
 
@@ -660,10 +687,13 @@
 
 <span class="sd">        Defined as:</span>
 
-<span class="sd">            turnover = (Σ |notional_i|) · T / (n · equity_avg)</span>
+<span class="sd">        .. math::</span>
 
-<span class="sd">        where n is the number of bars in the equity series, T =</span>
-<span class="sd">        ``periods_per_year``, and equity_avg is the mean equity over the period.</span>
+<span class="sd">            \\text{turnover} = \\frac{\\sum_i |N_i| \\cdot T}{n \\cdot \\bar{\\text{equity}}}</span>
+
+<span class="sd">        where :math:`n` is the number of bars in the equity series,</span>
+<span class="sd">        :math:`T` = ``periods_per_year``, and :math:`\\bar{\\text{equity}}` is</span>
+<span class="sd">        the mean equity over the period.</span>
 
 <span class="sd">        :param List[Trade] trades: List of leg fills from :attr:`Portfolio.trades`.</span>
 <span class="sd">        :param int periods_per_year: Number of bars per year (252 for daily).</span>
@@ -736,7 +766,9 @@
 <span class="sd">        For each leg (y and x), buys (+1) are pushed onto a stack and matched</span>
 <span class="sd">        FIFO against sells (−1). The P&amp;L of each matched pair is:</span>
 
-<span class="sd">            pnl = (exit_fill_price − entry_fill_price) · qty</span>
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \\text{pnl} = (\\text{exit\\_fill\\_price} - \\text{entry\\_fill\\_price}) \\cdot \\text{qty}</span>
 
 <span class="sd">        :param List[Trade] trades: List of leg fills from :attr:`Portfolio.trades`.</span>
 

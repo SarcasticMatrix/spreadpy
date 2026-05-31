@@ -147,15 +147,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../../../../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -254,15 +254,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../../../../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -375,20 +375,27 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts a Signal into (qty_y, qty_x) absolute quantities.</span>
 
-<span class="sd">    The position size is proportional to the z-score magnitude via a scaling function:</span>
+<span class="sd">    The position size is proportional to the z-score magnitude via a scaling</span>
+<span class="sd">    function:</span>
 
-<span class="sd">        notional_y = max_notional · scale(|z|)</span>
-<span class="sd">        qty_y      = notional_y / price_y</span>
-<span class="sd">        qty_x      = notional_y · |β| / price_x</span>
+<span class="sd">    .. math::</span>
 
-<span class="sd">    where β is the hedge ratio at signal time. The x-leg quantity is adjusted</span>
-<span class="sd">    so that the notional exposure is hedged: qty_x · price_x ≈ |β| · qty_y · price_y.</span>
+<span class="sd">        N_y &amp;= N_{\\max} \\cdot \\mathrm{scale}(|z|) \\\\</span>
+<span class="sd">        q_y &amp;= N_y / p_y \\\\</span>
+<span class="sd">        q_x &amp;= N_y \\cdot |\\beta| / p_x</span>
+
+<span class="sd">    where :math:`\\beta` is the hedge ratio at signal time. The x-leg quantity</span>
+<span class="sd">    is adjusted so that the notional exposure is hedged:</span>
+<span class="sd">    :math:`q_x \\cdot p_x \\approx |\\beta| \\cdot q_y \\cdot p_y`.</span>
 
 <span class="sd">    The default scale function is a linear ramp:</span>
 
-<span class="sd">        scale(|z|) = clip((|z| − 1) / 2,  0,  1)</span>
+<span class="sd">    .. math::</span>
 
-<span class="sd">    mapping |z| = 1 → 0% and |z| ≥ 3 → 100% of ``max_notional``.</span>
+<span class="sd">        \\mathrm{scale}(|z|) = \\mathrm{clip}\\!\\left(\\frac{|z| - 1}{2},\\; 0,\\; 1\\right)</span>
+
+<span class="sd">    mapping :math:`|z| = 1 \\to 0\\%` and :math:`|z| \\geq 3 \\to 100\\%`</span>
+<span class="sd">    of ``max_notional``.</span>
 
 <span class="sd">    :param float max_notional: Maximum notional per leg in monetary units.</span>
 <span class="sd">    :param Optional[Callable[[float], float]] scale_fn: Maps |z| → [0, 1].</span>

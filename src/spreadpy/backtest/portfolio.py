@@ -61,7 +61,10 @@ class Portfolio:
 
     Mark-to-market equity at each bar:
 
-        equity_t = cash_t + Σ_leg  qty_leg · (price_leg − avg_fill_leg)
+    .. math::
+
+        \\text{equity}_t = \\text{cash}_t
+        + \\sum_{\\ell \\in \\{y,x\\}} q_\\ell \\cdot (p_\\ell - \\bar{p}_\\ell)
 
     where ``cash_t`` accumulates realised P&L net of transaction costs.
 
@@ -225,7 +228,10 @@ class Portfolio:
 
         Computes and stores bar-level equity:
 
-            equity_t = cash_t + Σ_{leg ∈ {y, x}}  qty_leg · (price_leg − avg_fill_leg)
+        .. math::
+
+            \\text{equity}_t = \\text{cash}_t
+            + \\sum_{\\ell \\in \\{y,x\\}} q_\\ell \\cdot (p_\\ell - \\bar{p}_\\ell)
 
         Should be called at every bar, whether or not a trade occurred.
 

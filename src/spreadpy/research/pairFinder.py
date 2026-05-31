@@ -122,9 +122,12 @@ class PairFinder:
 def _npd(x: pd.Series, y: pd.Series) -> float:
     """Compute the Normalised Price Distance (NPD) between two series.
 
-    Both series are rebased to 1 at t = 0, then the NPD is:
+    Both series are rebased to 1 at :math:`t = 0`, then the NPD is:
 
-        NPD = √( (1/T) · Σ_{t=1}^{T} (x_t/x_0 − y_t/y_0)² )
+    .. math::
+
+        \\text{NPD} = \\sqrt{\\frac{1}{T} \\sum_{t=1}^{T}
+        \\left(\\frac{x_t}{x_0} - \\frac{y_t}{y_0}\\right)^2}
 
     A small NPD indicates that the two series track each other closely
     in relative terms.
@@ -145,7 +148,10 @@ def _ols_residuals(x: pd.Series, y: pd.Series) -> tuple[float, pd.Series]:
 
     Solves the normal equations for:
 
-        [β, α]^T = argmin ||y − [x | 1] · [β, α]^T||²
+    .. math::
+
+        [\\beta, \\alpha]^\\top = \\operatorname{argmin}
+        \\|y - [x \\mid \\mathbf{1}] [\\beta, \\alpha]^\\top\\|^2
 
     :param pd.Series x: Independent leg (regressor), shape (T,).
     :param pd.Series y: Dependent leg (regressand), shape (T,).
@@ -162,19 +168,25 @@ def _ols_residuals(x: pd.Series, y: pd.Series) -> tuple[float, pd.Series]:
 def _hurst(spread: pd.Series) -> float:
     """Estimate the Hurst exponent via the variance-of-lags method.
 
-    For a range of lags τ, the empirical variance of lag-τ differences is:
+    For a range of lags :math:`\\tau`, the empirical variance of
+    lag-:math:`\\tau` differences is:
 
-        Var(τ) = Var(s_t − s_{t−τ})
+    .. math::
 
-    The Hurst exponent H is estimated by OLS on:
+        \\mathrm{Var}(\\tau) = \\mathrm{Var}(s_t - s_{t-\\tau})
 
-        log Var(τ) ≈ 2H · log(τ)  ⟹  H = slope / 2
+    The Hurst exponent :math:`H` is estimated by OLS on:
+
+    .. math::
+
+        \\log \\mathrm{Var}(\\tau) \\approx 2H \\cdot \\log(\\tau)
+        \\implies H = \\text{slope} / 2
 
     Interpretation:
 
-        H < 0.5 — mean-reverting (sub-diffusive)
-        H = 0.5 — random walk (Brownian motion)
-        H > 0.5 — trending (super-diffusive)
+    - :math:`H < 0.5` — mean-reverting (sub-diffusive)
+    - :math:`H = 0.5` — random walk (Brownian motion)
+    - :math:`H > 0.5` — trending (super-diffusive)
 
     :param pd.Series spread: Spread residual series.
 
@@ -204,12 +216,17 @@ def _half_life(spread: pd.Series) -> float:
 
     Fits the discrete-time Ornstein-Uhlenbeck regression:
 
-        Δs_t = λ · s_{t−1} + α + ε_t,   ε_t ~ N(0, σ²)
+    .. math::
+
+        \\Delta s_t = \\lambda \\cdot s_{t-1} + \\alpha + \\varepsilon_t,
+        \\quad \\varepsilon_t \\sim \\mathcal{N}(0, \\sigma^2)
 
     The half-life is the time (in bars) for a deviation from equilibrium to
     decay by half:
 
-        τ_{1/2} = −log 2 / log(1 + λ)
+    .. math::
+
+        \\tau_{1/2} = -\\frac{\\log 2}{\\log(1 + \\lambda)}
 
     :param pd.Series spread: Spread residual series.
 

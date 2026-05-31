@@ -16,12 +16,15 @@ class TransactionCosts:
 
     The total cost per fill is computed as:
 
-        fill_price  = mid ± (slippage_bps / 10 000) · mid    (+ for buys, − for sells)
-        slippage    = |fill_price − mid| · qty
-        commission  = max(commission_per_unit · qty
-                          + notional · commission_bps / 10 000,
-                          min_commission)
-        total_cost  = slippage + commission
+    .. math::
+
+        p_{\\text{fill}} &= p_{\\text{mid}} \\cdot (1 + d \\cdot s / 10^4)
+            && (d = +1 \\text{ for buys, } -1 \\text{ for sells}) \\\\
+        c_{\\text{slip}} &= |p_{\\text{fill}} - p_{\\text{mid}}| \\cdot q \\\\
+        c_{\\text{comm}} &= \\max\\!\\left(c_{\\text{unit}} \\cdot q
+            + |p_{\\text{fill}} \\cdot q| \\cdot b / 10^4,\\;
+            c_{\\min}\\right) \\\\
+        c_{\\text{total}} &= c_{\\text{slip}} + c_{\\text{comm}}
 
     :param float slippage_bps: One-way adverse price move in basis points.
     :param float commission_per_unit: Fixed commission charged per unit traded.
@@ -40,15 +43,19 @@ class TransactionCosts:
 
         The fill price incorporates one-way adverse slippage:
 
-            fill_price = price · (1 + direction · slippage_bps / 10 000)
+        .. math::
+
+            p_{\\text{fill}} = p \\cdot (1 + d \\cdot s / 10^4)
 
         The total monetary cost is:
 
-            slippage   = |fill_price − price| · qty
-            commission = max(commission_per_unit · qty
-                             + |fill_price · qty| · commission_bps / 10 000,
-                             min_commission)
-            total_cost = slippage + commission
+        .. math::
+
+            c_{\\text{slip}}  &= |p_{\\text{fill}} - p| \\cdot q \\\\
+            c_{\\text{comm}}  &= \\max\\!\\left(c_{\\text{unit}} \\cdot q
+                + |p_{\\text{fill}} \\cdot q| \\cdot b / 10^4,\\;
+                c_{\\min}\\right) \\\\
+            c_{\\text{total}} &= c_{\\text{slip}} + c_{\\text{comm}}
 
         :param float price: Mid price at signal time.
         :param float qty: Absolute quantity (always positive).

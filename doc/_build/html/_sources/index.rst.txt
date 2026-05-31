@@ -40,7 +40,7 @@ spreadpy: A pairs trading framework for systematic strategies
                 <h3 style="font-size: 25px; font-weight: bold; margin-top: 0.6rem; text-align: left; padding-left: 0.6rem;">Pairs trading, from spread to backtest</h3>
                 <p><code>spreadpy</code> provides a complete pipeline for <b>pairs trading</b>:</p>
                 <ul>
-                    <li><b>Pair research</b> — cointegration tests, ADF, half-life, Hurst exponent</li>
+                    <li><b>Pair research</b>, cointegration tests, ADF, half-life, Hurst exponent</li>
                     <li><b>Spread construction</b>, OLS, rolling OLS, Kalman filter</li>
                     <li><b>Signal generation</b>, z-score, copula</li>
                     <li><b>Position sizing</b>, notional, inverse-vol, Kelly criterion</li>
@@ -49,8 +49,8 @@ spreadpy: A pairs trading framework for systematic strategies
 
                 <div class="homepage-button-container">
                 <div class="homepage-button-container-row">
-                    <a href="./user_guide/index.html" class="homepage-button primary-button">User guide</a>
-                    <a href="./examples/index.html" class="homepage-button secondary-button">Examples</a>
+                    <a href="./examples/index.html" class="homepage-button primary-button">Examples</a>
+                    <a href="./user_guide/index.html" class="homepage-button secondary-button">Exploration</a>
                 </div>
                 <div class="homepage-button-container-row">
                     <a href="./api/index.html" class="homepage-button-link">See API Reference →</a>
@@ -75,7 +75,7 @@ Key features
 The ``spreadpy`` Python package implements a complete **pairs trading** pipeline,
 from universe scanning to walk-forward backtesting.
 
-Covered topics by the ``spreadpy`` package:
+Covered topics by the ``spreadpy`` package :
 
 * **Pair research** — scan a universe of assets and rank cointegrated pairs (Engle-Granger, ADF, half-life, Hurst exponent).
 * **Spread construction** — estimate time-varying hedge ratios $\beta_t$: constant OLS, rolling OLS, 2-state and 3-state Kalman filters.
@@ -88,5 +88,5 @@ Covered topics by the ``spreadpy`` package:
    :caption: Contents:
 
    ./api/index.rst
-   ./user_guide/index.rst
    ./examples/index.rst
+   ./user_guide/index.rst

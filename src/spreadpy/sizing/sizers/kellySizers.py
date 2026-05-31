@@ -1,26 +1,41 @@
 """
 Kelly-based position sizers for spread mean-reversion trading.
 
-Both classes derive f* from the second-order Kelly criterion:
+Both classes derive :math:`f^*` from the second-order Kelly criterion:
 
-    f* = argmax_f E[log(1 + f·G)] ≈ E[G] / E[G²]
+.. math::
 
-where the approximation follows from log(1+x) ≈ x - x²/2, giving:
+    f^* = \\operatorname{argmax}_f \\mathbb{E}[\\log(1 + f G)]
+        \\approx \\frac{\\mathbb{E}[G]}{\\mathbb{E}[G^2]}
 
-    E[G] / E[G²] = E[G] / (Var(G) + E[G]²)
+where the approximation follows from :math:`\\log(1+x) \\approx x - x^2/2`,
+giving:
 
-The spread z-score is modelled as z_t = (X_t - μ_t) / σ_t ~ N(0,1).
-We trade mean-reversion: short when z_t ≥ z_entry, target z_revert < z_entry.
+.. math::
+
+    \\frac{\\mathbb{E}[G]}{\\mathbb{E}[G^2]}
+    = \\frac{\\mathbb{E}[G]}{\\mathrm{Var}(G) + \\mathbb{E}[G]^2}
+
+The spread z-score is modelled as
+:math:`z_t = (X_t - \\mu_t)/\\sigma_t \\sim \\mathcal{N}(0,1)`.
+We trade mean-reversion: short when :math:`z_t \\geq z_{\\text{entry}}`,
+target :math:`z_{\\text{revert}} < z_{\\text{entry}}`.
 
 Inverse Mills ratios
 --------------------
-Left truncation at a (z ≥ a):
-    λ₊(a) = φ(a) / (1 − Φ(a))
+Left truncation at :math:`a` (:math:`z \\geq a`):
 
-Right truncation at b (z ≤ b):
-    λ₋(b) = φ(b) / Φ(b)
+.. math::
 
-where φ and Φ are the standard normal PDF and CDF.
+    \\lambda_+(a) = \\frac{\\varphi(a)}{1 - \\Phi(a)}
+
+Right truncation at :math:`b` (:math:`z \\leq b`):
+
+.. math::
+
+    \\lambda_-(b) = \\frac{\\varphi(b)}{\\Phi(b)}
+
+where :math:`\\varphi` and :math:`\\Phi` are the standard normal PDF and CDF.
 """
 
 from __future__ import annotations
@@ -39,12 +54,12 @@ from spreadpy.sizing.positionSizer import PositionSizer
 # ---------------------------------------------------------------------------
 
 def _mills_left(a: float) -> float:
-    """λ₊(a) = φ(a) / (1 − Φ(a))  — left-truncation at a."""
+    """:math:`\\lambda_+(a) = \\varphi(a)/(1 - \\Phi(a))` — left-truncation at :math:`a`."""
     return float(norm.pdf(a) / (1.0 - norm.cdf(a)))
 
 
 def _mills_right(b: float) -> float:
-    """λ₋(b) = φ(b) / Φ(b)  — right-truncation at b."""
+    """:math:`\\lambda_-(b) = \\varphi(b)/\\Phi(b)` — right-truncation at :math:`b`."""
     return float(norm.pdf(b) / norm.cdf(b))
 
 
@@ -70,28 +85,36 @@ def _quantities(
 # ---------------------------------------------------------------------------
 
 class KellyTruncatedEntry(PositionSizer):
-    """Kelly sizer where only the entry level z is random.
+    """Kelly sizer where only the entry level :math:`z` is random.
 
     The entry z-score is modelled as a truncated standard normal:
 
-        z ~ N(0, 1) truncated to [z_entry, +∞),   p(z) = φ(z) / (1 − Φ(z_entry))
+    .. math::
 
-    The reversion target z_revert is treated as a deterministic constant.
-    The per-trade gain is G = z − z_revert.
+        z \\sim \\mathcal{N}(0,1) \\text{ truncated to } [z_{\\text{entry}}, +\\infty),
+        \\quad p(z) = \\frac{\\varphi(z)}{1 - \\Phi(z_{\\text{entry}})}
 
-    Moments  (λ₊ = λ₊(z_entry) = φ(z_entry) / (1 − Φ(z_entry))):
+    The reversion target :math:`z_{\\text{revert}}` is treated as a deterministic
+    constant. The per-trade gain is :math:`G = z - z_{\\text{revert}}`.
 
-        E[G]   = λ₊ − z_revert
-        Var(z) = 1 − λ₊(λ₊ − z_entry)
-        E[G²]  = Var(z) + E[G]²
+    Moments (:math:`\\lambda_+ = \\lambda_+(z_{\\text{entry}})`):
+
+    .. math::
+
+        \\mathbb{E}[G]   &= \\lambda_+ - z_{\\text{revert}} \\\\
+        \\mathrm{Var}(z) &= 1 - \\lambda_+(\\lambda_+ - z_{\\text{entry}}) \\\\
+        \\mathbb{E}[G^2] &= \\mathrm{Var}(z) + \\mathbb{E}[G]^2
 
     Second-order Kelly fraction:
 
-        f* = (λ₊ − z_revert) / (1 − λ₊(λ₊ − z_entry) + (λ₊ − z_revert)²)
+    .. math::
+
+        f^* = \\frac{\\lambda_+ - z_{\\text{revert}}}
+               {1 - \\lambda_+(\\lambda_+ - z_{\\text{entry}}) + (\\lambda_+ - z_{\\text{revert}})^2}
 
     The fraction is constant and computed once at construction.
 
-    :param float z_entry: Entry threshold; positions are opened when |z_t| ≥ z_entry.
+    :param float z_entry: Entry threshold; positions are opened when :math:`|z_t| \\geq z_{\\text{entry}}`.
     :param float z_revert: Deterministic reversion target (default 0.0, i.e. the mean).
     :param float f_max: Hard cap on the Kelly fraction (default 0.5).
     """
@@ -152,29 +175,39 @@ class KellyTruncatedEntry(PositionSizer):
 # ---------------------------------------------------------------------------
 
 class KellyTruncatedExit(PositionSizer):
-    """Kelly sizer where only the reversion level z̃ is random.
+    """Kelly sizer where only the reversion level :math:`\\tilde{z}` is random.
 
     The exit z-score is modelled as a truncated standard normal:
 
-        z̃ ~ N(0, 1) truncated to (−∞, z_revert],   p(z̃) = φ(z̃) / Φ(z_revert)
+    .. math::
 
-    The observed entry z_t is treated as a deterministic constant.
-    The per-trade gain is G = z_t − z̃.
+        \\tilde{z} \\sim \\mathcal{N}(0,1) \\text{ truncated to }
+        (-\\infty, z_{\\text{revert}}],
+        \\quad p(\\tilde{z}) = \\frac{\\varphi(\\tilde{z})}{\\Phi(z_{\\text{revert}})}
 
-    Moments  (λ₋ = λ₋(z_revert) = φ(z_revert) / Φ(z_revert)):
+    The observed entry :math:`z_t` is treated as a deterministic constant.
+    The per-trade gain is :math:`G = z_t - \\tilde{z}`.
 
-        E[z̃]   = −λ₋
-        E[G]    = z_t + λ₋
-        Var(z̃) = 1 − λ₋(λ₋ + z_revert)
-        E[G²]  = Var(z̃) + E[G]²
+    Moments (:math:`\\lambda_- = \\lambda_-(z_{\\text{revert}})`):
 
-    Second-order Kelly fraction (function of the observed z_t):
+    .. math::
 
-        f*(z_t) = (z_t + λ₋) / (1 − λ₋(λ₋ + z_revert) + (z_t + λ₋)²)
+        \\mathbb{E}[\\tilde{z}]  &= -\\lambda_- \\\\
+        \\mathbb{E}[G]            &= z_t + \\lambda_- \\\\
+        \\mathrm{Var}(\\tilde{z}) &= 1 - \\lambda_-(\\lambda_- + z_{\\text{revert}}) \\\\
+        \\mathbb{E}[G^2]          &= \\mathrm{Var}(\\tilde{z}) + \\mathbb{E}[G]^2
 
-    By symmetry of N(0,1), a LONG entry with z_t = −|z| is equivalent to a
-    SHORT entry with the reflected |z|, so ``|signal.zscore|`` is used for
-    both directions. The fraction is recomputed at each bar.
+    Second-order Kelly fraction (function of the observed :math:`z_t`):
+
+    .. math::
+
+        f^*(z_t) = \\frac{z_t + \\lambda_-}
+                    {1 - \\lambda_-(\\lambda_- + z_{\\text{revert}}) + (z_t + \\lambda_-)^2}
+
+    By symmetry of :math:`\\mathcal{N}(0,1)`, a LONG entry with
+    :math:`z_t = -|z|` is equivalent to a SHORT entry with the reflected
+    :math:`|z|`, so ``|signal.zscore|`` is used for both directions.
+    The fraction is recomputed at each bar.
 
     :param float z_revert: Right-truncation point for the exit distribution
         (default 0.0, i.e. exit at the mean).
@@ -237,31 +270,45 @@ class KellyTruncatedExit(PositionSizer):
 # ---------------------------------------------------------------------------
 
 class KellyTruncatedBoth(PositionSizer):
-    """Kelly sizer where both entry z and exit z̃ are random and independent.
+    """Kelly sizer where both entry :math:`z` and exit :math:`\\tilde{z}` are
+    random and independent.
 
     Entry and exit z-scores are modelled as independent truncated normals:
 
-        z  ~ N(0,1) truncated to [z_entry, +∞)   — entry level
-        z̃ ~ N(0,1) truncated to (−∞, z_revert]   — exit level
-        z ⊥ z̃
+    .. math::
 
-    The per-trade gain is G = z − z̃.
+        z         &\\sim \\mathcal{N}(0,1) \\text{ truncated to }
+                  [z_{\\text{entry}}, +\\infty) && \\text{(entry level)} \\\\
+        \\tilde{z} &\\sim \\mathcal{N}(0,1) \\text{ truncated to }
+                  (-\\infty, z_{\\text{revert}}] && \\text{(exit level)} \\\\
+        z &\\perp \\tilde{z}
 
-    Moments  (λ₊ = λ₊(z_entry),  λ₋ = λ₋(z_revert)):
+    The per-trade gain is :math:`G = z - \\tilde{z}`.
 
-        E[G]    = λ₊ + λ₋
-        Var(z)  = 1 − λ₊(λ₊ − z_entry)
-        Var(z̃) = 1 − λ₋(λ₋ + z_revert)
-        Var(G)  = Var(z) + Var(z̃)          (by independence)
-        E[G²]  = Var(G) + E[G]²
+    Moments (:math:`\\lambda_+ = \\lambda_+(z_{\\text{entry}})`,
+    :math:`\\lambda_- = \\lambda_-(z_{\\text{revert}})`):
+
+    .. math::
+
+        \\mathbb{E}[G]            &= \\lambda_+ + \\lambda_- \\\\
+        \\mathrm{Var}(z)          &= 1 - \\lambda_+(\\lambda_+ - z_{\\text{entry}}) \\\\
+        \\mathrm{Var}(\\tilde{z}) &= 1 - \\lambda_-(\\lambda_- + z_{\\text{revert}}) \\\\
+        \\mathrm{Var}(G)          &= \\mathrm{Var}(z) + \\mathrm{Var}(\\tilde{z})
+                                  && \\text{(independence)} \\\\
+        \\mathbb{E}[G^2]          &= \\mathrm{Var}(G) + \\mathbb{E}[G]^2
 
     Second-order Kelly fraction:
 
-        f* = (λ₊ + λ₋) / (2 − λ₊(λ₊ − z_entry) − λ₋(λ₋ + z_revert) + (λ₊ + λ₋)²)
+    .. math::
+
+        f^* = \\frac{\\lambda_+ + \\lambda_-}
+               {2 - \\lambda_+(\\lambda_+ - z_{\\text{entry}})
+               - \\lambda_-(\\lambda_- + z_{\\text{revert}})
+               + (\\lambda_+ + \\lambda_-)^2}
 
     The fraction is constant and computed once at construction.
 
-    :param float z_entry: Entry threshold; positions are opened when |z_t| ≥ z_entry.
+    :param float z_entry: Entry threshold; positions are opened when :math:`|z_t| \\geq z_{\\text{entry}}`.
     :param float z_revert: Right-truncation point for the exit distribution
         (default 0.0, i.e. exit at the mean).
     :param float f_max: Hard cap on the Kelly fraction (default 0.5).

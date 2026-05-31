@@ -1,0 +1,888 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Tracking the hedge ratio with the Kalman filter &#8212; spreadpy v0.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=af91de31" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../_static/documentation_options.js?v=fa47ad08"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/kalman_filter';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Is the implied volatility surface arbitrage-free?" href="arbitrage_free.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo-light-no-bg.png" class="logo__image only-light" alt="spreadpy v0.1.0 documentation - Home"/>
+    <img src="../_static/logo-light-no-bg.png" class="logo__image only-dark pst-js-only" alt="spreadpy v0.1.0 documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Example
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Explorations
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/SarcasticMatrix/spreadpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Example
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Explorations
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/SarcasticMatrix/spreadpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="arbitrage_free.html">Is the implied volatility surface arbitrage-free?</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Tracking the hedge ratio with the Kalman filter</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Explorations</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Tracking the hedge ratio with the Kalman filter</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="tracking-the-hedge-ratio-with-the-kalman-filter">
+<h1>Tracking the hedge ratio with the Kalman filter<a class="headerlink" href="#tracking-the-hedge-ratio-with-the-kalman-filter" title="Link to this heading">#</a></h1>
+<div class="seealso admonition">
+<p class="admonition-title">Topics</p>
+<p>Kalman filter · state-space model · dynamic hedge ratio · pairs trading · OLS bootstrap · lookahead bias</p>
+</div>
+<p>In pairs trading, the spread between two assets is only stationary if we subtract the right
+proportion of one asset from the other. That proportion — the <strong>hedge ratio</strong> <span class="math notranslate nohighlight">\(\beta_t\)</span> — is
+rarely constant in practice. Structural shifts in business models, changing correlations, or
+regime transitions all cause the relationship to drift over time.</p>
+<p>A constant OLS hedge ratio, estimated once on the training window, cannot adapt to these drifts.
+This note derives the Kalman filter state-space model used by <code class="docutils literal notranslate"><span class="pre">spreadpy</span></code> for dynamic hedge ratio
+estimation, following Palomar (2024), §15.6.3. Two variants are covered:</p>
+<ul class="simple">
+<li><p>the <strong>2-state model</strong> <code class="docutils literal notranslate"><span class="pre">KalmanFilter</span></code> — tracks the intercept <span class="math notranslate nohighlight">\(\mu_t\)</span> and the slope <span class="math notranslate nohighlight">\(\gamma_t\)</span></p></li>
+<li><p>the <strong>3-state model</strong> <code class="docutils literal notranslate"><span class="pre">KalmanFilterWithVelocity</span></code> — adds a velocity <span class="math notranslate nohighlight">\(\dot{\gamma}_t\)</span> to follow
+locally linear trends</p></li>
+</ul>
+<hr class="docutils" />
+<section id="why-not-ols">
+<h2>Why not OLS?<a class="headerlink" href="#why-not-ols" title="Link to this heading">#</a></h2>
+<p>Given price series <span class="math notranslate nohighlight">\((y_t, x_t)\)</span>, the simplest hedge ratio is the full-sample OLS slope:</p>
+<div class="math notranslate nohighlight">
+\[
+\hat{\gamma} = \frac{\sum_t (x_t - \bar{x})(y_t - \bar{y})}{\sum_t (x_t - \bar{x})^2}.
+\]</div>
+<p>This is optimal under stationarity. But it has two critical limitations:</p>
+<ol class="arabic simple">
+<li><p><strong>Static</strong> — it cannot react to regime changes occurring after the training window.</p></li>
+<li><p><strong>Biased at boundaries</strong> — even rolling OLS uses a fixed window of the past and discards all
+older information abruptly.</p></li>
+</ol>
+<p>Rolling OLS with window <span class="math notranslate nohighlight">\(w\)</span> is a middle ground:</p>
+<div class="math notranslate nohighlight">
+\[
+\hat{\gamma}_t = \operatorname{argmin}_{\gamma,\mu}
+\sum_{s=t-w+1}^{t} (y_s - \mu - \gamma\, x_s)^2.
+\]</div>
+<p>It adapts but introduces a tuning parameter <span class="math notranslate nohighlight">\(w\)</span> and uses observations with equal weights,
+while the Kalman filter <strong>weights all observations optimally</strong> and updates the estimate
+one observation at a time.</p>
+</section>
+<hr class="docutils" />
+<section id="the-state-space-model">
+<h2>The state-space model<a class="headerlink" href="#the-state-space-model" title="Link to this heading">#</a></h2>
+<section id="observation-and-transition-equations">
+<h3>Observation and transition equations<a class="headerlink" href="#observation-and-transition-equations" title="Link to this heading">#</a></h3>
+<p>We model the joint dynamics of <span class="math notranslate nohighlight">\((y_t, x_t)\)</span> as a <strong>linear Gaussian state-space model</strong>.
+The two hidden states are the intercept <span class="math notranslate nohighlight">\(\mu_t\)</span> and the hedge ratio <span class="math notranslate nohighlight">\(\gamma_t\)</span>.</p>
+<p><strong>Observation equation</strong> — <span class="math notranslate nohighlight">\(y_t\)</span> is explained by <span class="math notranslate nohighlight">\(x_t\)</span> through the current state:</p>
+<div class="math notranslate nohighlight">
+\[
+y_t = \mu_t + \gamma_t\, x_t + \varepsilon_t,
+\qquad \varepsilon_t \sim \mathcal{N}(0, \sigma^2_\varepsilon).
+\]</div>
+<p><strong>Transition equations</strong> — the states evolve as independent random walks:</p>
+<div class="math notranslate nohighlight">
+\[
+\mu_{t+1} = \mu_t + \eta_{\mu,t}, \qquad \eta_{\mu,t} \sim \mathcal{N}(0, \sigma^2_\mu),
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+\gamma_{t+1} = \gamma_t + \eta_{\gamma,t}, \qquad \eta_{\gamma,t} \sim \mathcal{N}(0, \sigma^2_\gamma).
+\]</div>
+<p>In matrix form, with state vector <span class="math notranslate nohighlight">\(\alpha_t = [\mu_t, \gamma_t]^\top\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\alpha_{t+1} = F\, \alpha_t + \eta_t, \quad F = I_2, \quad \eta_t \sim \mathcal{N}(0, Q),
+\quad Q = \begin{pmatrix} \sigma^2_\mu &amp; 0 \\ 0 &amp; \sigma^2_\gamma \end{pmatrix}.
+\end{split}\]</div>
+<p>At each bar <span class="math notranslate nohighlight">\(t\)</span> the observation matrix is <span class="math notranslate nohighlight">\(H_t = [1,\, x_t]\)</span>, so the observation equation
+rewrites compactly as:</p>
+<div class="math notranslate nohighlight">
+\[
+y_t = H_t\, \alpha_t + \varepsilon_t.
+\]</div>
+</section>
+<section id="hyperparameter-initialisation-ols-bootstrap">
+<h3>Hyperparameter initialisation (OLS bootstrap)<a class="headerlink" href="#hyperparameter-initialisation-ols-bootstrap" title="Link to this heading">#</a></h3>
+<p>The three noise variances <span class="math notranslate nohighlight">\((\sigma^2_\varepsilon, \sigma^2_\mu, \sigma^2_\gamma)\)</span> are not
+observed and must be fixed before running the filter. Following Palomar (2024), §15.6.3,
+we bootstrap them from an OLS fit on the first <span class="math notranslate nohighlight">\(T_{\mathrm{ls}}\)</span> bars:</p>
+<div class="math notranslate nohighlight">
+\[
+\sigma^2_\varepsilon = \mathrm{Var}[\varepsilon^{\mathrm{OLS}}],
+\qquad
+\sigma^2_\mu = \alpha\, \sigma^2_\varepsilon,
+\qquad
+\sigma^2_\gamma = \frac{\alpha\, \sigma^2_\varepsilon}{\mathrm{Var}[x]}.
+\]</div>
+<p>The scalar <span class="math notranslate nohighlight">\(\alpha \in (10^{-6}, 10^{-4})\)</span> is the single tuning parameter: smaller values
+make the states <strong>adapt more slowly</strong>, larger values track changes faster but add noise.</p>
+<p>The initial state covariance is also derived from OLS precision:</p>
+<div class="math notranslate nohighlight">
+\[
+P_0 = \mathrm{diag}\!\left(
+    \frac{\sigma^2_\varepsilon}{T_{\mathrm{ls}}},\;
+    \frac{\sigma^2_\varepsilon}{T_{\mathrm{ls}}\cdot\mathrm{Var}[x]}
+\right).
+\]</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="the-kalman-recursion">
+<h2>The Kalman recursion<a class="headerlink" href="#the-kalman-recursion" title="Link to this heading">#</a></h2>
+<p>At each bar <span class="math notranslate nohighlight">\(t = 1, \ldots, T\)</span>, the filter alternates between a <strong>predict</strong> step (prior
+before seeing <span class="math notranslate nohighlight">\(y_t\)</span>) and an <strong>update</strong> step (posterior after seeing <span class="math notranslate nohighlight">\(y_t\)</span>).</p>
+<p><strong>Predict:</strong></p>
+<div class="math notranslate nohighlight">
+\[
+\alpha_{t|t-1} = F\, \alpha_{t-1|t-1}, \qquad P_{t|t-1} = F\, P_{t-1|t-1}\, F^\top + Q.
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(F = I_2\)</span>, the predicted state is simply the previous filtered state —
+the hedge ratio is not expected to drift between bars.</p>
+<p><strong>Update</strong> — incorporate the new observation <span class="math notranslate nohighlight">\(y_t\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+\nu_t = y_t - H_t\, \alpha_{t|t-1} \qquad (\text{innovation})
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+S_t = H_t\, P_{t|t-1}\, H_t^\top + \sigma^2_\varepsilon \qquad (\text{innovation variance})
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+K_t = P_{t|t-1}\, H_t^\top / S_t \qquad (\text{Kalman gain})
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+\alpha_{t|t} = \alpha_{t|t-1} + K_t\, \nu_t, \qquad P_{t|t} = (I - K_t H_t^\top)\, P_{t|t-1}.
+\]</div>
+<p>The Kalman gain <span class="math notranslate nohighlight">\(K_t \in \mathbb{R}^2\)</span> determines how much the new observation moves the
+state estimate. When <span class="math notranslate nohighlight">\(\sigma^2_\varepsilon\)</span> is large (noisy observations), <span class="math notranslate nohighlight">\(K_t\)</span> is small
+and the filter trusts the prior more. When <span class="math notranslate nohighlight">\(\sigma^2_\gamma\)</span> is large (fast-moving state),
+<span class="math notranslate nohighlight">\(K_t\)</span> is large and new data dominates.</p>
+<section id="avoiding-lookahead-bias">
+<h3>Avoiding lookahead bias<a class="headerlink" href="#avoiding-lookahead-bias" title="Link to this heading">#</a></h3>
+<div class="warning admonition">
+<p class="admonition-title">Critical point</p>
+<p>For trading, we must use the <strong>predictive</strong> state <span class="math notranslate nohighlight">\(\gamma_{t|t-1}\)</span>, not the <strong>filtered</strong>
+state <span class="math notranslate nohighlight">\(\gamma_{t|t}\)</span>.</p>
+<p>The filtered state <span class="math notranslate nohighlight">\(\gamma_{t|t}\)</span> incorporates <span class="math notranslate nohighlight">\(y_t\)</span> itself — if we used it to construct
+the spread <span class="math notranslate nohighlight">\(s_t = y_t - \gamma_{t|t}\, x_t\)</span>, we would be using the future to explain
+the present.</p>
+<p><code class="docutils literal notranslate"><span class="pre">spreadpy</span></code> always returns and uses <span class="math notranslate nohighlight">\(\gamma_{t|t-1}\)</span>.</p>
+</div>
+<p>The lookahead-free normalised spread is therefore:</p>
+<div class="math notranslate nohighlight">
+\[
+z_t = \frac{y_t - \gamma_{t|t-1}\, x_t - \mu_{t|t-1}}{1 + \gamma_{t|t-1}}.
+\]</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="the-velocity-extension">
+<h2>The velocity extension<a class="headerlink" href="#the-velocity-extension" title="Link to this heading">#</a></h2>
+<section id="motivation">
+<h3>Motivation<a class="headerlink" href="#motivation" title="Link to this heading">#</a></h3>
+<p>The 2-state random-walk model assumes the hedge ratio has no directional trend —
+changes in <span class="math notranslate nohighlight">\(\gamma_t\)</span> are pure noise. When the cointegration relationship drifts
+persistently in one direction (e.g. a slow structural shift in business mix), the
+2-state model lags behind because it cannot anticipate the direction.</p>
+<p>The <strong>3-state model</strong> adds a velocity <span class="math notranslate nohighlight">\(\dot{\gamma}_t\)</span> that lets the filter
+extrapolate the current trend:</p>
+<div class="math notranslate nohighlight">
+\[
+\gamma_{t+1} = \gamma_t + \dot{\gamma}_t + \eta_{\gamma,t},
+\qquad
+\dot{\gamma}_{t+1} = \dot{\gamma}_t + \eta_{\dot{\gamma},t}.
+\]</div>
+<p>This is the <strong>locally linear trend</strong> (LLT) model applied to the hedge ratio.</p>
+</section>
+<section id="state-equations">
+<h3>State equations<a class="headerlink" href="#state-equations" title="Link to this heading">#</a></h3>
+<p>The augmented state vector is <span class="math notranslate nohighlight">\(\alpha_t = [\mu_t, \gamma_t, \dot{\gamma}_t]^\top\)</span> and the
+transition matrix becomes:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+F = \begin{pmatrix} 1 &amp; 0 &amp; 0 \\ 0 &amp; 1 &amp; 1 \\ 0 &amp; 0 &amp; 1 \end{pmatrix},
+\qquad
+Q = \begin{pmatrix} \sigma^2_\mu &amp; 0 &amp; 0 \\ 0 &amp; \sigma^2_\gamma &amp; 0 \\ 0 &amp; 0 &amp; \sigma^2_{\dot{\gamma}} \end{pmatrix}.
+\end{split}\]</div>
+<p>The observation matrix is <span class="math notranslate nohighlight">\(H_t = [1, x_t, 0]\)</span>, so the velocity is a <strong>latent</strong> variable
+that only influences <span class="math notranslate nohighlight">\(y_t\)</span> indirectly through <span class="math notranslate nohighlight">\(\gamma_t\)</span>.</p>
+<p>The predicted hedge ratio is now:</p>
+<div class="math notranslate nohighlight">
+\[
+\gamma_{t|t-1} = \gamma_{t-1|t-1} + \dot{\gamma}_{t-1|t-1},
+\]</div>
+<p>which extrapolates the last estimated trend — the filter “looks ahead” in the direction
+of the current drift.</p>
+</section>
+<section id="additional-hyperparameter">
+<h3>Additional hyperparameter<a class="headerlink" href="#additional-hyperparameter" title="Link to this heading">#</a></h3>
+<p>The velocity noise variance uses a second scale <span class="math notranslate nohighlight">\(\alpha_{\dot{\gamma}} &lt; \alpha\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+\sigma^2_{\dot{\gamma}} = \frac{\alpha_{\dot{\gamma}} \cdot \sigma^2_\varepsilon}{\mathrm{Var}[x]}.
+\]</div>
+<p>The inequality <span class="math notranslate nohighlight">\(\alpha_{\dot{\gamma}} &lt; \alpha\)</span> ensures the velocity is <strong>slower-moving</strong>
+than the hedge ratio itself: the trend is persistent but not erratic. The default in
+<code class="docutils literal notranslate"><span class="pre">spreadpy</span></code> is <span class="math notranslate nohighlight">\(\alpha_{\dot{\gamma}} = \alpha / 10\)</span>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="application-with-spreadpy">
+<h2>Application with <code class="docutils literal notranslate"><span class="pre">spreadpy</span></code><a class="headerlink" href="#application-with-spreadpy" title="Link to this heading">#</a></h2>
+<p>We illustrate the three estimators on a classic pair: <strong>GLD</strong> (SPDR Gold Shares)
+and <strong>GDX</strong> (VanEck Gold Miners ETF). Both are exposed to gold prices, but GDX
+carries additional equity and operational risk, so the relationship drifts over time.</p>
+<section id="loading-data">
+<h3>Loading data<a class="headerlink" href="#loading-data" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yfinance</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">yf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">PriceTimeSeries</span>
+
+<span class="n">raw</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">download</span><span class="p">([</span><span class="s2">&quot;GLD&quot;</span><span class="p">,</span> <span class="s2">&quot;GDX&quot;</span><span class="p">],</span> <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2018-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span>
+                  <span class="n">auto_adjust</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="s2">&quot;Close&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+<span class="n">y</span> <span class="o">=</span> <span class="n">PriceTimeSeries</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">&quot;GLD&quot;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;GLD&quot;</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">PriceTimeSeries</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">&quot;GDX&quot;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;GDX&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="fitting-the-three-estimators">
+<h3>Fitting the three estimators<a class="headerlink" href="#fitting-the-three-estimators" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.spread.hedgeRatio.constantOLS</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConstantOLS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.spread.hedgeRatio.rollingOLS</span><span class="w"> </span><span class="kn">import</span> <span class="n">RollingOLS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.spread.hedgeRatio.kalmanFilter</span><span class="w"> </span><span class="kn">import</span> <span class="n">KalmanFilter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.spread.hedgeRatio.kalmanFilterWithVelocity</span><span class="w"> </span><span class="kn">import</span> <span class="n">KalmanFilterWithVelocity</span>
+
+<span class="n">ols</span>     <span class="o">=</span> <span class="n">ConstantOLS</span><span class="p">()</span>
+<span class="n">rolling</span> <span class="o">=</span> <span class="n">RollingOLS</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+<span class="n">kf</span>      <span class="o">=</span> <span class="n">KalmanFilter</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">)</span>
+<span class="n">kfv</span>     <span class="o">=</span> <span class="n">KalmanFilterWithVelocity</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">alpha_dgam</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">)</span>
+
+<span class="c1"># All estimators work on log-prices for homoscedastic residuals</span>
+<span class="n">y_log</span> <span class="o">=</span> <span class="n">PriceTimeSeries</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">series</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;log GLD&quot;</span><span class="p">)</span>
+<span class="n">x_log</span> <span class="o">=</span> <span class="n">PriceTimeSeries</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">series</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;log GDX&quot;</span><span class="p">)</span>
+
+<span class="n">beta_ols</span>     <span class="o">=</span> <span class="n">ols</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">y_log</span><span class="p">,</span> <span class="n">x_log</span><span class="p">)</span>
+<span class="n">beta_rolling</span> <span class="o">=</span> <span class="n">rolling</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">y_log</span><span class="p">,</span> <span class="n">x_log</span><span class="p">)</span>
+<span class="n">beta_kf</span>      <span class="o">=</span> <span class="n">kf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">y_log</span><span class="p">,</span> <span class="n">x_log</span><span class="p">)</span>
+<span class="n">beta_kfv</span>     <span class="o">=</span> <span class="n">kfv</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">y_log</span><span class="p">,</span> <span class="n">x_log</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="comparing-the-hedge-ratios">
+<h3>Comparing the hedge ratios<a class="headerlink" href="#comparing-the-hedge-ratios" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">beta_ols</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Constant OLS&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">beta_rolling</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;steelblue&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Rolling OLS (w=120)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">beta_kf</span><span class="p">,</span>      <span class="n">color</span><span class="o">=</span><span class="s2">&quot;tomato&quot;</span><span class="p">,</span>    <span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>   <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Kalman 2-state&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">beta_kfv</span><span class="p">,</span>     <span class="n">color</span><span class="o">=</span><span class="s2">&quot;seagreen&quot;</span><span class="p">,</span>  <span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>   <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Kalman 3-state (velocity)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Hedge ratio $</span><span class="se">\\</span><span class="s2">gamma_t$ — GLD / GDX&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;$</span><span class="se">\\</span><span class="s2">gamma_t$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The Kalman curves adapt smoothly to structural breaks while Rolling OLS
+produces step-like jumps and lags by half a window.</p>
+</section>
+<section id="inspecting-the-normalised-spread">
+<h3>Inspecting the normalised spread<a class="headerlink" href="#inspecting-the-normalised-spread" title="Link to this heading">#</a></h3>
+<p>Both Kalman estimators expose the normalised spread <span class="math notranslate nohighlight">\(z_t\)</span> directly as an attribute
+after <code class="docutils literal notranslate"><span class="pre">fit()</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kf</span><span class="o">.</span><span class="n">normalized_spread_</span><span class="p">,</span>  <span class="n">color</span><span class="o">=</span><span class="s2">&quot;tomato&quot;</span><span class="p">,</span>   <span class="n">label</span><span class="o">=</span><span class="s2">&quot;2-state&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kfv</span><span class="o">.</span><span class="n">normalized_spread_</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;seagreen&quot;</span><span class="p">,</span>  <span class="n">label</span><span class="o">=</span><span class="s2">&quot;3-state&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Normalised spread $z_t$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kf</span><span class="o">.</span><span class="n">innovation_var_ts_</span><span class="p">,</span>  <span class="n">color</span><span class="o">=</span><span class="s2">&quot;tomato&quot;</span><span class="p">,</span>   <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$S_t$ — 2-state&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kfv</span><span class="o">.</span><span class="n">innovation_var_ts_</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;seagreen&quot;</span><span class="p">,</span>  <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$S_t$ — 3-state&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Innovation variance $S_t$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>A widening <span class="math notranslate nohighlight">\(S_t\)</span> signals that the filter is uncertain — the model and the data
+are temporarily inconsistent. This often coincides with news events or regime changes.</p>
+</section>
+<section id="stationarity-diagnostics">
+<h3>Stationarity diagnostics<a class="headerlink" href="#stationarity-diagnostics" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.spread</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpreadSeries</span>
+
+<span class="c1"># Build the spread series (in log-price space) with the KF hedge ratio</span>
+<span class="n">spread_kf</span> <span class="o">=</span> <span class="n">SpreadSeries</span><span class="p">(</span><span class="n">y_log</span><span class="p">,</span> <span class="n">x_log</span><span class="p">,</span> <span class="n">beta_kf</span><span class="p">,</span> <span class="n">estimator_name</span><span class="o">=</span><span class="s2">&quot;KalmanFilter&quot;</span><span class="p">)</span>
+
+<span class="n">hl</span>   <span class="o">=</span> <span class="n">spread_kf</span><span class="o">.</span><span class="n">half_life</span><span class="p">()</span>
+<span class="n">stat</span><span class="p">,</span> <span class="n">pval</span> <span class="o">=</span> <span class="n">spread_kf</span><span class="o">.</span><span class="n">adf_statistic</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Half-life : </span><span class="si">{</span><span class="n">hl</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> bars&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ADF stat  : </span><span class="si">{</span><span class="n">stat</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">  (p = </span><span class="si">{</span><span class="n">pval</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A short half-life (say, 20–60 bars for daily data) and a p-value below 0.05 suggest that
+the Kalman-filtered spread is mean-reverting and suitable for z-score signal generation.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="choosing-between-the-two-models">
+<h2>Choosing between the two models<a class="headerlink" href="#choosing-between-the-two-models" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p><strong>2-state</strong> <code class="docutils literal notranslate"><span class="pre">KalmanFilter</span></code></p></th>
+<th class="head"><p><strong>3-state</strong> <code class="docutils literal notranslate"><span class="pre">KalmanFilterWithVelocity</span></code></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Transition</p></td>
+<td><p>Random walk on <span class="math notranslate nohighlight">\(\gamma_t\)</span></p></td>
+<td><p>Locally linear trend</p></td>
+</tr>
+<tr class="row-odd"><td><p>Best for</p></td>
+<td><p>Stationary relationship with occasional jumps</p></td>
+<td><p>Slow, persistent drifts</p></td>
+</tr>
+<tr class="row-even"><td><p>Risk of</p></td>
+<td><p>Under-reacting to trends</p></td>
+<td><p>Over-fitting to transient moves</p></td>
+</tr>
+<tr class="row-odd"><td><p>Key param</p></td>
+<td><p><span class="math notranslate nohighlight">\(\alpha \in [10^{-6}, 10^{-4}]\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\alpha\)</span>, <span class="math notranslate nohighlight">\(\alpha_{\dot\gamma} = \alpha/10\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>Palomar recommendation</p></td>
+<td><p><span class="math notranslate nohighlight">\(\alpha = 10^{-5}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\alpha = 10^{-6}\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">Practical advice</p>
+<p>Use the <strong>2-state model</strong> as the default. Switch to the <strong>3-state model</strong> only if
+inspection of <span class="math notranslate nohighlight">\(\gamma_t\)</span> shows a persistent directional drift that the 2-state model
+cannot track without raising <span class="math notranslate nohighlight">\(\alpha\)</span> to a level that makes the spread too noisy.</p>
+<p>In both cases, <strong>always use log-prices</strong> — the constant-noise assumption
+<span class="math notranslate nohighlight">\(\sigma^2_\varepsilon = \mathrm{const}\)</span> breaks down on raw prices where
+<span class="math notranslate nohighlight">\(\sigma^2_\varepsilon \propto \text{price}^2\)</span>.</p>
+</div>
+</section>
+<hr class="docutils" />
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Palomar, D. P. (2024). <em>Portfolio Optimization: Theory and Application.</em>
+Cambridge University Press. §15.6 — Kalman filter for pairs trading.
+<a class="reference external" href="https://portfoliooptimizationbook.com/book/15.6-kalman-pairs-trading.html">Online version</a></p></li>
+<li><p>Kalman, R. E. (1960). <em>A new approach to linear filtering and prediction problems.</em>
+Journal of Basic Engineering, 82(1), 35–45.</p></li>
+<li><p>Pole, A. (2007). <em>Statistical Arbitrage: Algorithmic Trading Insights and Techniques.</em>
+Wiley Finance.</p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="arbitrage_free.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Is the implied volatility surface arbitrage-free?</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-not-ols">Why not OLS?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-state-space-model">The state-space model</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#observation-and-transition-equations">Observation and transition equations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hyperparameter-initialisation-ols-bootstrap">Hyperparameter initialisation (OLS bootstrap)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-kalman-recursion">The Kalman recursion</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#avoiding-lookahead-bias">Avoiding lookahead bias</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-velocity-extension">The velocity extension</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation">Motivation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#state-equations">State equations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#additional-hyperparameter">Additional hyperparameter</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#application-with-spreadpy">Application with <code class="docutils literal notranslate"><span class="pre">spreadpy</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-data">Loading data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fitting-the-three-estimators">Fitting the three estimators</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-the-hedge-ratios">Comparing the hedge ratios</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inspecting-the-normalised-spread">Inspecting the normalised spread</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stationarity-diagnostics">Stationarity diagnostics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-between-the-two-models">Choosing between the two models</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/user_guide/kalman_filter.md.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Théophile Schmutz.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

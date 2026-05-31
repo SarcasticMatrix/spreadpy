@@ -24,10 +24,14 @@ class RiskMetrics:
 
     Key metrics:
 
-        Sharpe  = E[r − r_f] / σ[r] · √T
-        Sortino = (CAGR − r_f) / σ_down · √T     (downside std below MAR)
-        Calmar  = CAGR / |MaxDD|
-        MaxDD   = min_t  (equity_t / max_{s≤t} equity_s  − 1)
+    .. math::
+
+        \\text{Sharpe}  &= \\frac{\\mathbb{E}[r - r_f]}{\\sigma[r]} \\cdot \\sqrt{T} \\\\
+        \\text{Sortino} &= \\frac{\\text{CAGR} - r_f}{\\sigma_{\\downarrow}} \\cdot \\sqrt{T}
+                         \\quad (\\text{downside std below MAR}) \\\\
+        \\text{Calmar}  &= \\frac{\\text{CAGR}}{|\\text{MaxDD}|} \\\\
+        \\text{MaxDD}   &= \\min_t\\!\\left(\\frac{\\text{equity}_t}
+                         {\\max_{s \\leq t}\\, \\text{equity}_s} - 1\\right)
 
     :param pd.Series equity: Bar-level or daily equity curve (NaNs are dropped).
     :param float risk_free_rate: Annual risk-free rate r_f (e.g. 0.04 for 4%).
@@ -49,7 +53,9 @@ class RiskMetrics:
 
         Defined as:
 
-            R = equity_T / equity_0 − 1
+        .. math::
+
+            R = \\frac{\\text{equity}_T}{\\text{equity}_0} - 1
 
         :returns: Total return as a fraction (e.g. 0.12 for +12%).
         :rtype: float
@@ -63,10 +69,12 @@ class RiskMetrics:
 
         Defined as:
 
-            CAGR = (1 + R)^{T / n} − 1
+        .. math::
 
-        where R is the total return, n the number of bars, and T =
-        ``periods_per_year``.
+            \\text{CAGR} = (1 + R)^{T/n} - 1
+
+        where :math:`R` is the total return, :math:`n` the number of bars,
+        and :math:`T` = ``periods_per_year``.
 
         :param int periods_per_year: Number of bars per year (252 for daily).
 
@@ -85,8 +93,9 @@ class RiskMetrics:
     def volatility(self, periods_per_year: int = 252) -> float:
         """Compute the annualised volatility of bar-level returns.
 
-        Defined as σ_ann = σ_bar · √T where σ_bar is the sample standard
-        deviation of simple returns and T = ``periods_per_year``.
+        Defined as :math:`\\sigma_{\\text{ann}} = \\sigma_{\\text{bar}} \\cdot \\sqrt{T}`
+        where :math:`\\sigma_{\\text{bar}}` is the sample standard deviation of
+        simple returns and :math:`T` = ``periods_per_year``.
 
         :param int periods_per_year: Number of bars per year (252 for daily).
 
@@ -100,11 +109,12 @@ class RiskMetrics:
 
         Defined as:
 
-            Sharpe = E[r_t / T] / σ_bar · √T
+        .. math::
 
-        where r_t is the bar-level return,
-        T = ``periods_per_year``, and σ_bar the sample standard deviation of
-        bar returns.
+            \\text{Sharpe} = \\frac{\\mathbb{E}[r_t - r_f/T]}{\\sigma_{\\text{bar}}} \\cdot \\sqrt{T}
+
+        where :math:`r_t` is the bar-level return, :math:`T` = ``periods_per_year``,
+        and :math:`\\sigma_{\\text{bar}}` the sample standard deviation of bar returns.
 
         :param int periods_per_year: Number of bars per year (252 for daily).
 
@@ -123,8 +133,11 @@ class RiskMetrics:
         Uses downside deviation below the minimum acceptable return (MAR)
         as the risk denominator:
 
-            σ_down = √(E[min(r_t − mar, 0)²]) · √T
-            Sortino = (CAGR − r_f) / σ_down
+        .. math::
+
+            \\sigma_{\\downarrow} &= \\sqrt{\\mathbb{E}[\\min(r_t - \\text{mar},\\, 0)^2]}
+                                  \\cdot \\sqrt{T} \\\\
+            \\text{Sortino} &= \\frac{\\text{CAGR} - r_f}{\\sigma_{\\downarrow}}
 
         :param int periods_per_year: Number of bars per year (252 for daily).
         :param float mar: Minimum acceptable return per bar (default 0.0).
@@ -147,7 +160,11 @@ class RiskMetrics:
 
         Defined as:
 
-            MDD = min_t ( equity_t / max_{s ≤ t} equity_s  − 1 )
+        .. math::
+
+            \\text{MDD} = \\min_t\\!\\left(
+                \\frac{\\text{equity}_t}{\\max_{s \\leq t}\\, \\text{equity}_s} - 1
+            \\right)
 
         :returns: Maximum drawdown as a negative fraction (e.g. −0.15 for −15%).
         :rtype: float
@@ -161,7 +178,9 @@ class RiskMetrics:
 
         Defined as:
 
-            Calmar = CAGR / |MDD|
+        .. math::
+
+            \\text{Calmar} = \\frac{\\text{CAGR}}{|\\text{MDD}|}
 
         :param int periods_per_year: Number of bars per year (252 for daily).
 
@@ -176,9 +195,11 @@ class RiskMetrics:
     def drawdown_series(self) -> pd.Series:
         """Compute the full drawdown time series.
 
-        At each bar t:
+        At each bar :math:`t`:
 
-            DD_t = equity_t / max_{s ≤ t} equity_s  − 1
+        .. math::
+
+            DD_t = \\frac{\\text{equity}_t}{\\max_{s \\leq t}\\, \\text{equity}_s} - 1
 
         :returns: Drawdown series (values ≤ 0) aligned with ``self.equity.index``.
         :rtype: pd.Series
@@ -203,10 +224,13 @@ class RiskMetrics:
 
         Average of the worst alpha-fraction of drawdown observations:
 
-            CDaR_α = E[DD_t | DD_t ≤ VaR_α(DD)]
+        .. math::
 
-        where VaR_α is the alpha-quantile of the drawdown distribution.
-        Returns a negative value (same sign convention as max_drawdown).
+            \\text{CDaR}_\\alpha = \\mathbb{E}[DD_t \\mid DD_t \\leq \\text{VaR}_\\alpha(DD)]
+
+        where :math:`\\text{VaR}_\\alpha` is the :math:`\\alpha`-quantile of the
+        drawdown distribution. Returns a negative value (same sign convention
+        as :meth:`max_drawdown`).
 
         :param float alpha: Tail level (default 0.05 = worst 5%).
         :returns: Mean drawdown in the worst alpha fraction of bars.
@@ -240,7 +264,10 @@ class RiskMetrics:
 
         Defined as:
 
-            PF = Σ_{winning trades} P&L / |Σ_{losing trades} P&L|
+        .. math::
+
+            \\text{PF} = \\frac{\\sum_{\\text{winning}} \\text{P\\&L}}
+                               {\\left|\\sum_{\\text{losing}} \\text{P\\&L}\\right|}
 
         :param List[Trade] trades: List of leg fills from :attr:`Portfolio.trades`.
 
@@ -258,10 +285,13 @@ class RiskMetrics:
 
         Defined as:
 
-            turnover = (Σ |notional_i|) · T / (n · equity_avg)
+        .. math::
 
-        where n is the number of bars in the equity series, T =
-        ``periods_per_year``, and equity_avg is the mean equity over the period.
+            \\text{turnover} = \\frac{\\sum_i |N_i| \\cdot T}{n \\cdot \\bar{\\text{equity}}}
+
+        where :math:`n` is the number of bars in the equity series,
+        :math:`T` = ``periods_per_year``, and :math:`\\bar{\\text{equity}}` is
+        the mean equity over the period.
 
         :param List[Trade] trades: List of leg fills from :attr:`Portfolio.trades`.
         :param int periods_per_year: Number of bars per year (252 for daily).
@@ -330,7 +360,9 @@ class RiskMetrics:
         For each leg (y and x), buys (+1) are pushed onto a stack and matched
         FIFO against sells (−1). The P&L of each matched pair is:
 
-            pnl = (exit_fill_price − entry_fill_price) · qty
+        .. math::
+
+            \\text{pnl} = (\\text{exit\\_fill\\_price} - \\text{entry\\_fill\\_price}) \\cdot \\text{qty}
 
         :param List[Trade] trades: List of leg fills from :attr:`Portfolio.trades`.
 

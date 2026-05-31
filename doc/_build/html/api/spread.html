@@ -46,6 +46,8 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/spread';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -150,15 +152,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -259,15 +261,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -397,7 +399,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="spreadpy.spread.spreadSeries.SpreadSeries">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spreadpy.spread.spreadSeries.</span></span><span class="sig-name descname"><span class="pre">SpreadSeries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="data.html#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="data.html#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">hedge_ratio_ts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimator_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/spread/spreadSeries.html#SpreadSeries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.spread.spreadSeries.SpreadSeries" title="Link to this definition">#</a></dt>
-<dd><p>Residual spread series s_t = y_t − β_t · x_t.</p>
+<dd><p>Residual spread series <span class="math notranslate nohighlight">\(s_t = y_t - \beta_t \cdot x_t\)</span>.</p>
 <p>Given aligned price series y, x and a time-varying hedge ratio β_t,
 the spread is computed bar-by-bar. Provides stationarity diagnostics
 (Ornstein-Uhlenbeck half-life, ADF test) and a rolling z-score.</p>
@@ -416,14 +418,14 @@ aligned (or reindexed + forward-filled) to <code class="docutils literal notrans
 <dt class="sig sig-object py" id="spreadpy.spread.spreadSeries.SpreadSeries.adf_statistic">
 <span class="sig-name descname"><span class="pre">adf_statistic</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/spreadpy/spread/spreadSeries.html#SpreadSeries.adf_statistic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.spread.spreadSeries.SpreadSeries.adf_statistic" title="Link to this definition">#</a></dt>
 <dd><p>Compute the Augmented Dickey-Fuller test statistic for the spread.</p>
-<p>Tests the null hypothesis H₀ of a unit root (non-stationarity)
-against the alternative H₁ of stationarity (mean-reversion).
+<p>Tests the null hypothesis <span class="math notranslate nohighlight">\(H_0\)</span> of a unit root (non-stationarity)
+against the alternative <span class="math notranslate nohighlight">\(H_1\)</span> of stationarity (mean-reversion).
 The ADF regression with one lag is:</p>
-<blockquote>
-<div><p>Δs_t = ρ · s_{t−1} + c + δ · Δs_{t−1} + ε_t</p>
-</div></blockquote>
-<p>A t-statistic on ρ that is sufficiently negative (p-value &lt; 0.05)
-rejects H₀ and supports cointegration of the pair.</p>
+<div class="math notranslate nohighlight">
+\[\Delta s_t = \rho \cdot s_{t-1} + c + \delta \cdot \Delta s_{t-1} + \varepsilon_t\]</div>
+<p>A t-statistic on <span class="math notranslate nohighlight">\(\rho\)</span> that is sufficiently negative
+(p-value &lt; 0.05) rejects <span class="math notranslate nohighlight">\(H_0\)</span> and supports cointegration of
+the pair.</p>
 <p>Requires <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -444,17 +446,17 @@ rejects H₀ and supports cointegration of the pair.</p>
 <dd><p>Estimate the mean-reversion half-life of the spread via an
 Ornstein-Uhlenbeck OLS regression.</p>
 <p>The discrete-time OU model is:</p>
-<blockquote>
-<div><p>Δs_t = λ · s_{t−1} + c + ε_t,   ε_t ~ N(0, σ²)</p>
-</div></blockquote>
-<p>where λ &lt; 0 indicates mean-reversion. The half-life is the time
-(in bars) for a deviation from equilibrium to decay by half:</p>
-<blockquote>
-<div><p>τ_{1/2} = −ln 2 / λ</p>
-</div></blockquote>
-<p>λ is estimated by regressing Δs_t on s_{t−1} (with constant)
-using OLS. If λ ≥ 0, the spread is non-stationary and the method
-returns <code class="docutils literal notranslate"><span class="pre">float('inf')</span></code> with a warning.</p>
+<div class="math notranslate nohighlight">
+\[\Delta s_t = \lambda \cdot s_{t-1} + c + \varepsilon_t,
+\quad \varepsilon_t \sim \mathcal{N}(0, \sigma^2)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\lambda &lt; 0\)</span> indicates mean-reversion. The half-life
+is the time (in bars) for a deviation from equilibrium to decay by half:</p>
+<div class="math notranslate nohighlight">
+\[\tau_{1/2} = -\frac{\ln 2}{\lambda}\]</div>
+<p><span class="math notranslate nohighlight">\(\lambda\)</span> is estimated by regressing <span class="math notranslate nohighlight">\(\Delta s_t\)</span> on
+<span class="math notranslate nohighlight">\(s_{t-1}\)</span> (with constant) using OLS. If <span class="math notranslate nohighlight">\(\lambda \geq 0\)</span>,
+the spread is non-stationary and the method returns <code class="docutils literal notranslate"><span class="pre">float('inf')</span></code>
+with a warning.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Mean-reversion half-life in bars. <code class="docutils literal notranslate"><span class="pre">float('inf')</span></code> if the
@@ -470,14 +472,13 @@ spread does not mean-revert.</p>
 <dt class="sig sig-object py" id="spreadpy.spread.spreadSeries.SpreadSeries.rolling_zscore">
 <span class="sig-name descname"><span class="pre">rolling_zscore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/spreadpy/spread/spreadSeries.html#SpreadSeries.rolling_zscore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.spread.spreadSeries.SpreadSeries.rolling_zscore" title="Link to this definition">#</a></dt>
 <dd><p>Compute a rolling z-score of the spread with no lookahead.</p>
-<p>At each bar t, the z-score standardises s_t using statistics
-estimated over the preceding window of w bars:</p>
-<blockquote>
-<div><p>μ_{t,w} = (1/w) · Σ_{j=0}^{w−1} s_{t−j}
-σ_{t,w} = std(s_{t−w+1}, …, s_t)   (sample std, ddof=1)
-z_t     = (s_t − μ_{t,w}) / σ_{t,w}</p>
-</div></blockquote>
-<p>Bars t &lt; w are set to NaN (insufficient history). This is the
+<p>At each bar <span class="math notranslate nohighlight">\(t\)</span>, the z-score standardises <span class="math notranslate nohighlight">\(s_t\)</span> using
+statistics estimated over the preceding window of <span class="math notranslate nohighlight">\(w\)</span> bars:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mu_{t,w} &amp;= \frac{1}{w} \sum_{j=0}^{w-1} s_{t-j} \\
+\sigma_{t,w} &amp;= \mathrm{std}(s_{t-w+1}, \ldots, s_t) \quad (\mathrm{ddof}=1) \\
+z_t &amp;= \frac{s_t - \mu_{t,w}}{\sigma_{t,w}}\end{split}\]</div>
+<p>Bars <span class="math notranslate nohighlight">\(t &lt; w\)</span> are set to NaN (insufficient history). This is the
 signal used by <code class="xref py py-class docutils literal notranslate"><span class="pre">ZScoreSignal</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -526,11 +527,11 @@ sub-period with no reference to the original data outside [start, end].</p>
 <dt class="sig sig-object py" id="spreadpy.spread.hedgeRatioEstimator.HedgeRatioEstimator">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spreadpy.spread.hedgeRatioEstimator.</span></span><span class="sig-name descname"><span class="pre">HedgeRatioEstimator</span></span><a class="reference internal" href="../_modules/spreadpy/spread/hedgeRatioEstimator.html#HedgeRatioEstimator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.spread.hedgeRatioEstimator.HedgeRatioEstimator" title="Link to this definition">#</a></dt>
 <dd><p>Abstract base class for hedge ratio estimators.</p>
-<p>Given two price series y (dependent leg) and x (independent leg),
-an estimator produces a time series β_t such that the spread</p>
-<blockquote>
-<div><p>s_t = y_t − β_t · x_t</p>
-</div></blockquote>
+<p>Given two price series <span class="math notranslate nohighlight">\(y\)</span> (dependent leg) and <span class="math notranslate nohighlight">\(x\)</span>
+(independent leg), an estimator produces a time series <span class="math notranslate nohighlight">\(\beta_t\)</span>
+such that the spread</p>
+<div class="math notranslate nohighlight">
+\[s_t = y_t - \beta_t \cdot x_t\]</div>
 <p>is (ideally) stationary. All concrete subclasses must implement
 <a class="reference internal" href="#spreadpy.spread.hedgeRatioEstimator.HedgeRatioEstimator.fit" title="spreadpy.spread.hedgeRatioEstimator.HedgeRatioEstimator.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>, which returns a <code class="docutils literal notranslate"><span class="pre">pd.Series</span></code> of hedge ratios aligned
 with <code class="docutils literal notranslate"><span class="pre">y.index</span></code>.</p>
@@ -540,9 +541,8 @@ with <code class="docutils literal notranslate"><span class="pre">y.index</span>
 <dd><p>Fit the estimator and return the residual spread in a single call.</p>
 <p>Equivalent to <code class="docutils literal notranslate"><span class="pre">SpreadSeries(y,</span> <span class="pre">x,</span> <span class="pre">self.fit(y,</span> <span class="pre">x))</span></code>. The spread
 is defined bar-by-bar as:</p>
-<blockquote>
-<div><p>s_t = y_t − β_t · x_t</p>
-</div></blockquote>
+<div class="math notranslate nohighlight">
+\[s_t = y_t - \beta_t \cdot x_t\]</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -564,12 +564,12 @@ is defined bar-by-bar as:</p>
 <em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="data.html#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="data.html#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/spreadpy/spread/hedgeRatioEstimator.html#HedgeRatioEstimator.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.spread.hedgeRatioEstimator.HedgeRatioEstimator.fit" title="Link to this definition">#</a></dt>
 <dd><p>Estimate the hedge ratio series β_t from price series y and x.</p>
 <p>The returned series satisfies:</p>
-<blockquote>
-<div><p>s_t = y_t − β_t · x_t</p>
-</div></blockquote>
-<p>where s_t is (ideally) stationary. Implementations must ensure
-β_t is free of lookahead bias: at each bar t, β_t may only depend
-on observations {(y_s, x_s) : s ≤ t}.</p>
+<div class="math notranslate nohighlight">
+\[s_t = y_t - \beta_t \cdot x_t\]</div>
+<p>where <span class="math notranslate nohighlight">\(s_t\)</span> is (ideally) stationary. Implementations must ensure
+<span class="math notranslate nohighlight">\(\beta_t\)</span> is free of lookahead bias: at each bar <span class="math notranslate nohighlight">\(t\)</span>,
+<span class="math notranslate nohighlight">\(\beta_t\)</span> may only depend on observations
+<span class="math notranslate nohighlight">\(\{(y_s, x_s) : s \leq t\}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -596,40 +596,36 @@ on observations {(y_s, x_s) : s ≤ t}.</p>
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spreadpy.spread.hedgeRatio.constantOLS.</span></span><span class="sig-name descname"><span class="pre">ConstantOLS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">add_intercept</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/spread/hedgeRatio/constantOLS.html#ConstantOLS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.spread.hedgeRatio.constantOLS.ConstantOLS" title="Link to this definition">#</a></dt>
 <dd><p>Full-sample OLS hedge ratio estimator.</p>
 <p>Fits a single linear regression over the entire supplied period:</p>
-<blockquote>
-<div><p>y_t = α + β · x_t + ε_t</p>
-</div></blockquote>
-<p>and returns the constant slope β as the hedge ratio for all bars.
+<div class="math notranslate nohighlight">
+\[y_t = \alpha + \beta \cdot x_t + \varepsilon_t\]</div>
+<p>and returns the constant slope <span class="math notranslate nohighlight">\(\beta\)</span> as the hedge ratio for all bars.
 Suitable as a baseline when the cointegration relationship is stable.</p>
 <p>After calling <a class="reference internal" href="#spreadpy.spread.hedgeRatio.constantOLS.ConstantOLS.fit" title="spreadpy.spread.hedgeRatio.constantOLS.ConstantOLS.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>, the fitted values are available as
 <code class="docutils literal notranslate"><span class="pre">beta_</span></code>, <code class="docutils literal notranslate"><span class="pre">alpha_</span></code>, and <code class="docutils literal notranslate"><span class="pre">r_squared_</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>add_intercept</strong> (<em>bool</em>) – If True (default), fits with an intercept α.
-If False, forces the regression through the origin (α = 0).</p>
+<dd class="field-odd"><p><strong>add_intercept</strong> (<em>bool</em>) – If True (default), fits with an intercept <span class="math notranslate nohighlight">\(\alpha\)</span>.
+If False, forces the regression through the origin (<span class="math notranslate nohighlight">\(\alpha = 0\)</span>).</p>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="spreadpy.spread.hedgeRatio.constantOLS.ConstantOLS.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="data.html#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="data.html#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/spreadpy/spread/hedgeRatio/constantOLS.html#ConstantOLS.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.spread.hedgeRatio.constantOLS.ConstantOLS.fit" title="Link to this definition">#</a></dt>
-<dd><p>Estimate a single hedge ratio β via full-sample OLS and return it
-as a constant series.</p>
+<dd><p>Estimate a single hedge ratio <span class="math notranslate nohighlight">\(\beta\)</span> via full-sample OLS and
+return it as a constant series.</p>
 <p><strong>With intercept</strong> (default): solves the normal equations</p>
-<blockquote>
-<div><p>[β, α]^T = (X^T X)^{-1} X^T y,   X = [x | 1]</p>
-</div></blockquote>
+<div class="math notranslate nohighlight">
+\[[\beta,\, \alpha]^\top = (X^\top X)^{-1} X^\top y,
+\quad X = [x \mid \mathbf{1}]\]</div>
 <p><strong>Without intercept</strong>: uses the closed-form projection</p>
-<blockquote>
-<div><p>β = (x^T y) / (x^T x)</p>
-</div></blockquote>
+<div class="math notranslate nohighlight">
+\[\beta = \frac{x^\top y}{x^\top x}\]</div>
 <p>After fitting, <code class="docutils literal notranslate"><span class="pre">beta_</span></code>, <code class="docutils literal notranslate"><span class="pre">alpha_</span></code>, and <code class="docutils literal notranslate"><span class="pre">r_squared_</span></code> are set.
 The coefficient of determination is:</p>
-<blockquote>
-<div><dl class="simple">
-<dt>R² = 1 − SS_res / SS_tot,   SS_res = ||y − β·x − α||²,</dt><dd><p>SS_tot = ||y − ȳ||²</p>
-</dd>
-</dl>
-</div></blockquote>
+<div class="math notranslate nohighlight">
+\[R^2 = 1 - \frac{SS_{\mathrm{res}}}{SS_{\mathrm{tot}}}, \quad
+SS_{\mathrm{res}} = \|y - \hat{\beta}\, x - \hat{\alpha}\|^2, \quad
+SS_{\mathrm{tot}} = \|y - \bar{y}\|^2\]</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -638,7 +634,7 @@ The coefficient of determination is:</p>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Constant hedge ratio β broadcast over <code class="docutils literal notranslate"><span class="pre">y.index</span></code>.</p>
+<dd class="field-even"><p>Constant hedge ratio <span class="math notranslate nohighlight">\(\beta\)</span> broadcast over <code class="docutils literal notranslate"><span class="pre">y.index</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>pd.Series</p>
@@ -655,37 +651,37 @@ The coefficient of determination is:</p>
 <dt class="sig sig-object py" id="spreadpy.spread.hedgeRatio.rollingOLS.RollingOLS">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spreadpy.spread.hedgeRatio.rollingOLS.</span></span><span class="sig-name descname"><span class="pre">RollingOLS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_intercept</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/spread/hedgeRatio/rollingOLS.html#RollingOLS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.spread.hedgeRatio.rollingOLS.RollingOLS" title="Link to this definition">#</a></dt>
 <dd><p>Rolling OLS hedge ratio estimator.</p>
-<p>At each bar t, fits OLS on the most recent <code class="docutils literal notranslate"><span class="pre">window</span></code> observations:</p>
-<blockquote>
-<div><p>y_s = α + β_t · x_s + ε_s,   s ∈ [t − w + 1,  t]</p>
-</div></blockquote>
+<p>At each bar <span class="math notranslate nohighlight">\(t\)</span>, fits OLS on the most recent <code class="docutils literal notranslate"><span class="pre">window</span></code> observations:</p>
+<div class="math notranslate nohighlight">
+\[y_s = \alpha + \beta_t \cdot x_s + \varepsilon_s,
+\quad s \in [t - w + 1,\; t]\]</div>
 <p>This adapts to structural shifts in the cointegration relationship
 without the complexity of a state-space model. Bars before the first
 complete window are filled with the first available estimate (forward-fill).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>window</strong> (<em>int</em>) – Number of bars in each rolling regression (must be ≥ 2).</p></li>
-<li><p><strong>add_intercept</strong> (<em>bool</em>) – If True (default), includes an intercept term α.</p></li>
+<li><p><strong>window</strong> (<em>int</em>) – Number of bars in each rolling regression (must be <span class="math notranslate nohighlight">\(\geq 2\)</span>).</p></li>
+<li><p><strong>add_intercept</strong> (<em>bool</em>) – If True (default), includes an intercept term <span class="math notranslate nohighlight">\(\alpha\)</span>.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="spreadpy.spread.hedgeRatio.rollingOLS.RollingOLS.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="data.html#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="data.html#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/spreadpy/spread/hedgeRatio/rollingOLS.html#RollingOLS.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.spread.hedgeRatio.rollingOLS.RollingOLS.fit" title="Link to this definition">#</a></dt>
-<dd><p>Estimate a time-varying hedge ratio β_t via rolling OLS.</p>
-<p>At each bar t ≥ w − 1, the hedge ratio is the OLS slope over the
-most recent w observations:</p>
-<blockquote>
-<div><p>β_t = argmin_{β,α} Σ_{s=t−w+1}^{t} (y_s − α − β·x_s)²</p>
-</div></blockquote>
+<dd><p>Estimate a time-varying hedge ratio <span class="math notranslate nohighlight">\(\beta_t\)</span> via rolling OLS.</p>
+<p>At each bar <span class="math notranslate nohighlight">\(t \geq w - 1\)</span>, the hedge ratio is the OLS slope
+over the most recent <span class="math notranslate nohighlight">\(w\)</span> observations:</p>
+<div class="math notranslate nohighlight">
+\[\beta_t = \operatorname{argmin}_{\beta,\, \alpha}
+\sum_{s=t-w+1}^{t} (y_s - \alpha - \beta\, x_s)^2\]</div>
 <p>whose solution is:</p>
-<blockquote>
-<div><p>β_t = Cov_w[x, y] / Var_w[x]</p>
-</div></blockquote>
-<p>where Cov_w and Var_w denote the sample covariance and variance
-over the rolling window. For the first w − 1 bars (warm-up), the
-first available estimate is forward-filled.</p>
+<div class="math notranslate nohighlight">
+\[\beta_t = \frac{\mathrm{Cov}_w[x,\, y]}{\mathrm{Var}_w[x]}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathrm{Cov}_w\)</span> and <span class="math notranslate nohighlight">\(\mathrm{Var}_w\)</span> denote the
+sample covariance and variance over the rolling window. For the first
+<span class="math notranslate nohighlight">\(w - 1\)</span> bars (warm-up), the first available estimate is
+forward-filled.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -694,7 +690,7 @@ first available estimate is forward-filled.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Time series of hedge ratios β_t aligned with <code class="docutils literal notranslate"><span class="pre">y.index</span></code>.</p>
+<dd class="field-even"><p>Time series of hedge ratios <span class="math notranslate nohighlight">\(\beta_t\)</span> aligned with <code class="docutils literal notranslate"><span class="pre">y.index</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>pd.Series</p>
@@ -716,14 +712,14 @@ following the heuristic of Palomar (2024), §15.6.3.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sigma2_eps</strong> (<em>float</em>) – Observation noise variance σ²_ε.</p></li>
+<li><p><strong>sigma2_eps</strong> (<em>float</em>) – Observation noise variance <span class="math notranslate nohighlight">\(\sigma^2_\varepsilon\)</span>.</p></li>
 <li><p><strong>sigma2_mu</strong> (<em>float</em>) – State noise variance for the intercept,
-σ²_μ = α · σ²_ε.</p></li>
+<span class="math notranslate nohighlight">\(\sigma^2_\mu = \alpha \cdot \sigma^2_\varepsilon\)</span>.</p></li>
 <li><p><strong>sigma2_gam</strong> (<em>float</em>) – State noise variance for the hedge ratio,
-σ²_γ = α · σ²_ε / Var[x].</p></li>
-<li><p><strong>mu0</strong> (<em>float</em>) – Initial intercept estimate μ₁ (from OLS).</p></li>
-<li><p><strong>gam0</strong> (<em>float</em>) – Initial hedge ratio estimate γ₁ (from OLS).</p></li>
-<li><p><strong>P0</strong> (<em>np.ndarray</em>) – Initial state covariance matrix (2×2, diagonal).</p></li>
+<span class="math notranslate nohighlight">\(\sigma^2_\gamma = \alpha \cdot \sigma^2_\varepsilon / \mathrm{Var}[x]\)</span>.</p></li>
+<li><p><strong>mu0</strong> (<em>float</em>) – Initial intercept estimate <span class="math notranslate nohighlight">\(\mu_1\)</span> (from OLS).</p></li>
+<li><p><strong>gam0</strong> (<em>float</em>) – Initial hedge ratio estimate <span class="math notranslate nohighlight">\(\gamma_1\)</span> (from OLS).</p></li>
+<li><p><strong>P0</strong> (<em>np.ndarray</em>) – Initial state covariance matrix (<span class="math notranslate nohighlight">\(2 \times 2\)</span>, diagonal).</p></li>
 </ul>
 </dd>
 </dl>
@@ -732,33 +728,33 @@ following the heuristic of Palomar (2024), §15.6.3.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spreadpy.spread.hedgeRatio.kalmanFilter.KalmanFilter">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spreadpy.spread.hedgeRatio.kalmanFilter.</span></span><span class="sig-name descname"><span class="pre">KalmanFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ls_window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/spread/hedgeRatio/kalmanFilter.html#KalmanFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.spread.hedgeRatio.kalmanFilter.KalmanFilter" title="Link to this definition">#</a></dt>
-<dd><p>Kalman filter hedge ratio estimator with two latent states [μ_t, γ_t].</p>
+<dd><p>Kalman filter hedge ratio estimator with two latent states
+<span class="math notranslate nohighlight">\([\mu_t,\, \gamma_t]\)</span>.</p>
 <p>Implements the pairs-trading state-space model of Palomar (2024), §15.6.3, eq. (15.3).</p>
 <p>Observation equation:</p>
-<blockquote>
-<div><p>y_t = μ_t + γ_t · x_t + ε_t,   ε_t ~ N(0, σ²_ε)</p>
-</div></blockquote>
+<div class="math notranslate nohighlight">
+\[y_t = \mu_t + \gamma_t x_t + \varepsilon_t,
+\quad \varepsilon_t \sim \mathcal{N}(0, \sigma^2_\varepsilon)\]</div>
 <p>Transition equations (independent random walks):</p>
-<blockquote>
-<div><p>μ_{t+1} = μ_t + η_{μ,t},   η_{μ,t} ~ N(0, σ²_μ)
-γ_{t+1} = γ_t + η_{γ,t},   η_{γ,t} ~ N(0, σ²_γ)</p>
-</div></blockquote>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mu_{t+1} &amp;= \mu_t + \eta_{\mu,t}, \quad \eta_{\mu,t} \sim \mathcal{N}(0, \sigma^2_\mu) \\
+\gamma_{t+1} &amp;= \gamma_t + \eta_{\gamma,t}, \quad \eta_{\gamma,t} \sim \mathcal{N}(0, \sigma^2_\gamma)\end{split}\]</div>
 <p>The hedge ratio returned by <a class="reference internal" href="#spreadpy.spread.hedgeRatio.kalmanFilter.KalmanFilter.fit" title="spreadpy.spread.hedgeRatio.kalmanFilter.KalmanFilter.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> is the one-step-ahead predictive
-γ_{t|t−1}, free of lookahead bias. The normalised spread is:</p>
-<blockquote>
-<div><p>z_t = (y_t − γ_{t|t−1} · x_t − μ_{t|t−1}) / (1 + γ_{t|t−1})</p>
-</div></blockquote>
+<span class="math notranslate nohighlight">\(\gamma_{t|t-1}\)</span>, free of lookahead bias. The normalised spread is:</p>
+<div class="math notranslate nohighlight">
+\[z_t = \frac{y_t - \gamma_{t|t-1}\, x_t - \mu_{t|t-1}}{1 + \gamma_{t|t-1}}\]</div>
 <p>Hyperparameters are initialised via an OLS bootstrap on the first
 <code class="docutils literal notranslate"><span class="pre">ls_window</span></code> bars (Palomar, §15.6.3):</p>
-<blockquote>
-<div><p>σ²_ε = Var[ε^OLS],   σ²_μ = α · σ²_ε,   σ²_γ = α · σ²_ε / Var[x]</p>
-</div></blockquote>
+<div class="math notranslate nohighlight">
+\[\sigma^2_\varepsilon = \mathrm{Var}[\varepsilon^{\mathrm{OLS}}], \quad
+\sigma^2_\mu = \alpha \cdot \sigma^2_\varepsilon, \quad
+\sigma^2_\gamma = \frac{\alpha \cdot \sigma^2_\varepsilon}{\mathrm{Var}[x]}\]</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>alpha</strong> (<em>float</em>) – Controls state noise relative to observation noise.
-Smaller values → slower adaptation of μ and γ. Typical range: 1e-6 to 1e-4.
-Palomar uses 1e-5 for this model.</p></li>
+Smaller values → slower adaptation of <span class="math notranslate nohighlight">\(\mu\)</span> and <span class="math notranslate nohighlight">\(\gamma\)</span>.
+Typical range: 1e-6 to 1e-4. Palomar uses 1e-5 for this model.</p></li>
 <li><p><strong>ls_window</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – Number of bars for the OLS initialisation.
 None uses the entire series (recommended: pass <code class="docutils literal notranslate"><span class="pre">train_size</span></code> from the engine).</p></li>
 </ul>
@@ -766,10 +762,12 @@ None uses the entire series (recommended: pass <code class="docutils literal not
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><strong>Use log-prices.</strong> The filter assumes constant observation noise σ²_ε.
-With raw prices, σ²_ε ∝ price², making the Kalman gain K_t systematically
-mis-calibrated when prices drift. Passing <code class="docutils literal notranslate"><span class="pre">log(y)</span></code>, <code class="docutils literal notranslate"><span class="pre">log(x)</span></code> makes
-σ²_ε approximately homoscedastic and gives more stable hedge ratio estimates.
+<p><strong>Use log-prices.</strong> The filter assumes constant observation noise
+<span class="math notranslate nohighlight">\(\sigma^2_\varepsilon\)</span>. With raw prices,
+<span class="math notranslate nohighlight">\(\sigma^2_\varepsilon \propto \text{price}^2\)</span>, making the Kalman
+gain <span class="math notranslate nohighlight">\(K_t\)</span> systematically mis-calibrated when prices drift.
+Passing <code class="docutils literal notranslate"><span class="pre">log(y)</span></code>, <code class="docutils literal notranslate"><span class="pre">log(x)</span></code> makes <span class="math notranslate nohighlight">\(\sigma^2_\varepsilon\)</span>
+approximately homoscedastic and gives more stable hedge ratio estimates.
 In <code class="xref py py-class docutils literal notranslate"><span class="pre">BacktestEngine</span></code>, set <code class="docutils literal notranslate"><span class="pre">log_prices=True</span></code> to apply this
 automatically while keeping actual prices for P&amp;L accounting.</p>
 </div>
@@ -777,18 +775,18 @@ automatically while keeping actual prices for P&amp;L accounting.</p>
 <dt class="sig sig-object py" id="spreadpy.spread.hedgeRatio.kalmanFilter.KalmanFilter.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="data.html#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="data.html#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/spreadpy/spread/hedgeRatio/kalmanFilter.html#KalmanFilter.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.spread.hedgeRatio.kalmanFilter.KalmanFilter.fit" title="Link to this definition">#</a></dt>
 <dd><p>Run the Kalman filter on (y, x) and return the one-step-ahead
-predictive hedge ratio γ_{t|t−1}.</p>
-<p>Using the predictive state rather than the filtered state γ_{t|t}
-ensures no lookahead bias: at bar t, γ_{t|t−1} is computed from
-observations {(y_s, x_s) : s ≤ t − 1} only.</p>
+predictive hedge ratio <span class="math notranslate nohighlight">\(\gamma_{t|t-1}\)</span>.</p>
+<p>Using the predictive state rather than the filtered state
+<span class="math notranslate nohighlight">\(\gamma_{t|t}\)</span> ensures no lookahead bias: at bar <span class="math notranslate nohighlight">\(t\)</span>,
+<span class="math notranslate nohighlight">\(\gamma_{t|t-1}\)</span> is computed from observations
+<span class="math notranslate nohighlight">\(\{(y_s, x_s) : s \leq t-1\}\)</span> only.</p>
 <p>After calling this method the following attributes are set:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">params_</span></code> — fitted <a class="reference internal" href="#spreadpy.spread.hedgeRatio.kalmanFilter.KalmanFilterParams" title="spreadpy.spread.hedgeRatio.kalmanFilter.KalmanFilterParams"><code class="xref py py-class docutils literal notranslate"><span class="pre">KalmanFilterParams</span></code></a></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">mu_ts_</span></code> — filtered intercept series μ_{t|t}</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mu_ts_</span></code> — filtered intercept series <span class="math notranslate nohighlight">\(\mu_{t|t}\)</span></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">normalized_spread_</span></code> — lookahead-free normalised spread</p>
-<blockquote>
-<div><p>z_t = (y_t − γ_{t|t−1} · x_t − μ_{t|t−1}) / (1 + γ_{t|t−1})</p>
-</div></blockquote>
+<div class="math notranslate nohighlight">
+\[z_t = \frac{y_t - \gamma_{t|t-1}\, x_t - \mu_{t|t-1}}{1 + \gamma_{t|t-1}}\]</div>
 </li>
 </ul>
 <dl class="field-list simple">
@@ -799,7 +797,7 @@ observations {(y_s, x_s) : s ≤ t − 1} only.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Predictive hedge ratio series γ_{t|t−1} aligned with <code class="docutils literal notranslate"><span class="pre">y.index</span></code>.</p>
+<dd class="field-even"><p>Predictive hedge ratio series <span class="math notranslate nohighlight">\(\gamma_{t|t-1}\)</span> aligned with <code class="docutils literal notranslate"><span class="pre">y.index</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>pd.Series</p>
@@ -820,13 +818,13 @@ observations {(y_s, x_s) : s ≤ t − 1} only.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sigma2_eps</strong> (<em>float</em>) – Observation noise variance σ²_ε.</p></li>
-<li><p><strong>sigma2_mu</strong> (<em>float</em>) – State noise variance for the intercept μ_t.</p></li>
-<li><p><strong>sigma2_gam</strong> (<em>float</em>) – State noise variance for the hedge ratio γ_t.</p></li>
-<li><p><strong>sigma2_dgam</strong> (<em>float</em>) – State noise variance for the velocity γ̇_t.</p></li>
-<li><p><strong>mu0</strong> (<em>float</em>) – Initial intercept estimate μ₁ (from OLS).</p></li>
-<li><p><strong>gam0</strong> (<em>float</em>) – Initial hedge ratio estimate γ₁ (from OLS).</p></li>
-<li><p><strong>P0</strong> (<em>np.ndarray</em>) – Initial state covariance matrix (3×3, diagonal).</p></li>
+<li><p><strong>sigma2_eps</strong> (<em>float</em>) – Observation noise variance <span class="math notranslate nohighlight">\(\sigma^2_\varepsilon\)</span>.</p></li>
+<li><p><strong>sigma2_mu</strong> (<em>float</em>) – State noise variance for the intercept <span class="math notranslate nohighlight">\(\mu_t\)</span>.</p></li>
+<li><p><strong>sigma2_gam</strong> (<em>float</em>) – State noise variance for the hedge ratio <span class="math notranslate nohighlight">\(\gamma_t\)</span>.</p></li>
+<li><p><strong>sigma2_dgam</strong> (<em>float</em>) – State noise variance for the velocity <span class="math notranslate nohighlight">\(\dot{\gamma}_t\)</span>.</p></li>
+<li><p><strong>mu0</strong> (<em>float</em>) – Initial intercept estimate <span class="math notranslate nohighlight">\(\mu_1\)</span> (from OLS).</p></li>
+<li><p><strong>gam0</strong> (<em>float</em>) – Initial hedge ratio estimate <span class="math notranslate nohighlight">\(\gamma_1\)</span> (from OLS).</p></li>
+<li><p><strong>P0</strong> (<em>np.ndarray</em>) – Initial state covariance matrix (<span class="math notranslate nohighlight">\(3 \times 3\)</span>, diagonal).</p></li>
 </ul>
 </dd>
 </dl>
@@ -835,40 +833,40 @@ observations {(y_s, x_s) : s ≤ t − 1} only.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spreadpy.spread.hedgeRatio.kalmanFilterWithVelocity.KalmanFilterWithVelocity">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spreadpy.spread.hedgeRatio.kalmanFilterWithVelocity.</span></span><span class="sig-name descname"><span class="pre">KalmanFilterWithVelocity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_dgam</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ls_window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/spread/hedgeRatio/kalmanFilterWithVelocity.html#KalmanFilterWithVelocity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.spread.hedgeRatio.kalmanFilterWithVelocity.KalmanFilterWithVelocity" title="Link to this definition">#</a></dt>
-<dd><p>Kalman filter hedge ratio estimator with augmented state [μ_t, γ_t, γ̇_t].</p>
-<p>Extends <code class="xref py py-class docutils literal notranslate"><span class="pre">KalmanFilter</span></code> with a velocity state γ̇_t that allows
-the hedge ratio to follow a locally linear trend. Implements Palomar (2024),
-§15.6.3, eq. (15.4).</p>
+<dd><p>Kalman filter hedge ratio estimator with augmented state
+<span class="math notranslate nohighlight">\([\mu_t,\, \gamma_t,\, \dot{\gamma}_t]\)</span>.</p>
+<p>Extends <code class="xref py py-class docutils literal notranslate"><span class="pre">KalmanFilter</span></code> with a velocity state <span class="math notranslate nohighlight">\(\dot{\gamma}_t\)</span>
+that allows the hedge ratio to follow a locally linear trend. Implements
+Palomar (2024), §15.6.3, eq. (15.4).</p>
 <p>Observation equation:</p>
-<blockquote>
-<div><p>y_t = μ_t + γ_t · x_t + ε_t,   ε_t ~ N(0, σ²_ε)</p>
-</div></blockquote>
+<div class="math notranslate nohighlight">
+\[y_t = \mu_t + \gamma_t x_t + \varepsilon_t,
+\quad \varepsilon_t \sim \mathcal{N}(0, \sigma^2_\varepsilon)\]</div>
 <p>Transition equations:</p>
-<blockquote>
-<div><p>μ_{t+1} = μ_t                  + η_{μ,t}
-γ_{t+1} = γ_t  + γ̇_t         + η_{γ,t}
-γ̇_{t+1} =       γ̇_t         + η_{γ̇,t}</p>
-</div></blockquote>
-<p>γ follows a locally linear trend driven by its velocity γ̇.
-The velocity is a slow random walk (σ²_γ̇ ≪ σ²_γ).</p>
-<p>The predictive hedge ratio γ_{t|t−1} is returned by <a class="reference internal" href="#spreadpy.spread.hedgeRatio.kalmanFilterWithVelocity.KalmanFilterWithVelocity.fit" title="spreadpy.spread.hedgeRatio.kalmanFilterWithVelocity.KalmanFilterWithVelocity.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>.
+<div class="math notranslate nohighlight">
+\[\begin{split}\mu_{t+1}          &amp;= \mu_t + \eta_{\mu,t} \\
+\gamma_{t+1}       &amp;= \gamma_t + \dot{\gamma}_t + \eta_{\gamma,t} \\
+\dot{\gamma}_{t+1} &amp;= \dot{\gamma}_t + \eta_{\dot{\gamma},t}\end{split}\]</div>
+<p><span class="math notranslate nohighlight">\(\gamma\)</span> follows a locally linear trend driven by its velocity
+<span class="math notranslate nohighlight">\(\dot{\gamma}\)</span>. The velocity is a slow random walk
+(<span class="math notranslate nohighlight">\(\sigma^2_{\dot{\gamma}} \ll \sigma^2_\gamma\)</span>).</p>
+<p>The predictive hedge ratio <span class="math notranslate nohighlight">\(\gamma_{t|t-1}\)</span> is returned by <a class="reference internal" href="#spreadpy.spread.hedgeRatio.kalmanFilterWithVelocity.KalmanFilterWithVelocity.fit" title="spreadpy.spread.hedgeRatio.kalmanFilterWithVelocity.KalmanFilterWithVelocity.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>.
 The normalised spread (no lookahead) is:</p>
-<blockquote>
-<div><p>z_t = (y_t − γ_{t|t−1} · x_t − μ_{t|t−1}) / (1 + γ_{t|t−1})</p>
-</div></blockquote>
+<div class="math notranslate nohighlight">
+\[z_t = \frac{y_t - \gamma_{t|t-1}\, x_t - \mu_{t|t-1}}{1 + \gamma_{t|t-1}}\]</div>
 <p>Hyperparameters are initialised via OLS bootstrap (same heuristic as
-<code class="xref py py-class docutils literal notranslate"><span class="pre">KalmanFilter</span></code>), with an additional term for σ²_γ̇:</p>
-<blockquote>
-<div><p>σ²_γ̇ = alpha_dgam · σ²_ε / Var[x]</p>
-</div></blockquote>
+<code class="xref py py-class docutils literal notranslate"><span class="pre">KalmanFilter</span></code>), with an additional term for
+<span class="math notranslate nohighlight">\(\sigma^2_{\dot{\gamma}}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\sigma^2_{\dot{\gamma}} = \alpha_{\dot{\gamma}} \cdot \sigma^2_\varepsilon / \mathrm{Var}[x]\]</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>alpha</strong> (<em>float</em>) – State noise scale for μ and γ. Palomar recommends
-1e-6 for this model.</p></li>
-<li><p><strong>alpha_dgam</strong> (<em>Optional</em><em>[</em><em>float</em><em>]</em>) – State noise scale for γ̇. Should satisfy
-alpha_dgam &lt; alpha so that velocity varies slowly.
-Defaults to alpha / 10.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – State noise scale for <span class="math notranslate nohighlight">\(\mu\)</span> and <span class="math notranslate nohighlight">\(\gamma\)</span>.
+Palomar recommends 1e-6 for this model.</p></li>
+<li><p><strong>alpha_dgam</strong> (<em>Optional</em><em>[</em><em>float</em><em>]</em>) – State noise scale for <span class="math notranslate nohighlight">\(\dot{\gamma}\)</span>.
+Should satisfy <code class="docutils literal notranslate"><span class="pre">alpha_dgam</span> <span class="pre">&lt;</span> <span class="pre">alpha</span></code> so that velocity varies slowly.
+Defaults to <code class="docutils literal notranslate"><span class="pre">alpha</span> <span class="pre">/</span> <span class="pre">10</span></code>.</p></li>
 <li><p><strong>ls_window</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – Bars used for OLS initialisation.
 None uses the full series.</p></li>
 </ul>
@@ -876,10 +874,12 @@ None uses the full series.</p></li>
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><strong>Use log-prices.</strong> The filter assumes constant observation noise σ²_ε.
-With raw prices, σ²_ε ∝ price², making the Kalman gain K_t systematically
-mis-calibrated when prices drift. Passing <code class="docutils literal notranslate"><span class="pre">log(y)</span></code>, <code class="docutils literal notranslate"><span class="pre">log(x)</span></code> makes
-σ²_ε approximately homoscedastic and gives more stable hedge ratio estimates.
+<p><strong>Use log-prices.</strong> The filter assumes constant observation noise
+<span class="math notranslate nohighlight">\(\sigma^2_\varepsilon\)</span>. With raw prices,
+<span class="math notranslate nohighlight">\(\sigma^2_\varepsilon \propto \text{price}^2\)</span>, making the Kalman
+gain <span class="math notranslate nohighlight">\(K_t\)</span> systematically mis-calibrated when prices drift.
+Passing <code class="docutils literal notranslate"><span class="pre">log(y)</span></code>, <code class="docutils literal notranslate"><span class="pre">log(x)</span></code> makes <span class="math notranslate nohighlight">\(\sigma^2_\varepsilon\)</span>
+approximately homoscedastic and gives more stable hedge ratio estimates.
 In <code class="xref py py-class docutils literal notranslate"><span class="pre">BacktestEngine</span></code>, set <code class="docutils literal notranslate"><span class="pre">log_prices=True</span></code> to apply this
 automatically while keeping actual prices for P&amp;L accounting.</p>
 </div>
@@ -887,19 +887,19 @@ automatically while keeping actual prices for P&amp;L accounting.</p>
 <dt class="sig sig-object py" id="spreadpy.spread.hedgeRatio.kalmanFilterWithVelocity.KalmanFilterWithVelocity.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="data.html#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="data.html#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/spreadpy/spread/hedgeRatio/kalmanFilterWithVelocity.html#KalmanFilterWithVelocity.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.spread.hedgeRatio.kalmanFilterWithVelocity.KalmanFilterWithVelocity.fit" title="Link to this definition">#</a></dt>
 <dd><p>Run the Kalman filter on (y, x) and return the one-step-ahead
-predictive hedge ratio γ_{t|t−1}.</p>
-<p>Using the predictive state rather than the filtered state γ_{t|t}
-ensures no lookahead bias: at bar t, γ_{t|t−1} is computed from
-observations {(y_s, x_s) : s ≤ t − 1} only.</p>
+predictive hedge ratio <span class="math notranslate nohighlight">\(\gamma_{t|t-1}\)</span>.</p>
+<p>Using the predictive state rather than the filtered state
+<span class="math notranslate nohighlight">\(\gamma_{t|t}\)</span> ensures no lookahead bias: at bar <span class="math notranslate nohighlight">\(t\)</span>,
+<span class="math notranslate nohighlight">\(\gamma_{t|t-1}\)</span> is computed from observations
+<span class="math notranslate nohighlight">\(\{(y_s, x_s) : s \leq t-1\}\)</span> only.</p>
 <p>After calling this method the following attributes are set:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">params_</span></code> — fitted <a class="reference internal" href="#spreadpy.spread.hedgeRatio.kalmanFilterWithVelocity.KalmanFilterWithVelocityParams" title="spreadpy.spread.hedgeRatio.kalmanFilterWithVelocity.KalmanFilterWithVelocityParams"><code class="xref py py-class docutils literal notranslate"><span class="pre">KalmanFilterWithVelocityParams</span></code></a></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">mu_ts_</span></code> — filtered intercept series μ_{t|t}</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">velocity_ts_</span></code> — filtered velocity series γ̇_{t|t}</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mu_ts_</span></code> — filtered intercept series <span class="math notranslate nohighlight">\(\mu_{t|t}\)</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">velocity_ts_</span></code> — filtered velocity series <span class="math notranslate nohighlight">\(\dot{\gamma}_{t|t}\)</span></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">normalized_spread_</span></code> — lookahead-free normalised spread</p>
-<blockquote>
-<div><p>z_t = (y_t − γ_{t|t−1} · x_t − μ_{t|t−1}) / (1 + γ_{t|t−1})</p>
-</div></blockquote>
+<div class="math notranslate nohighlight">
+\[z_t = \frac{y_t - \gamma_{t|t-1}\, x_t - \mu_{t|t-1}}{1 + \gamma_{t|t-1}}\]</div>
 </li>
 </ul>
 <dl class="field-list simple">
@@ -910,7 +910,7 @@ observations {(y_s, x_s) : s ≤ t − 1} only.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Predictive hedge ratio series γ_{t|t−1} aligned with <code class="docutils literal notranslate"><span class="pre">y.index</span></code>.</p>
+<dd class="field-even"><p>Predictive hedge ratio series <span class="math notranslate nohighlight">\(\gamma_{t|t-1}\)</span> aligned with <code class="docutils literal notranslate"><span class="pre">y.index</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>pd.Series</p>

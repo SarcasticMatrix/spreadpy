@@ -26,16 +26,20 @@ def _quantities(
 class InverseVolSizer(PositionSizer):
     """Markowitz inverse-volatility position sizer.
 
-    Sizes each position so that a 1-σ adverse move of the spread residual
-    costs exactly ``target_vol`` of the current capital:
+    Sizes each position so that a 1-:math:`\\sigma` adverse move of the spread
+    residual costs exactly ``target_vol`` of the current capital:
 
-        frac_t = min(target_vol / σ_t,  f_max)
+    .. math::
 
-    where σ_t is the rolling standard deviation of spread residuals over the
-    last ``window`` bars (no lookahead), consistent with the rolling z-score
-    used by :class:`ZScoreSignal`. The y-leg notional is then:
+        f_t = \\min\\!\\left(\\frac{\\texttt{target\\_vol}}{\\sigma_t},\\; f_{\\max}\\right)
 
-        notional_y = frac_t · capital_t
+    where :math:`\\sigma_t` is the rolling standard deviation of spread residuals
+    over the last ``window`` bars (no lookahead), consistent with the rolling
+    z-score used by :class:`ZScoreSignal`. The y-leg notional is then:
+
+    .. math::
+
+        N_y = f_t \\cdot \\text{capital}_t
 
     :meth:`fit` **must** be called before :meth:`size`. Pass the combined
     train + evaluation spread so that σ_t is already warmed up at the first
@@ -85,13 +89,13 @@ class InverseVolSizer(PositionSizer):
         """Compute quantities using inverse-volatility sizing.
 
         Returns ``(0, 0)`` when ``signal.direction`` is ``FLAT``,
-        ``signal.zscore`` is NaN, ``capital`` ≤ 0, or σ_t is unavailable
-        or non-positive.
+        ``signal.zscore`` is NaN, ``capital`` ≤ 0, or :math:`\\sigma_t` is
+        unavailable or non-positive.
 
         :param Signal signal: Signal at the current bar.
         :param float price_y: Current price of the y leg.
         :param float price_x: Current price of the x leg.
-        :param float hedge_ratio: Hedge ratio β_t (absolute value used).
+        :param float hedge_ratio: Hedge ratio :math:`\\beta_t` (absolute value used).
         :param float capital: Current mark-to-market equity in monetary units.
 
         :returns: ``(qty_y, qty_x)`` — absolute quantities for each leg.

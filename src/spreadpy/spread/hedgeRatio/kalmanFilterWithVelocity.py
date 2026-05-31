@@ -15,13 +15,13 @@ class KalmanFilterWithVelocityParams:
 
     Derived from an OLS bootstrap following Palomar (2024), §15.6.3, eq. (15.4).
 
-    :param float sigma2_eps: Observation noise variance σ²_ε.
-    :param float sigma2_mu: State noise variance for the intercept μ_t.
-    :param float sigma2_gam: State noise variance for the hedge ratio γ_t.
-    :param float sigma2_dgam: State noise variance for the velocity γ̇_t.
-    :param float mu0: Initial intercept estimate μ₁ (from OLS).
-    :param float gam0: Initial hedge ratio estimate γ₁ (from OLS).
-    :param np.ndarray P0: Initial state covariance matrix (3×3, diagonal).
+    :param float sigma2_eps: Observation noise variance :math:`\\sigma^2_\\varepsilon`.
+    :param float sigma2_mu: State noise variance for the intercept :math:`\\mu_t`.
+    :param float sigma2_gam: State noise variance for the hedge ratio :math:`\\gamma_t`.
+    :param float sigma2_dgam: State noise variance for the velocity :math:`\\dot{\\gamma}_t`.
+    :param float mu0: Initial intercept estimate :math:`\\mu_1` (from OLS).
+    :param float gam0: Initial hedge ratio estimate :math:`\\gamma_1` (from OLS).
+    :param np.ndarray P0: Initial state covariance matrix (:math:`3 \\times 3`, diagonal).
     """
     sigma2_eps:  float
     sigma2_mu:   float
@@ -34,48 +34,62 @@ class KalmanFilterWithVelocityParams:
 
 class KalmanFilterWithVelocity(HedgeRatioEstimator):
     """
-    Kalman filter hedge ratio estimator with augmented state [μ_t, γ_t, γ̇_t].
+    Kalman filter hedge ratio estimator with augmented state
+    :math:`[\\mu_t,\\, \\gamma_t,\\, \\dot{\\gamma}_t]`.
 
-    Extends :class:`KalmanFilter` with a velocity state γ̇_t that allows
-    the hedge ratio to follow a locally linear trend. Implements Palomar (2024),
-    §15.6.3, eq. (15.4).
+    Extends :class:`KalmanFilter` with a velocity state :math:`\\dot{\\gamma}_t`
+    that allows the hedge ratio to follow a locally linear trend. Implements
+    Palomar (2024), §15.6.3, eq. (15.4).
 
     Observation equation:
 
-        y_t = μ_t + γ_t · x_t + ε_t,   ε_t ~ N(0, σ²_ε)
+    .. math::
+
+        y_t = \\mu_t + \\gamma_t x_t + \\varepsilon_t,
+        \\quad \\varepsilon_t \\sim \\mathcal{N}(0, \\sigma^2_\\varepsilon)
 
     Transition equations:
 
-        μ_{t+1} = μ_t                  + η_{μ,t}
-        γ_{t+1} = γ_t  + γ̇_t         + η_{γ,t}
-        γ̇_{t+1} =       γ̇_t         + η_{γ̇,t}
+    .. math::
 
-    γ follows a locally linear trend driven by its velocity γ̇.
-    The velocity is a slow random walk (σ²_γ̇ ≪ σ²_γ).
+        \\mu_{t+1}          &= \\mu_t + \\eta_{\\mu,t} \\\\
+        \\gamma_{t+1}       &= \\gamma_t + \\dot{\\gamma}_t + \\eta_{\\gamma,t} \\\\
+        \\dot{\\gamma}_{t+1} &= \\dot{\\gamma}_t + \\eta_{\\dot{\\gamma},t}
 
-    The predictive hedge ratio γ_{t|t−1} is returned by :meth:`fit`.
+    :math:`\\gamma` follows a locally linear trend driven by its velocity
+    :math:`\\dot{\\gamma}`. The velocity is a slow random walk
+    (:math:`\\sigma^2_{\\dot{\\gamma}} \\ll \\sigma^2_\\gamma`).
+
+    The predictive hedge ratio :math:`\\gamma_{t|t-1}` is returned by :meth:`fit`.
     The normalised spread (no lookahead) is:
 
-        z_t = (y_t − γ_{t|t−1} · x_t − μ_{t|t−1}) / (1 + γ_{t|t−1})
+    .. math::
+
+        z_t = \\frac{y_t - \\gamma_{t|t-1}\\, x_t - \\mu_{t|t-1}}{1 + \\gamma_{t|t-1}}
 
     Hyperparameters are initialised via OLS bootstrap (same heuristic as
-    :class:`KalmanFilter`), with an additional term for σ²_γ̇:
+    :class:`KalmanFilter`), with an additional term for
+    :math:`\\sigma^2_{\\dot{\\gamma}}`:
 
-        σ²_γ̇ = alpha_dgam · σ²_ε / Var[x]
+    .. math::
 
-    :param float alpha: State noise scale for μ and γ. Palomar recommends
-        1e-6 for this model.
-    :param Optional[float] alpha_dgam: State noise scale for γ̇. Should satisfy
-        alpha_dgam < alpha so that velocity varies slowly.
-        Defaults to alpha / 10.
+        \\sigma^2_{\\dot{\\gamma}} = \\alpha_{\\dot{\\gamma}} \\cdot \\sigma^2_\\varepsilon / \\mathrm{Var}[x]
+
+    :param float alpha: State noise scale for :math:`\\mu` and :math:`\\gamma`.
+        Palomar recommends 1e-6 for this model.
+    :param Optional[float] alpha_dgam: State noise scale for :math:`\\dot{\\gamma}`.
+        Should satisfy ``alpha_dgam < alpha`` so that velocity varies slowly.
+        Defaults to ``alpha / 10``.
     :param Optional[int] ls_window: Bars used for OLS initialisation.
         None uses the full series.
 
     .. note::
-        **Use log-prices.** The filter assumes constant observation noise σ²_ε.
-        With raw prices, σ²_ε ∝ price², making the Kalman gain K_t systematically
-        mis-calibrated when prices drift. Passing ``log(y)``, ``log(x)`` makes
-        σ²_ε approximately homoscedastic and gives more stable hedge ratio estimates.
+        **Use log-prices.** The filter assumes constant observation noise
+        :math:`\\sigma^2_\\varepsilon`. With raw prices,
+        :math:`\\sigma^2_\\varepsilon \\propto \\text{price}^2`, making the Kalman
+        gain :math:`K_t` systematically mis-calibrated when prices drift.
+        Passing ``log(y)``, ``log(x)`` makes :math:`\\sigma^2_\\varepsilon`
+        approximately homoscedastic and gives more stable hedge ratio estimates.
         In :class:`BacktestEngine`, set ``log_prices=True`` to apply this
         automatically while keeping actual prices for P&L accounting.
     """
@@ -112,24 +126,27 @@ class KalmanFilterWithVelocity(HedgeRatioEstimator):
     def fit(self, y: PriceTimeSeries, x: PriceTimeSeries) -> pd.Series:
         """
         Run the Kalman filter on (y, x) and return the one-step-ahead
-        predictive hedge ratio γ_{t|t−1}.
+        predictive hedge ratio :math:`\\gamma_{t|t-1}`.
 
-        Using the predictive state rather than the filtered state γ_{t|t}
-        ensures no lookahead bias: at bar t, γ_{t|t−1} is computed from
-        observations {(y_s, x_s) : s ≤ t − 1} only.
+        Using the predictive state rather than the filtered state
+        :math:`\\gamma_{t|t}` ensures no lookahead bias: at bar :math:`t`,
+        :math:`\\gamma_{t|t-1}` is computed from observations
+        :math:`\\{(y_s, x_s) : s \\leq t-1\\}` only.
 
         After calling this method the following attributes are set:
 
         - ``params_`` — fitted :class:`KalmanFilterWithVelocityParams`
-        - ``mu_ts_`` — filtered intercept series μ_{t|t}
-        - ``velocity_ts_`` — filtered velocity series γ̇_{t|t}
+        - ``mu_ts_`` — filtered intercept series :math:`\\mu_{t|t}`
+        - ``velocity_ts_`` — filtered velocity series :math:`\\dot{\\gamma}_{t|t}`
         - ``normalized_spread_`` — lookahead-free normalised spread
 
-            z_t = (y_t − γ_{t|t−1} · x_t − μ_{t|t−1}) / (1 + γ_{t|t−1})
+          .. math::
+
+              z_t = \\frac{y_t - \\gamma_{t|t-1}\\, x_t - \\mu_{t|t-1}}{1 + \\gamma_{t|t-1}}
 
         :param PriceTimeSeries y: Dependent-leg price series.
         :param PriceTimeSeries x: Independent-leg price series.
-        :returns: Predictive hedge ratio series γ_{t|t−1} aligned with ``y.index``.
+        :returns: Predictive hedge ratio series :math:`\\gamma_{t|t-1}` aligned with ``y.index``.
         :rtype: pd.Series
         """
         y_al, x_al = y.align(x)
@@ -169,20 +186,30 @@ class KalmanFilterWithVelocity(HedgeRatioEstimator):
         Bootstrap filter hyperparameters from OLS on the first T_ls bars.
 
         Extends the 2-state bootstrap (Palomar, §15.6.3) with an additional
-        noise term for the velocity state γ̇_t:
+        noise term for the velocity state :math:`\\dot{\\gamma}_t`:
 
-            σ²_ε   = Var[ε^{OLS}]
-            σ²_μ   = α      · σ²_ε
-            σ²_γ   = α      · σ²_ε / Var[x]
-            σ²_γ̇  = α_dgam · σ²_ε / Var[x]   (α_dgam < α ⟹ slow velocity)
+        .. math::
 
-        The initial state covariance P₀ is 3 × 3 diagonal:
+            \\sigma^2_\\varepsilon   &= \\mathrm{Var}[\\varepsilon^{\\mathrm{OLS}}] \\\\
+            \\sigma^2_\\mu           &= \\alpha \\cdot \\sigma^2_\\varepsilon \\\\
+            \\sigma^2_\\gamma        &= \\alpha \\cdot \\sigma^2_\\varepsilon / \\mathrm{Var}[x] \\\\
+            \\sigma^2_{\\dot{\\gamma}} &= \\alpha_{\\dot{\\gamma}} \\cdot \\sigma^2_\\varepsilon / \\mathrm{Var}[x]
+            \\quad (\\alpha_{\\dot{\\gamma}} < \\alpha \\Rightarrow \\text{slow velocity})
 
-            P₀ = diag(σ²_ε / T_ls,   σ²_ε / (T_ls · Var[x]),   σ²_γ)
+        The initial state covariance :math:`P_0` is :math:`3 \\times 3` diagonal:
+
+        .. math::
+
+            P_0 = \\mathrm{diag}\\!\\left(
+                \\frac{\\sigma^2_\\varepsilon}{T_{\\mathrm{ls}}},\\;
+                \\frac{\\sigma^2_\\varepsilon}{T_{\\mathrm{ls}} \\cdot \\mathrm{Var}[x]},\\;
+                \\sigma^2_\\gamma
+            \\right)
 
         The third diagonal entry initialises uncertainty on the unknown
-        velocity γ̇₁ at the level of the hedge-ratio process noise σ²_γ,
-        reflecting that the initial trend is completely unknown.
+        velocity :math:`\\dot{\\gamma}_1` at the level of the hedge-ratio
+        process noise :math:`\\sigma^2_\\gamma`, reflecting that the initial
+        trend is completely unknown.
 
         :param np.ndarray yv: Dependent-leg values, shape (T,).
         :param np.ndarray xv: Independent-leg values, shape (T,).
@@ -239,39 +266,45 @@ class KalmanFilterWithVelocity(HedgeRatioEstimator):
         """
         Execute the forward Kalman recursion for the 3-state model.
 
-        State vector: α_t = [μ_t, γ_t, γ̇_t]^T.
+        State vector: :math:`\\alpha_t = [\\mu_t,\\, \\gamma_t,\\, \\dot{\\gamma}_t]^\\top`.
 
-        Transition matrix (locally-linear trend on γ):
+        Transition matrix (locally-linear trend on :math:`\\gamma`):
 
-            F = [[1, 0, 0],
-                 [0, 1, 1],
-                 [0, 0, 1]]
+        .. math::
 
-        State noise: Q = diag(σ²_μ, σ²_γ, σ²_γ̇).
-        Observation vector at bar t: H_t = [1, x_t, 0].
+            F = \\begin{pmatrix} 1 & 0 & 0 \\\\ 0 & 1 & 1 \\\\ 0 & 0 & 1 \\end{pmatrix}
 
-        For t = 1, …, T:
+        State noise: :math:`Q = \\mathrm{diag}(\\sigma^2_\\mu,\\, \\sigma^2_\\gamma,\\, \\sigma^2_{\\dot{\\gamma}})`.
+        Observation vector at bar :math:`t`: :math:`H_t = [1,\\, x_t,\\, 0]`.
 
-        **Predict**::
+        For :math:`t = 1, \\ldots, T`:
 
-            α_{t|t−1} = F · α_{t−1|t−1}
-            P_{t|t−1} = F · P_{t−1|t−1} · F^T + Q
+        **Predict**:
 
-        which gives γ_{t|t−1} = γ_{t−1|t−1} + γ̇_{t−1|t−1} (trend extrapolation).
+        .. math::
 
-        **Update**::
+            \\alpha_{t|t-1} &= F\\, \\alpha_{t-1|t-1} \\\\
+            P_{t|t-1} &= F\\, P_{t-1|t-1}\\, F^\\top + Q
 
-            ν_t  = y_t − H_t · α_{t|t−1}                 (innovation, scalar)
-            S_t  = H_t · P_{t|t−1} · H_t^T + σ²_ε        (innovation variance)
-            K_t  = P_{t|t−1} · H_t^T / S_t                (Kalman gain, 3×1)
-            α_{t|t} = α_{t|t−1} + K_t · ν_t
-            P_{t|t} = (I − K_t · H_t^T) · P_{t|t−1}
+        which gives :math:`\\gamma_{t|t-1} = \\gamma_{t-1|t-1} + \\dot{\\gamma}_{t-1|t-1}`
+        (trend extrapolation).
+
+        **Update**:
+
+        .. math::
+
+            \\nu_t &= y_t - H_t\\, \\alpha_{t|t-1} & &(\\text{innovation, scalar}) \\\\
+            S_t   &= H_t\\, P_{t|t-1}\\, H_t^\\top + \\sigma^2_\\varepsilon
+                   & &(\\text{innovation variance}) \\\\
+            K_t   &= P_{t|t-1}\\, H_t^\\top / S_t  & &(\\text{Kalman gain, } 3 \\times 1) \\\\
+            \\alpha_{t|t} &= \\alpha_{t|t-1} + K_t\\, \\nu_t \\\\
+            P_{t|t} &= (I - K_t\\, H_t^\\top)\\, P_{t|t-1}
 
         :param np.ndarray yv: Dependent-leg values, shape (T,).
         :param np.ndarray xv: Independent-leg values, shape (T,).
         :param KalmanFilterWithVelocityParams p: Hyperparameters.
         :returns: Tuple
-            ``(μ_{t|t}, γ_{t|t}, γ̇_{t|t}, γ_{t|t−1}, μ_{t|t−1}, S_t)``,
+            :math:`(\\mu_{t|t},\\, \\gamma_{t|t},\\, \\dot{\\gamma}_{t|t},\\, \\gamma_{t|t-1},\\, \\mu_{t|t-1},\\, S_t)`,
             each an ndarray of shape (T,).
         :rtype: tuple[np.ndarray, ...]
         """

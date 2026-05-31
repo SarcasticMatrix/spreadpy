@@ -46,6 +46,8 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/data';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -150,15 +152,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -259,15 +261,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -577,10 +579,9 @@ intersection of their DatetimeIndex.</p>
 <dt class="sig sig-object py" id="spreadpy.data.priceTimeSeries.PriceTimeSeries.log_returns">
 <span class="sig-name descname"><span class="pre">log_returns</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/spreadpy/data/priceTimeSeries.html#PriceTimeSeries.log_returns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries.log_returns" title="Link to this definition">#</a></dt>
 <dd><p>Compute continuously compounded log-returns.</p>
-<p>The log-return at bar t is defined as:</p>
-<blockquote>
-<div><p>r_t = log(P_t / P_{t−1})</p>
-</div></blockquote>
+<p>The log-return at bar <span class="math notranslate nohighlight">\(t\)</span> is defined as:</p>
+<div class="math notranslate nohighlight">
+\[r_t = \log\!\left(\frac{P_t}{P_{t-1}}\right)\]</div>
 <p>The first observation is dropped (NaN from the lag).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -616,10 +617,9 @@ bins (e.g. empty periods).</p>
 <dt class="sig sig-object py" id="spreadpy.data.priceTimeSeries.PriceTimeSeries.returns">
 <span class="sig-name descname"><span class="pre">returns</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/spreadpy/data/priceTimeSeries.html#PriceTimeSeries.returns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.data.priceTimeSeries.PriceTimeSeries.returns" title="Link to this definition">#</a></dt>
 <dd><p>Compute simple (arithmetic) returns.</p>
-<p>The return at bar t is defined as:</p>
-<blockquote>
-<div><p>r_t = (P_t − P_{t−1}) / P_{t−1}</p>
-</div></blockquote>
+<p>The return at bar <span class="math notranslate nohighlight">\(t\)</span> is defined as:</p>
+<div class="math notranslate nohighlight">
+\[r_t = \frac{P_t - P_{t-1}}{P_{t-1}}\]</div>
 <p>The first observation is dropped (NaN from the lag).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>

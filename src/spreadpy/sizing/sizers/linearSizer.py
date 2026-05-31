@@ -11,20 +11,27 @@ class LinearSizer(PositionSizer):
     """
     Converts a Signal into (qty_y, qty_x) absolute quantities.
 
-    The position size is proportional to the z-score magnitude via a scaling function:
+    The position size is proportional to the z-score magnitude via a scaling
+    function:
 
-        notional_y = max_notional · scale(|z|)
-        qty_y      = notional_y / price_y
-        qty_x      = notional_y · |β| / price_x
+    .. math::
 
-    where β is the hedge ratio at signal time. The x-leg quantity is adjusted
-    so that the notional exposure is hedged: qty_x · price_x ≈ |β| · qty_y · price_y.
+        N_y &= N_{\\max} \\cdot \\mathrm{scale}(|z|) \\\\
+        q_y &= N_y / p_y \\\\
+        q_x &= N_y \\cdot |\\beta| / p_x
+
+    where :math:`\\beta` is the hedge ratio at signal time. The x-leg quantity
+    is adjusted so that the notional exposure is hedged:
+    :math:`q_x \\cdot p_x \\approx |\\beta| \\cdot q_y \\cdot p_y`.
 
     The default scale function is a linear ramp:
 
-        scale(|z|) = clip((|z| − 1) / 2,  0,  1)
+    .. math::
 
-    mapping |z| = 1 → 0% and |z| ≥ 3 → 100% of ``max_notional``.
+        \\mathrm{scale}(|z|) = \\mathrm{clip}\\!\\left(\\frac{|z| - 1}{2},\\; 0,\\; 1\\right)
+
+    mapping :math:`|z| = 1 \\to 0\\%` and :math:`|z| \\geq 3 \\to 100\\%`
+    of ``max_notional``.
 
     :param float max_notional: Maximum notional per leg in monetary units.
     :param Optional[Callable[[float], float]] scale_fn: Maps |z| → [0, 1].

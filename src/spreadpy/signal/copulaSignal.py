@@ -15,29 +15,34 @@ class CopulaSignal(SignalGenerator):
     Copula-based entry / exit signal generator.
 
     Uses the conditional CDF of a fitted bivariate copula to detect
-statistical mispricings between the two legs.
+    statistical mispricings between the two legs.
 
-    In-sample fitting:
-        1. Convert prices to pseudo-observations u_t = F̂_y(y_t),
-           v_t = F̂_x(x_t) via empirical ranks (Hazen formula).
-        2. Estimate Kendall's τ and invert to copula parameter θ:
-               Gaussian:  θ = sin(π/2 · τ)
-               Clayton:   θ = 2τ / (1 - τ)   (θ > 0)
-               Gumbel:    θ = 1 / (1 - τ)    (θ ≥ 1)
+    **In-sample fitting:**
 
-    Entry logic (out-of-sample):
-        LONG  if C(u_t | v_t) < entry_prob         (y cheap relative to x)
-        SHORT if C(u_t | v_t) > 1 - entry_prob     (y expensive relative to x)
+    1. Convert prices to pseudo-observations :math:`u_t = \\hat{F}_y(y_t)`,
+       :math:`v_t = \\hat{F}_x(x_t)` via empirical ranks (Hazen formula).
+    2. Estimate Kendall's :math:`\\tau` and invert to copula parameter :math:`\\theta`:
 
-    Exit uses the rolling z-score: FLAT when |z| < exit_zscore or |z| > stop_zscore.
+       - Gaussian: :math:`\\theta = \\sin(\\pi\\tau/2)`
+       - Clayton:  :math:`\\theta = 2\\tau/(1-\\tau)`, :math:`\\theta > 0`
+       - Gumbel:   :math:`\\theta = 1/(1-\\tau)`, :math:`\\theta \\geq 1`
+
+    **Entry logic (out-of-sample):**
+
+    - **LONG**  if :math:`C(u_t \\mid v_t) < p_{\\text{entry}}` (y cheap relative to x)
+    - **SHORT** if :math:`C(u_t \\mid v_t) > 1 - p_{\\text{entry}}` (y expensive relative to x)
+
+    Exit uses the rolling z-score: **FLAT** when
+    :math:`|z| < z_{\\text{revert}}` or :math:`|z| > z_{\\text{stop}}`.
     The z-score is also passed to the :class:`LinearSizer` for sizing.
 
     :param str family: Copula family — ``'gaussian'``, ``'clayton'``, or ``'gumbel'``.
     :param int window: Rolling window for the z-score computation (position sizing only).
-    :param float entry_prob: Tail probability threshold for entry (default 0.10).
-        Fires when the conditional CDF is below ``entry_prob`` or above ``1 - entry_prob``.
-    :param float revert_threshold: Exit position when |z| drops below this value.
-    :param float stop_zscore: Stop-loss when |z| exceeds this value.
+    :param float entry_prob: Tail probability threshold :math:`p_{\\text{entry}}` for entry
+        (default 0.10). Fires when :math:`C(u_t \\mid v_t)` is below ``entry_prob``
+        or above :math:`1 - \\texttt{entry\\_prob}`.
+    :param float revert_threshold: Exit position when :math:`|z|` drops below this value.
+    :param float stop_zscore: Stop-loss when :math:`|z|` exceeds this value.
     """
 
     SUPPORTED_FAMILIES = {"gaussian", "clayton", "gumbel"}
@@ -67,11 +72,11 @@ statistical mispricings between the two legs.
     # ------------------------------------------------------------------
 
     def fit(self, spread: SpreadSeries) -> "CopulaSignal":
-        """Calibrate the copula parameter θ from in-sample data.
+        """Calibrate the copula parameter :math:`\\theta` from in-sample data.
 
-        Estimates Kendall's τ from the in-sample price pair (y, x) and
-        inverts it to the copula parameter θ via the family-specific
-        mapping described in the class docstring.
+        Estimates Kendall's :math:`\\tau` from the in-sample price pair
+        :math:`(y, x)` and inverts it to the copula parameter :math:`\\theta`
+        via the family-specific mapping described in the class docstring.
 
         After fitting, ``_theta`` and ``_kendall_tau`` are set.
 
@@ -90,17 +95,21 @@ statistical mispricings between the two legs.
         return self
 
     def _tau_to_theta(self, tau: float) -> float:
-        """Convert Kendall's τ to the copula parameter θ via moment matching.
+        """Convert Kendall's :math:`\\tau` to the copula parameter :math:`\\theta`
+        via moment matching.
 
         Family-specific inversion formulas:
 
-        - **Gaussian**: θ = sin(π/2 · τ)  (Pearson ρ via Greiner's relation)
-        - **Clayton**: θ = 2τ / (1 − τ),  θ > 0  (clipped to 0.01 if τ ≤ 0)
-        - **Gumbel**: θ = 1 / (1 − τ),   θ ≥ 1  (clipped to 100 if τ → 1)
+        - **Gaussian**: :math:`\\theta = \\sin(\\pi\\tau/2)` (Pearson :math:`\\rho`
+          via Greiner's relation)
+        - **Clayton**: :math:`\\theta = 2\\tau/(1-\\tau)`, :math:`\\theta > 0`
+          (clipped to 0.01 if :math:`\\tau \\leq 0`)
+        - **Gumbel**: :math:`\\theta = 1/(1-\\tau)`, :math:`\\theta \\geq 1`
+          (clipped to 100 if :math:`\\tau \\to 1`)
 
-        :param float tau: Sample Kendall's τ ∈ (−1, 1).
+        :param float tau: Sample Kendall's :math:`\\tau \\in (-1, 1)`.
 
-        :returns: Copula parameter θ.
+        :returns: Copula parameter :math:`\\theta`.
         :rtype: float
         """
         if self.family == "gaussian":
@@ -125,16 +134,21 @@ statistical mispricings between the two legs.
     def generate(self, spread: SpreadSeries) -> pd.Series:
         """Generate copula-based entry / exit signals for each bar.
 
-        For each bar t, the pseudo-observations u_t = F̂_y(y_t) and
-        v_t = F̂_x(x_t) are computed via the empirical CDF (Hazen formula)
-        over the full out-of-sample window. The conditional CDF
-        C(u_t | v_t) = ∂C(u_t, v_t) / ∂v_t is then evaluated using the
-        fitted copula parameter θ.
+        For each bar :math:`t`, the pseudo-observations
+        :math:`u_t = \\hat{F}_y(y_t)` and :math:`v_t = \\hat{F}_x(x_t)`
+        are computed via the empirical CDF (Hazen formula) over the full
+        out-of-sample window. The conditional CDF
 
-        Entry / exit rules:
+        .. math::
+
+            C(u_t \\mid v_t) = \\frac{\\partial C(u_t,\\, v_t)}{\\partial v_t}
+
+        is then evaluated using the fitted copula parameter :math:`\\theta`.
+
+        Entry / exit rules::
 
             LONG   if C(u_t | v_t) < entry_prob               (y cheap)
-            SHORT  if C(u_t | v_t) > 1 − entry_prob           (y expensive)
+            SHORT  if C(u_t | v_t) > 1 - entry_prob           (y expensive)
             FLAT   if in position and |z_t| < revert_threshold (mean-reverted)
             FLAT   if in position and |z_t| > stop_zscore      (stop-loss)
 
@@ -217,15 +231,17 @@ statistical mispricings between the two legs.
     def _empirical_cdf(self, x: np.ndarray) -> np.ndarray:
         """Empirical CDF via fractional ranks (Hazen formula).
 
-        For each observation x_i the pseudo-observation is:
+        For each observation :math:`x_i` the pseudo-observation is:
 
-            u_i = (rank(x_i) − 0.5) / n
+        .. math::
 
-        ensuring u_i ∈ (0, 1) with no values exactly at 0 or 1.
+            u_i = \\frac{\\mathrm{rank}(x_i) - 0.5}{n}
+
+        ensuring :math:`u_i \\in (0, 1)` with no values exactly at 0 or 1.
 
         :param np.ndarray x: 1-D array of observations, shape (n,).
 
-        :returns: Pseudo-observations in (0, 1), shape (n,).
+        :returns: Pseudo-observations in :math:`(0, 1)`, shape (n,).
         :rtype: np.ndarray
         """
         n = len(x)
@@ -233,22 +249,35 @@ statistical mispricings between the two legs.
         return (ranks - 0.5) / n
 
     def _conditional_cdf(self, u: float, v: float) -> float:
-        """Evaluate the copula h-function C(u | v) = ∂C(u, v) / ∂v.
+        """Evaluate the copula h-function :math:`C(u \\mid v) = \\partial C(u,v)/\\partial v`.
 
         Family-specific implementations:
 
-        - **Gaussian**: Φ((Φ⁻¹(u) − ρ · Φ⁻¹(v)) / √(1 − ρ²))
-        - **Clayton**: v^(−θ−1) · (u^{−θ} + v^{−θ} − 1)^{−1−1/θ}
+        - **Gaussian**:
+
+          .. math::
+
+              C(u \\mid v) = \\Phi\\!\\left(
+                  \\frac{\\Phi^{-1}(u) - \\rho\\,\\Phi^{-1}(v)}{\\sqrt{1 - \\rho^2}}
+              \\right)
+
+        - **Clayton**:
+
+          .. math::
+
+              C(u \\mid v) = v^{-\\theta-1}\\,
+                  \\bigl(u^{-\\theta} + v^{-\\theta} - 1\\bigr)^{-1-1/\\theta}
+
         - **Gumbel**: numerical central difference of :meth:`_gumbel_cdf`
-          w.r.t. v with step 10⁻⁵.
+          w.r.t. :math:`v` with step :math:`10^{-5}`.
 
-        Both u and v are clipped to (10⁻⁹, 1 − 10⁻⁹) for numerical
-        stability.
+        Both :math:`u` and :math:`v` are clipped to :math:`(10^{-9},\\, 1-10^{-9})`
+        for numerical stability.
 
-        :param float u: Pseudo-observation for the y leg ∈ (0, 1).
-        :param float v: Pseudo-observation for the x leg ∈ (0, 1).
+        :param float u: Pseudo-observation for the y leg :math:`\\in (0, 1)`.
+        :param float v: Pseudo-observation for the x leg :math:`\\in (0, 1)`.
 
-        :returns: Conditional probability C(u | v) ∈ [0, 1].
+        :returns: Conditional probability :math:`C(u \\mid v) \\in [0, 1]`.
         :rtype: float
         """
         eps = 1e-9
@@ -284,14 +313,16 @@ statistical mispricings between the two legs.
     def _gumbel_cdf(self, u: float, v: float) -> float:
         """Evaluate the bivariate Gumbel copula CDF.
 
-        The Gumbel copula is:
+        .. math::
 
-            C(u, v; θ) = exp(−((−log u)^θ + (−log v)^θ)^{1/θ}),   θ ≥ 1
+            C(u, v;\\,\\theta) = \\exp\\!\\Bigl(
+                -\\bigl((-\\log u)^\\theta + (-\\log v)^\\theta\\bigr)^{1/\\theta}
+            \\Bigr), \\quad \\theta \\geq 1
 
-        :param float u: First pseudo-observation ∈ (0, 1).
-        :param float v: Second pseudo-observation ∈ (0, 1).
+        :param float u: First pseudo-observation :math:`\\in (0, 1)`.
+        :param float v: Second pseudo-observation :math:`\\in (0, 1)`.
 
-        :returns: C(u, v) ∈ (0, 1).
+        :returns: :math:`C(u, v) \\in (0, 1)`.
         :rtype: float
         """
         eps = 1e-9

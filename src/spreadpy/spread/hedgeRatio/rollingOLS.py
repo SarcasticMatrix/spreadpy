@@ -10,16 +10,19 @@ class RollingOLS(HedgeRatioEstimator):
     """
     Rolling OLS hedge ratio estimator.
 
-    At each bar t, fits OLS on the most recent ``window`` observations:
+    At each bar :math:`t`, fits OLS on the most recent ``window`` observations:
 
-        y_s = α + β_t · x_s + ε_s,   s ∈ [t − w + 1,  t]
+    .. math::
+
+        y_s = \\alpha + \\beta_t \\cdot x_s + \\varepsilon_s,
+        \\quad s \\in [t - w + 1,\\; t]
 
     This adapts to structural shifts in the cointegration relationship
     without the complexity of a state-space model. Bars before the first
     complete window are filled with the first available estimate (forward-fill).
 
-    :param int window: Number of bars in each rolling regression (must be ≥ 2).
-    :param bool add_intercept: If True (default), includes an intercept term α.
+    :param int window: Number of bars in each rolling regression (must be :math:`\\geq 2`).
+    :param bool add_intercept: If True (default), includes an intercept term :math:`\\alpha`.
     """
 
     def __init__(self, window: int = 60, add_intercept: bool = True) -> None:
@@ -30,24 +33,30 @@ class RollingOLS(HedgeRatioEstimator):
 
     def fit(self, y: PriceTimeSeries, x: PriceTimeSeries) -> pd.Series:
         """
-        Estimate a time-varying hedge ratio β_t via rolling OLS.
+        Estimate a time-varying hedge ratio :math:`\\beta_t` via rolling OLS.
 
-        At each bar t ≥ w − 1, the hedge ratio is the OLS slope over the
-        most recent w observations:
+        At each bar :math:`t \\geq w - 1`, the hedge ratio is the OLS slope
+        over the most recent :math:`w` observations:
 
-            β_t = argmin_{β,α} Σ_{s=t−w+1}^{t} (y_s − α − β·x_s)²
+        .. math::
+
+            \\beta_t = \\operatorname{argmin}_{\\beta,\\, \\alpha}
+            \\sum_{s=t-w+1}^{t} (y_s - \\alpha - \\beta\\, x_s)^2
 
         whose solution is:
 
-            β_t = Cov_w[x, y] / Var_w[x]
+        .. math::
 
-        where Cov_w and Var_w denote the sample covariance and variance
-        over the rolling window. For the first w − 1 bars (warm-up), the
-        first available estimate is forward-filled.
+            \\beta_t = \\frac{\\mathrm{Cov}_w[x,\\, y]}{\\mathrm{Var}_w[x]}
+
+        where :math:`\\mathrm{Cov}_w` and :math:`\\mathrm{Var}_w` denote the
+        sample covariance and variance over the rolling window. For the first
+        :math:`w - 1` bars (warm-up), the first available estimate is
+        forward-filled.
 
         :param PriceTimeSeries y: Dependent-leg price series.
         :param PriceTimeSeries x: Independent-leg price series.
-        :returns: Time series of hedge ratios β_t aligned with ``y.index``.
+        :returns: Time series of hedge ratios :math:`\\beta_t` aligned with ``y.index``.
         :rtype: pd.Series
         """
         y_al, x_al = y.align(x)

@@ -13,25 +13,27 @@ class ZScoreSignal(SignalGenerator):
 
     At each bar, computes a rolling z-score of the spread residuals:
 
-        z_t = (s_t − μ̂_t) / σ̂_t
+    .. math::
 
-    where μ̂_t and σ̂_t are the rolling mean and standard deviation over
-    the last ``window`` bars (no lookahead).
+        z_t = \\frac{s_t - \\hat{\\mu}_t}{\\hat{\\sigma}_t}
 
-    Entry / exit rules:
+    where :math:`\\hat{\\mu}_t` and :math:`\\hat{\\sigma}_t` are the rolling mean and
+    standard deviation over the last ``window`` bars (no lookahead).
 
-        LONG   if z_t < −entry_threshold
+    Entry / exit rules::
+
+        LONG   if z_t < -entry_threshold
         SHORT  if z_t > +entry_threshold
-        FLAT   if LONG  and z_t > −revert_threshold  (z reverted back up)
+        FLAT   if LONG  and z_t > -revert_threshold  (z reverted back up)
         FLAT   if SHORT and z_t < +revert_threshold  (z reverted back down)
 
-    Setting ``revert_threshold=0`` exits at the mean crossing (z crosses 0).
+    Setting ``revert_threshold=0`` exits at the mean crossing (:math:`z` crosses 0).
     Setting it to a positive value exits before the mean is fully reached.
 
     :param int window: Number of bars for the rolling z-score computation.
-    :param float entry_threshold: |z| level above which a position is opened.
-    :param float revert_threshold: z level at which mean reversion is considered
-        complete and the position is closed. Must be ≤ entry_threshold.
+    :param float entry_threshold: :math:`|z|` level above which a position is opened.
+    :param float revert_threshold: :math:`z` level at which mean reversion is considered
+        complete and the position is closed. Must be :math:`\\leq` ``entry_threshold``.
         Use 0.0 to exit at the mean (default).
     """
 
@@ -69,13 +71,16 @@ class ZScoreSignal(SignalGenerator):
     def generate(self, spread: SpreadSeries) -> pd.Series:
         """Compute the rolling z-score and map each bar to a :class:`Signal`.
 
-        At each bar t the z-score is:
+        At each bar :math:`t` the z-score is:
 
-            z_t = (s_t − μ̂_{t,w}) / σ̂_{t,w}
+        .. math::
 
-        where μ̂_{t,w} and σ̂_{t,w} are the rolling mean and standard deviation
-        over the previous ``window`` bars (no lookahead). Bars with fewer than
-        ``window`` predecessors yield ``Direction.FLAT`` with ``zscore=NaN``.
+            z_t = \\frac{s_t - \\hat{\\mu}_{t,w}}{\\hat{\\sigma}_{t,w}}
+
+        where :math:`\\hat{\\mu}_{t,w}` and :math:`\\hat{\\sigma}_{t,w}` are the rolling
+        mean and standard deviation over the previous ``window`` bars (no lookahead).
+        Bars with fewer than ``window`` predecessors yield ``Direction.FLAT`` with
+        ``zscore=NaN``.
 
         :param SpreadSeries spread: Spread series to generate signals for
             (may be out-of-sample).

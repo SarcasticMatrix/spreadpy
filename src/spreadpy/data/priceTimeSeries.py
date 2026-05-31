@@ -112,9 +112,11 @@ class PriceTimeSeries:
     def log_returns(self) -> pd.Series:
         """Compute continuously compounded log-returns.
 
-        The log-return at bar t is defined as:
+        The log-return at bar :math:`t` is defined as:
 
-            r_t = log(P_t / P_{t−1})
+        .. math::
+
+            r_t = \\log\\!\\left(\\frac{P_t}{P_{t-1}}\\right)
 
         The first observation is dropped (NaN from the lag).
 
@@ -138,9 +140,11 @@ class PriceTimeSeries:
     def returns(self) -> pd.Series:
         """Compute simple (arithmetic) returns.
 
-        The return at bar t is defined as:
+        The return at bar :math:`t` is defined as:
 
-            r_t = (P_t − P_{t−1}) / P_{t−1}
+        .. math::
+
+            r_t = \\frac{P_t - P_{t-1}}{P_{t-1}}
 
         The first observation is dropped (NaN from the lag).
 

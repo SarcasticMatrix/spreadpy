@@ -46,6 +46,8 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/signal';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -150,15 +152,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -259,15 +261,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -488,27 +490,26 @@ on observations up to and including t.</p>
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spreadpy.signal.zScoreSignal.</span></span><span class="sig-name descname"><span class="pre">ZScoreSignal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entry_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">revert_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/signal/zScoreSignal.html#ZScoreSignal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.zScoreSignal.ZScoreSignal" title="Link to this definition">#</a></dt>
 <dd><p>Classic z-score entry / exit signal generator.</p>
 <p>At each bar, computes a rolling z-score of the spread residuals:</p>
-<blockquote>
-<div><p>z_t = (s_t − μ̂_t) / σ̂_t</p>
-</div></blockquote>
-<p>where μ̂_t and σ̂_t are the rolling mean and standard deviation over
-the last <code class="docutils literal notranslate"><span class="pre">window</span></code> bars (no lookahead).</p>
+<div class="math notranslate nohighlight">
+\[z_t = \frac{s_t - \hat{\mu}_t}{\hat{\sigma}_t}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\hat{\mu}_t\)</span> and <span class="math notranslate nohighlight">\(\hat{\sigma}_t\)</span> are the rolling mean and
+standard deviation over the last <code class="docutils literal notranslate"><span class="pre">window</span></code> bars (no lookahead).</p>
 <p>Entry / exit rules:</p>
-<blockquote>
-<div><p>LONG   if z_t &lt; −entry_threshold
-SHORT  if z_t &gt; +entry_threshold
-FLAT   if LONG  and z_t &gt; −revert_threshold  (z reverted back up)
-FLAT   if SHORT and z_t &lt; +revert_threshold  (z reverted back down)</p>
-</div></blockquote>
-<p>Setting <code class="docutils literal notranslate"><span class="pre">revert_threshold=0</span></code> exits at the mean crossing (z crosses 0).
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">LONG</span>   <span class="k">if</span> <span class="n">z_t</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">entry_threshold</span>
+<span class="n">SHORT</span>  <span class="k">if</span> <span class="n">z_t</span> <span class="o">&gt;</span> <span class="o">+</span><span class="n">entry_threshold</span>
+<span class="n">FLAT</span>   <span class="k">if</span> <span class="n">LONG</span>  <span class="ow">and</span> <span class="n">z_t</span> <span class="o">&gt;</span> <span class="o">-</span><span class="n">revert_threshold</span>  <span class="p">(</span><span class="n">z</span> <span class="n">reverted</span> <span class="n">back</span> <span class="n">up</span><span class="p">)</span>
+<span class="n">FLAT</span>   <span class="k">if</span> <span class="n">SHORT</span> <span class="ow">and</span> <span class="n">z_t</span> <span class="o">&lt;</span> <span class="o">+</span><span class="n">revert_threshold</span>  <span class="p">(</span><span class="n">z</span> <span class="n">reverted</span> <span class="n">back</span> <span class="n">down</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Setting <code class="docutils literal notranslate"><span class="pre">revert_threshold=0</span></code> exits at the mean crossing (<span class="math notranslate nohighlight">\(z\)</span> crosses 0).
 Setting it to a positive value exits before the mean is fully reached.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>window</strong> (<em>int</em>) – Number of bars for the rolling z-score computation.</p></li>
-<li><p><strong>entry_threshold</strong> (<em>float</em>) – <a href="#id2"><span class="problematic" id="id3">|z|</span></a> level above which a position is opened.</p></li>
-<li><p><strong>revert_threshold</strong> (<em>float</em>) – z level at which mean reversion is considered
-complete and the position is closed. Must be ≤ entry_threshold.
+<li><p><strong>entry_threshold</strong> (<em>float</em>) – <span class="math notranslate nohighlight">\(|z|\)</span> level above which a position is opened.</p></li>
+<li><p><strong>revert_threshold</strong> (<em>float</em>) – <span class="math notranslate nohighlight">\(z\)</span> level at which mean reversion is considered
+complete and the position is closed. Must be <span class="math notranslate nohighlight">\(\leq\)</span> <code class="docutils literal notranslate"><span class="pre">entry_threshold</span></code>.
 Use 0.0 to exit at the mean (default).</p></li>
 </ul>
 </dd>
@@ -537,13 +538,13 @@ by the <code class="xref py py-class docutils literal notranslate"><span class="
 <dt class="sig sig-object py" id="spreadpy.signal.zScoreSignal.ZScoreSignal.generate">
 <span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><span class="pre">SpreadSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/spreadpy/signal/zScoreSignal.html#ZScoreSignal.generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.zScoreSignal.ZScoreSignal.generate" title="Link to this definition">#</a></dt>
 <dd><p>Compute the rolling z-score and map each bar to a <code class="xref py py-class docutils literal notranslate"><span class="pre">Signal</span></code>.</p>
-<p>At each bar t the z-score is:</p>
-<blockquote>
-<div><p>z_t = (s_t − μ̂_{t,w}) / σ̂_{t,w}</p>
-</div></blockquote>
-<p>where μ̂_{t,w} and σ̂_{t,w} are the rolling mean and standard deviation
-over the previous <code class="docutils literal notranslate"><span class="pre">window</span></code> bars (no lookahead). Bars with fewer than
-<code class="docutils literal notranslate"><span class="pre">window</span></code> predecessors yield <code class="docutils literal notranslate"><span class="pre">Direction.FLAT</span></code> with <code class="docutils literal notranslate"><span class="pre">zscore=NaN</span></code>.</p>
+<p>At each bar <span class="math notranslate nohighlight">\(t\)</span> the z-score is:</p>
+<div class="math notranslate nohighlight">
+\[z_t = \frac{s_t - \hat{\mu}_{t,w}}{\hat{\sigma}_{t,w}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\hat{\mu}_{t,w}\)</span> and <span class="math notranslate nohighlight">\(\hat{\sigma}_{t,w}\)</span> are the rolling
+mean and standard deviation over the previous <code class="docutils literal notranslate"><span class="pre">window</span></code> bars (no lookahead).
+Bars with fewer than <code class="docutils literal notranslate"><span class="pre">window</span></code> predecessors yield <code class="docutils literal notranslate"><span class="pre">Direction.FLAT</span></code> with
+<code class="docutils literal notranslate"><span class="pre">zscore=NaN</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>spread</strong> (<a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><em>SpreadSeries</em></a>) – Spread series to generate signals for
@@ -566,57 +567,49 @@ over the previous <code class="docutils literal notranslate"><span class="pre">w
 <dl class="py class">
 <dt class="sig sig-object py" id="spreadpy.signal.copulaSignal.CopulaSignal">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spreadpy.signal.copulaSignal.</span></span><span class="sig-name descname"><span class="pre">CopulaSignal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">family</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gaussian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entry_prob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">revert_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_zscore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/signal/copulaSignal.html#CopulaSignal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.copulaSignal.CopulaSignal" title="Link to this definition">#</a></dt>
-<dd><blockquote>
-<div><p>Copula-based entry / exit signal generator.</p>
-<p>Uses the conditional CDF of a fitted bivariate copula to detect</p>
-</div></blockquote>
-<p>statistical mispricings between the two legs.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>In-sample fitting:</dt><dd><ol class="arabic simple">
-<li><p>Convert prices to pseudo-observations u_t = F̂_y(y_t),
-v_t = F̂_x(x_t) via empirical ranks (Hazen formula).</p></li>
-<li><dl class="simple">
-<dt>Estimate Kendall’s τ and invert to copula parameter θ:</dt><dd><p>Gaussian:  θ = sin(π/2 · τ)
-Clayton:   θ = 2τ / (1 - τ)   (θ &gt; 0)
-Gumbel:    θ = 1 / (1 - τ)    (θ ≥ 1)</p>
-</dd>
-</dl>
+<dd><p>Copula-based entry / exit signal generator.</p>
+<p>Uses the conditional CDF of a fitted bivariate copula to detect
+statistical mispricings between the two legs.</p>
+<p><strong>In-sample fitting:</strong></p>
+<ol class="arabic simple">
+<li><p>Convert prices to pseudo-observations <span class="math notranslate nohighlight">\(u_t = \hat{F}_y(y_t)\)</span>,
+<span class="math notranslate nohighlight">\(v_t = \hat{F}_x(x_t)\)</span> via empirical ranks (Hazen formula).</p></li>
+<li><p>Estimate Kendall’s <span class="math notranslate nohighlight">\(\tau\)</span> and invert to copula parameter <span class="math notranslate nohighlight">\(\theta\)</span>:</p>
+<ul class="simple">
+<li><p>Gaussian: <span class="math notranslate nohighlight">\(\theta = \sin(\pi\tau/2)\)</span></p></li>
+<li><p>Clayton:  <span class="math notranslate nohighlight">\(\theta = 2\tau/(1-\tau)\)</span>, <span class="math notranslate nohighlight">\(\theta &gt; 0\)</span></p></li>
+<li><p>Gumbel:   <span class="math notranslate nohighlight">\(\theta = 1/(1-\tau)\)</span>, <span class="math notranslate nohighlight">\(\theta \geq 1\)</span></p></li>
+</ul>
 </li>
 </ol>
-</dd>
-<dt>Entry logic (out-of-sample):</dt><dd><p>LONG  if C(u_t | v_t) &lt; entry_prob         (y cheap relative to x)
-SHORT if C(u_t | v_t) &gt; 1 - entry_prob     (y expensive relative to x)</p>
-</dd>
-</dl>
-<p>Exit uses the rolling z-score: FLAT when <a href="#id4"><span class="problematic" id="id5">|z|</span></a> &lt; exit_zscore or <a href="#id6"><span class="problematic" id="id7">|z|</span></a> &gt; stop_zscore.
+<p><strong>Entry logic (out-of-sample):</strong></p>
+<ul class="simple">
+<li><p><strong>LONG</strong>  if <span class="math notranslate nohighlight">\(C(u_t \mid v_t) &lt; p_{\text{entry}}\)</span> (y cheap relative to x)</p></li>
+<li><p><strong>SHORT</strong> if <span class="math notranslate nohighlight">\(C(u_t \mid v_t) &gt; 1 - p_{\text{entry}}\)</span> (y expensive relative to x)</p></li>
+</ul>
+<p>Exit uses the rolling z-score: <strong>FLAT</strong> when
+<span class="math notranslate nohighlight">\(|z| &lt; z_{\text{revert}}\)</span> or <span class="math notranslate nohighlight">\(|z| &gt; z_{\text{stop}}\)</span>.
 The z-score is also passed to the <code class="xref py py-class docutils literal notranslate"><span class="pre">LinearSizer</span></code> for sizing.</p>
 <dl class="field-list simple">
-<dt class="field-odd">param str family<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Copula family — <code class="docutils literal notranslate"><span class="pre">'gaussian'</span></code>, <code class="docutils literal notranslate"><span class="pre">'clayton'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'gumbel'</span></code>.</p>
-</dd>
-<dt class="field-even">param int window<span class="colon">:</span></dt>
-<dd class="field-even"><p>Rolling window for the z-score computation (position sizing only).</p>
-</dd>
-<dt class="field-odd">param float entry_prob<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Tail probability threshold for entry (default 0.10).
-Fires when the conditional CDF is below <code class="docutils literal notranslate"><span class="pre">entry_prob</span></code> or above <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">entry_prob</span></code>.</p>
-</dd>
-<dt class="field-even">param float revert_threshold<span class="colon">:</span></dt>
-<dd class="field-even"><p>Exit position when <a href="#id8"><span class="problematic" id="id9">|z|</span></a> drops below this value.</p>
-</dd>
-<dt class="field-odd">param float stop_zscore<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Stop-loss when <a href="#id10"><span class="problematic" id="id11">|z|</span></a> exceeds this value.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>family</strong> (<em>str</em>) – Copula family — <code class="docutils literal notranslate"><span class="pre">'gaussian'</span></code>, <code class="docutils literal notranslate"><span class="pre">'clayton'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'gumbel'</span></code>.</p></li>
+<li><p><strong>window</strong> (<em>int</em>) – Rolling window for the z-score computation (position sizing only).</p></li>
+<li><p><strong>entry_prob</strong> (<em>float</em>) – Tail probability threshold <span class="math notranslate nohighlight">\(p_{\text{entry}}\)</span> for entry
+(default 0.10). Fires when <span class="math notranslate nohighlight">\(C(u_t \mid v_t)\)</span> is below <code class="docutils literal notranslate"><span class="pre">entry_prob</span></code>
+or above <span class="math notranslate nohighlight">\(1 - \texttt{entry\_prob}\)</span>.</p></li>
+<li><p><strong>revert_threshold</strong> (<em>float</em>) – Exit position when <span class="math notranslate nohighlight">\(|z|\)</span> drops below this value.</p></li>
+<li><p><strong>stop_zscore</strong> (<em>float</em>) – Stop-loss when <span class="math notranslate nohighlight">\(|z|\)</span> exceeds this value.</p></li>
+</ul>
 </dd>
 </dl>
-</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="spreadpy.signal.copulaSignal.CopulaSignal.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><span class="pre">SpreadSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#spreadpy.signal.copulaSignal.CopulaSignal" title="spreadpy.signal.copulaSignal.CopulaSignal"><span class="pre">CopulaSignal</span></a></span></span><a class="reference internal" href="../_modules/spreadpy/signal/copulaSignal.html#CopulaSignal.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.copulaSignal.CopulaSignal.fit" title="Link to this definition">#</a></dt>
-<dd><p>Calibrate the copula parameter θ from in-sample data.</p>
-<p>Estimates Kendall’s τ from the in-sample price pair (y, x) and
-inverts it to the copula parameter θ via the family-specific
-mapping described in the class docstring.</p>
+<dd><p>Calibrate the copula parameter <span class="math notranslate nohighlight">\(\theta\)</span> from in-sample data.</p>
+<p>Estimates Kendall’s <span class="math notranslate nohighlight">\(\tau\)</span> from the in-sample price pair
+<span class="math notranslate nohighlight">\((y, x)\)</span> and inverts it to the copula parameter <span class="math notranslate nohighlight">\(\theta\)</span>
+via the family-specific mapping described in the class docstring.</p>
 <p>After fitting, <code class="docutils literal notranslate"><span class="pre">_theta</span></code> and <code class="docutils literal notranslate"><span class="pre">_kendall_tau</span></code> are set.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -636,18 +629,20 @@ and <code class="docutils literal notranslate"><span class="pre">spread.x</span>
 <dt class="sig sig-object py" id="spreadpy.signal.copulaSignal.CopulaSignal.generate">
 <span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><span class="pre">SpreadSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/spreadpy/signal/copulaSignal.html#CopulaSignal.generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.copulaSignal.CopulaSignal.generate" title="Link to this definition">#</a></dt>
 <dd><p>Generate copula-based entry / exit signals for each bar.</p>
-<p>For each bar t, the pseudo-observations u_t = F̂_y(y_t) and
-v_t = F̂_x(x_t) are computed via the empirical CDF (Hazen formula)
-over the full out-of-sample window. The conditional CDF
-C(u_t | v_t) = ∂C(u_t, v_t) / ∂v_t is then evaluated using the
-fitted copula parameter θ.</p>
+<p>For each bar <span class="math notranslate nohighlight">\(t\)</span>, the pseudo-observations
+<span class="math notranslate nohighlight">\(u_t = \hat{F}_y(y_t)\)</span> and <span class="math notranslate nohighlight">\(v_t = \hat{F}_x(x_t)\)</span>
+are computed via the empirical CDF (Hazen formula) over the full
+out-of-sample window. The conditional CDF</p>
+<div class="math notranslate nohighlight">
+\[C(u_t \mid v_t) = \frac{\partial C(u_t,\, v_t)}{\partial v_t}\]</div>
+<p>is then evaluated using the fitted copula parameter <span class="math notranslate nohighlight">\(\theta\)</span>.</p>
 <p>Entry / exit rules:</p>
-<blockquote>
-<div><p>LONG   if C(u_t | v_t) &lt; entry_prob               (y cheap)
-SHORT  if C(u_t | v_t) &gt; 1 − entry_prob           (y expensive)
-FLAT   if in position and <a href="#id12"><span class="problematic" id="id13">|z_t|</span></a> &lt; revert_threshold (mean-reverted)
-FLAT   if in position and <a href="#id14"><span class="problematic" id="id15">|z_t|</span></a> &gt; stop_zscore      (stop-loss)</p>
-</div></blockquote>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">LONG</span>   <span class="k">if</span> <span class="n">C</span><span class="p">(</span><span class="n">u_t</span> <span class="o">|</span> <span class="n">v_t</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">entry_prob</span>               <span class="p">(</span><span class="n">y</span> <span class="n">cheap</span><span class="p">)</span>
+<span class="n">SHORT</span>  <span class="k">if</span> <span class="n">C</span><span class="p">(</span><span class="n">u_t</span> <span class="o">|</span> <span class="n">v_t</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">entry_prob</span>           <span class="p">(</span><span class="n">y</span> <span class="n">expensive</span><span class="p">)</span>
+<span class="n">FLAT</span>   <span class="k">if</span> <span class="ow">in</span> <span class="n">position</span> <span class="ow">and</span> <span class="o">|</span><span class="n">z_t</span><span class="o">|</span> <span class="o">&lt;</span> <span class="n">revert_threshold</span> <span class="p">(</span><span class="n">mean</span><span class="o">-</span><span class="n">reverted</span><span class="p">)</span>
+<span class="n">FLAT</span>   <span class="k">if</span> <span class="ow">in</span> <span class="n">position</span> <span class="ow">and</span> <span class="o">|</span><span class="n">z_t</span><span class="o">|</span> <span class="o">&gt;</span> <span class="n">stop_zscore</span>      <span class="p">(</span><span class="n">stop</span><span class="o">-</span><span class="n">loss</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>The rolling z-score (same <code class="docutils literal notranslate"><span class="pre">window</span></code> as the class parameter) is
 computed in parallel and stored in each <code class="xref py py-class docutils literal notranslate"><span class="pre">Signal</span></code> for downstream
 position sizing.</p>

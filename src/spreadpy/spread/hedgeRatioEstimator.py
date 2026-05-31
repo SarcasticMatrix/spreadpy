@@ -22,10 +22,13 @@ class HedgeRatioEstimator(ABC):
     """
     Abstract base class for hedge ratio estimators.
 
-    Given two price series y (dependent leg) and x (independent leg),
-    an estimator produces a time series β_t such that the spread
+    Given two price series :math:`y` (dependent leg) and :math:`x`
+    (independent leg), an estimator produces a time series :math:`\\beta_t`
+    such that the spread
 
-        s_t = y_t − β_t · x_t
+    .. math::
+
+        s_t = y_t - \\beta_t \\cdot x_t
 
     is (ideally) stationary. All concrete subclasses must implement
     :meth:`fit`, which returns a ``pd.Series`` of hedge ratios aligned
@@ -39,11 +42,14 @@ class HedgeRatioEstimator(ABC):
 
         The returned series satisfies:
 
-            s_t = y_t − β_t · x_t
+        .. math::
 
-        where s_t is (ideally) stationary. Implementations must ensure
-        β_t is free of lookahead bias: at each bar t, β_t may only depend
-        on observations {(y_s, x_s) : s ≤ t}.
+            s_t = y_t - \\beta_t \\cdot x_t
+
+        where :math:`s_t` is (ideally) stationary. Implementations must ensure
+        :math:`\\beta_t` is free of lookahead bias: at each bar :math:`t`,
+        :math:`\\beta_t` may only depend on observations
+        :math:`\\{(y_s, x_s) : s \\leq t\\}`.
 
         :param PriceTimeSeries y: Dependent-leg price series.
         :param PriceTimeSeries x: Independent-leg price series.
@@ -58,7 +64,9 @@ class HedgeRatioEstimator(ABC):
         Equivalent to ``SpreadSeries(y, x, self.fit(y, x))``. The spread
         is defined bar-by-bar as:
 
-            s_t = y_t − β_t · x_t
+        .. math::
+
+            s_t = y_t - \\beta_t \\cdot x_t
 
         :param PriceTimeSeries y: Dependent-leg price series.
         :param PriceTimeSeries x: Independent-leg price series.
