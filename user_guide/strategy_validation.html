@@ -1,0 +1,946 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Validating a pairs trading strategy &#8212; spreadpy v0.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=0790524f97105ba85085" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=0790524f97105ba85085" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=af91de31" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=0790524f97105ba85085"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=0790524f97105ba85085" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085" />
+
+    <script src="../_static/documentation_options.js?v=fa47ad08"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/strategy_validation';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Tracking the hedge ratio with the Kalman filter" href="kalman_filter.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo-light-no-bg.png" class="logo__image only-light" alt="spreadpy v0.1.0 documentation - Home"/>
+    <img src="../_static/logo-light-no-bg.png" class="logo__image only-dark pst-js-only" alt="spreadpy v0.1.0 documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Example
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Explorations
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/SarcasticMatrix/spreadpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Example
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Explorations
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/SarcasticMatrix/spreadpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="kalman_filter.html">Tracking the hedge ratio with the Kalman filter</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Validating a pairs trading strategy</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Explorations</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Validating a pairs trading strategy</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="validating-a-pairs-trading-strategy">
+<h1>Validating a pairs trading strategy<a class="headerlink" href="#validating-a-pairs-trading-strategy" title="Link to this heading">#</a></h1>
+<div class="seealso admonition">
+<p class="admonition-title">Topics</p>
+<p>Walk-forward · overfitting · Deflated Sharpe Ratio · Probability of Backtest Overfitting ·
+Minimum Track Record Length · autocorrelation correction · parameter sensitivity</p>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Status</p>
+<p>This is a <strong>design document</strong> — a reflection on what needs to be built in <code class="docutils literal notranslate"><span class="pre">spreadpy</span></code>
+to properly validate a strategy. Nothing described here is implemented yet.</p>
+</div>
+<p>A backtest is an optimistic experiment by construction: we fit a model on historical data,
+evaluate it on the same (or adjacent) data, and report the result. Every choice — the
+pair, the estimator, the signal threshold, the sizer — is at least partially informed by
+the data we are testing on. The result is <strong>selection bias</strong>: we over-report performance
+that will not repeat out of sample.</p>
+<p>This note identifies the four failure modes of naive backtesting and proposes a concrete
+validation stack for <code class="docutils literal notranslate"><span class="pre">spreadpy</span></code>, centred on a <code class="docutils literal notranslate"><span class="pre">StrategyValidator</span></code> class.</p>
+<hr class="docutils" />
+<section id="the-four-failure-modes">
+<h2>The four failure modes<a class="headerlink" href="#the-four-failure-modes" title="Link to this heading">#</a></h2>
+<section id="a-single-train-test-split-is-not-enough">
+<h3>1. A single train/test split is not enough<a class="headerlink" href="#a-single-train-test-split-is-not-enough" title="Link to this heading">#</a></h3>
+<p>The current <code class="docutils literal notranslate"><span class="pre">BacktestEngine</span></code> splits data once into train / val / test. This is a solid
+baseline, but a strategy that performs well on <em>one</em> test period may simply be lucky.
+A genuine edge should survive across <em>many</em> consecutive out-of-sample windows.</p>
+<p><strong>What to build:</strong> <code class="docutils literal notranslate"><span class="pre">WalkForwardEngine</span></code> — rolls the train window forward in fixed steps,
+re-fits the full pipeline at each fold, and aggregates OOS results.</p>
+</section>
+<section id="multiple-testing-inflates-the-sharpe-ratio">
+<h3>2. Multiple testing inflates the Sharpe ratio<a class="headerlink" href="#multiple-testing-inflates-the-sharpe-ratio" title="Link to this heading">#</a></h3>
+<p>Suppose we run <span class="math notranslate nohighlight">\(N\)</span> parameter configurations and keep the best. Let <span class="math notranslate nohighlight">\(r_1, \ldots, r_T\)</span>
+be the bar-level returns of a single configuration, with <span class="math notranslate nohighlight">\(T\)</span> the number of bars, sample
+mean <span class="math notranslate nohighlight">\(\bar{r}\)</span>, and sample standard deviation <span class="math notranslate nohighlight">\(\hat{\sigma}\)</span>. The per-bar sample Sharpe
+ratio is <span class="math notranslate nohighlight">\(\widehat{SR} = \bar{r}/\hat{\sigma}\)</span>.</p>
+<p>Under the null hypothesis of zero true edge, <span class="math notranslate nohighlight">\(\widehat{SR}_k\)</span> is approximately normally
+distributed for each configuration <span class="math notranslate nohighlight">\(k\)</span>, with standard deviation:</p>
+<div class="math notranslate nohighlight">
+\[
+\sigma_{\widehat{SR}} = \sqrt{\frac{1}{T}\left(1 + \frac{\widehat{SR}_k^2}{2}\right)} \approx \frac{1}{\sqrt{T}},
+\]</div>
+<p>where the approximation holds when <span class="math notranslate nohighlight">\(\widehat{SR}_k \approx 0\)</span>. The expected maximum of <span class="math notranslate nohighlight">\(N\)</span>
+such independent statistics is then:</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E}\!\left[\max_{k=1}^N \widehat{SR}_k\right] \approx \sigma_{\widehat{SR}} \cdot \Phi^{-1}\!\left(1 - \frac{1}{N}\right),
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Phi^{-1}\)</span> is the standard normal quantile function. Even for <span class="math notranslate nohighlight">\(N = 20\)</span> and
+<span class="math notranslate nohighlight">\(T = 252\)</span> bars, this expectation is <span class="math notranslate nohighlight">\(\approx 0.12\)</span> per bar, equivalent to an annualised
+Sharpe of <span class="math notranslate nohighlight">\(0.12\sqrt{252} \approx 1.9\)</span> from pure noise.</p>
+<p><strong>What to build:</strong> <code class="docutils literal notranslate"><span class="pre">DeflatedSharpeRatio</span></code> — penalises the observed Sharpe for the number
+of trials and the non-normality of returns.</p>
+</section>
+<section id="returns-are-autocorrelated-the-sharpe-ratio-is-biased">
+<h3>3. Returns are autocorrelated — the Sharpe ratio is biased<a class="headerlink" href="#returns-are-autocorrelated-the-sharpe-ratio-is-biased" title="Link to this heading">#</a></h3>
+<p>The standard annualised Sharpe <span class="math notranslate nohighlight">\(\widehat{SR}_\text{ann} = \widehat{SR} \cdot \sqrt{n}\)</span>,
+where <span class="math notranslate nohighlight">\(n\)</span> is the number of bars per year (e.g. <span class="math notranslate nohighlight">\(n = 252\)</span> for daily data), assumes i.i.d.
+returns. Mean-reversion strategies produce <strong>positively autocorrelated</strong> returns at short
+horizons: a winning day is followed by another winning day while the open position
+continues to revert. Positive serial correlation inflates <span class="math notranslate nohighlight">\(\widehat{SR}_\text{ann}\)</span> because
+the i.i.d. formula underestimates the true variance of multi-period returns.</p>
+<p>Lo (2002) derives the correction. Let <span class="math notranslate nohighlight">\(\hat{\rho}_k\)</span> be the sample autocorrelation at lag
+<span class="math notranslate nohighlight">\(k\)</span>, defined as:</p>
+<div class="math notranslate nohighlight">
+\[
+\hat{\rho}_k = \frac{\sum_{t=k+1}^T (r_t - \bar{r})(r_{t-k} - \bar{r})}{\sum_{t=1}^T (r_t - \bar{r})^2},
+\]</div>
+<p>and let <span class="math notranslate nohighlight">\(q\)</span> be the truncation lag (e.g. chosen by Newey-West). The long-run variance
+scaling factor is:</p>
+<div class="math notranslate nohighlight">
+\[
+\eta = 1 + 2\sum_{k=1}^{q} \left(1 - \frac{k}{q+1}\right)\hat{\rho}_k,
+\]</div>
+<p>where the Bartlett weights <span class="math notranslate nohighlight">\((1 - k/(q+1))\)</span> downweight higher lags. The
+autocorrelation-adjusted annualised Sharpe is then:</p>
+<div class="math notranslate nohighlight">
+\[
+\widehat{SR}_\text{adj} = \frac{\widehat{SR}_\text{ann}}{\sqrt{\eta}}.
+\]</div>
+<p>When <span class="math notranslate nohighlight">\(\hat{\rho}_k &gt; 0\)</span> for all <span class="math notranslate nohighlight">\(k\)</span>, we have <span class="math notranslate nohighlight">\(\eta &gt; 1\)</span> and therefore
+<span class="math notranslate nohighlight">\(\widehat{SR}_\text{adj} &lt; \widehat{SR}_\text{ann}\)</span>: the i.i.d. formula overstates
+performance. For typical mean-reversion strategies, <span class="math notranslate nohighlight">\(\eta \in [1.2, 2.0]\)</span>, yielding a
+downward correction of 10–40%.</p>
+<p><strong>What to build:</strong> <code class="docutils literal notranslate"><span class="pre">autocorr_adjusted_sharpe(returns,</span> <span class="pre">max_lags)</span></code> — applies Lo’s correction
+before any significance test.</p>
+</section>
+<section id="overfitting-to-a-specific-period">
+<h3>4. Overfitting to a specific period<a class="headerlink" href="#overfitting-to-a-specific-period" title="Link to this heading">#</a></h3>
+<p>A strategy can be structurally sound but over-tuned to the volatility regime, liquidity
+conditions, or correlation structure of the backtest period. This is the hardest failure
+mode to detect because the OOS period may look similar to IS on the surface.</p>
+<p><strong>What to build:</strong> <code class="docutils literal notranslate"><span class="pre">ProbabilityOfBacktestOverfitting</span></code> — the combinatorial test of Bailey
+&amp; López de Prado (2014).</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="proposed-building-blocks">
+<h2>Proposed building blocks<a class="headerlink" href="#proposed-building-blocks" title="Link to this heading">#</a></h2>
+<section id="walkforwardengine">
+<h3><code class="docutils literal notranslate"><span class="pre">WalkForwardEngine</span></code><a class="headerlink" href="#walkforwardengine" title="Link to this heading">#</a></h3>
+<p>Rolls the train+test window forward in steps of <code class="docutils literal notranslate"><span class="pre">step</span></code> bars. At each fold <span class="math notranslate nohighlight">\(k\)</span>, denoting
+by <span class="math notranslate nohighlight">\(t_k\)</span> the fold start date, <span class="math notranslate nohighlight">\(T_\text{train}\)</span> the training window length, and
+<span class="math notranslate nohighlight">\(T_\text{test}\)</span> the evaluation window length:</p>
+<ol class="arabic simple">
+<li><p>Train on <span class="math notranslate nohighlight">\([t_k,\; t_k + T_\text{train})\)</span></p></li>
+<li><p>Evaluate on <span class="math notranslate nohighlight">\([t_k + T_\text{train},\; t_k + T_\text{train} + T_\text{test})\)</span></p></li>
+<li><p>Store <code class="docutils literal notranslate"><span class="pre">BacktestResult</span></code></p></li>
+</ol>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>WalkForwardEngine(
+    estimator, signal_gen, sizer,
+    train_size   : int,      # bars in each training window
+    test_size    : int,      # bars in each OOS window
+    step         : int,      # how many bars to advance each fold
+    expanding    : bool,     # True → expanding window, False → rolling
+)
+.run(y, x) → List[BacktestResult]
+.aggregate()  → pd.DataFrame   # one row per fold: Sharpe, MDD, n_trades, …
+.plot()
+</pre></div>
+</div>
+<p>A fold summary that immediately shows whether performance is <strong>consistent</strong> across time or
+concentrated in one lucky period is the single most useful diagnostic.</p>
+<p>Key design question: <strong>expanding vs rolling window?</strong></p>
+<ul class="simple">
+<li><p><em>Expanding</em> (anchored start): more data each fold → more stable estimates, but older
+data may be structurally irrelevant.</p></li>
+<li><p><em>Rolling</em> (fixed size): represents how the strategy would actually be run live, but
+early folds may be noisy due to small training sets.</p></li>
+</ul>
+<p>Both should be supported.</p>
+</section>
+<section id="deflatedsharperatio">
+<h3><code class="docutils literal notranslate"><span class="pre">DeflatedSharpeRatio</span></code><a class="headerlink" href="#deflatedsharperatio" title="Link to this heading">#</a></h3>
+<p>Bailey &amp; López de Prado (2014) correct the observed Sharpe for three simultaneous biases:
+non-normality of returns, number of trials, and track record length.</p>
+<p><strong>Step 1 — Probabilistic Sharpe Ratio (PSR).</strong></p>
+<p>Let <span class="math notranslate nohighlight">\(T\)</span> be the number of OOS bar-level return observations, <span class="math notranslate nohighlight">\(\widehat{SR}\)</span> the per-bar
+sample Sharpe ratio of the selected strategy, <span class="math notranslate nohighlight">\(\hat{\gamma}_3\)</span> the sample skewness of
+those returns, and <span class="math notranslate nohighlight">\(\hat{\gamma}_4\)</span> their sample <em>excess</em> kurtosis. Given a benchmark
+per-bar Sharpe <span class="math notranslate nohighlight">\(SR^*\)</span>, the PSR is the estimated probability that the true Sharpe exceeds
+<span class="math notranslate nohighlight">\(SR^*\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+\widehat{PSR}(SR^*) = \Phi\!\left(
+    \frac{(\widehat{SR} - SR^*)\sqrt{T-1}}
+    {\sqrt{1 - \hat{\gamma}_3\, \widehat{SR} + \dfrac{\hat{\gamma}_4 - 1}{4}\, \widehat{SR}^2}}
+\right),
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Phi\)</span> is the standard normal CDF. The denominator inflates the standard error when
+returns are skewed (<span class="math notranslate nohighlight">\(\hat{\gamma}_3 \neq 0\)</span>) or fat-tailed (<span class="math notranslate nohighlight">\(\hat{\gamma}_4 &gt; 0\)</span>):
+non-Gaussian returns make <span class="math notranslate nohighlight">\(\widehat{SR}\)</span> a noisier estimator, so the same observed value
+carries less statistical evidence.</p>
+<p><strong>Step 2 — Deflated Sharpe Ratio (DSR).</strong></p>
+<p>Suppose <span class="math notranslate nohighlight">\(N\)</span> configurations were tested in total. Let <span class="math notranslate nohighlight">\(\widehat{SR}_k\)</span> be the per-bar
+Sharpe of configuration <span class="math notranslate nohighlight">\(k\)</span>, and <span class="math notranslate nohighlight">\(\overline{SR} = \frac{1}{N}\sum_{k=1}^N \widehat{SR}_k\)</span>
+their average. The DSR sets <span class="math notranslate nohighlight">\(SR^*\)</span> to the expected maximum Sharpe one would observe under
+data-mining alone:</p>
+<div class="math notranslate nohighlight">
+\[
+SR^* = \Phi^{-1}\!\left(1 - \frac{1}{N}\right)
+\cdot \sqrt{\frac{1 - \hat{\gamma}_3\,\overline{SR} + \dfrac{\hat{\gamma}_4-1}{4}\,\overline{SR}^2}{T - 1}}.
+\]</div>
+<p>The DSR is then <span class="math notranslate nohighlight">\(\widehat{PSR}(SR^*)\)</span>: the probability that the selected strategy has
+genuine alpha beyond what data-mining would produce. A DSR above 0.95 (i.e. <span class="math notranslate nohighlight">\(p &lt; 0.05\)</span>
+under the null) is the target.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>DeflatedSharpeRatio(
+    returns      : pd.Series,            # OOS bar-level returns of the selected strategy
+    n_trials     : int,                  # N = total number of configurations tested
+    all_returns  : List[pd.Series],      # returns of all N trials (to compute SR̄)
+)
+.psr(sr_star)  → float    # PSR at a given benchmark SR*
+.dsr()         → float    # DSR = PSR(SR*) with SR* set by data-mining correction
+.summary()     → pd.Series
+</pre></div>
+</div>
+</section>
+<section id="minimumtrackrecordlength">
+<h3><code class="docutils literal notranslate"><span class="pre">MinimumTrackRecordLength</span></code><a class="headerlink" href="#minimumtrackrecordlength" title="Link to this heading">#</a></h3>
+<p>Before testing for selection bias, a more basic question: <em>do we have enough OOS data to
+conclude that <span class="math notranslate nohighlight">\(\widehat{SR} &gt; 0\)</span> is not due to chance?</em></p>
+<p>Inverting the PSR formula at benchmark <span class="math notranslate nohighlight">\(SR^* = 0\)</span>, the minimum number of OOS bars <span class="math notranslate nohighlight">\(T^*\)</span>
+required to reject <span class="math notranslate nohighlight">\(H_0: \text{true } SR \leq 0\)</span> at Type I error level <span class="math notranslate nohighlight">\(\delta\)</span> is:</p>
+<div class="math notranslate nohighlight">
+\[
+T^* = 1 + \left(1 - \hat{\gamma}_3\, \widehat{SR} + \frac{\hat{\gamma}_4 - 1}{4}\, \widehat{SR}^2\right)
+\cdot \left(\frac{\Phi^{-1}(1 - \delta)}{\widehat{SR}}\right)^2.
+\]</div>
+<p>Note that <span class="math notranslate nohighlight">\(\delta\)</span> here is the significance level, not the Kalman filter noise parameter
+used elsewhere in <code class="docutils literal notranslate"><span class="pre">spreadpy</span></code>. For concreteness, consider Gaussian returns
+(<span class="math notranslate nohighlight">\(\hat{\gamma}_3 = \hat{\gamma}_4 = 0\)</span>) and <span class="math notranslate nohighlight">\(\delta = 0.05\)</span>:</p>
+<ul class="simple">
+<li><p>For <span class="math notranslate nohighlight">\(\widehat{SR}_\text{ann} = 0.5\)</span> with <span class="math notranslate nohighlight">\(n = 252\)</span> daily bars: <span class="math notranslate nohighlight">\(\widehat{SR} = 0.5/\sqrt{252} \approx 0.031\)</span>, giving <span class="math notranslate nohighlight">\(T^* \approx 2{,}730\)</span> bars — about <strong>10.8 years</strong> of daily OOS data.</p></li>
+<li><p>For <span class="math notranslate nohighlight">\(\widehat{SR}_\text{ann} = 1.0\)</span>: <span class="math notranslate nohighlight">\(\widehat{SR} \approx 0.063\)</span>, giving <span class="math notranslate nohighlight">\(T^* \approx 683\)</span> bars — about <strong>2.7 years</strong>.</p></li>
+</ul>
+<p>Negative skewness (common in pairs trading due to occasional blow-ups) or excess kurtosis
+increases <span class="math notranslate nohighlight">\(T^*\)</span> further by making <span class="math notranslate nohighlight">\(\widehat{SR}\)</span> a noisier estimator.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>MinimumTrackRecordLength(
+    sr_annualised    : float,
+    skew             : float = 0.0,    # γ̂₃ of returns
+    excess_kurt      : float = 0.0,    # γ̂₄ of returns
+    significance     : float = 0.05,   # δ
+    periods_per_year : int   = 252,    # n
+)
+.mtrl()  → int     # T* in bars
+</pre></div>
+</div>
+</section>
+<section id="probabilityofbacktestoverfitting">
+<h3><code class="docutils literal notranslate"><span class="pre">ProbabilityOfBacktestOverfitting</span></code><a class="headerlink" href="#probabilityofbacktestoverfitting" title="Link to this heading">#</a></h3>
+<p>The PBO test (Bailey &amp; López de Prado, 2014) does not require specifying the number of
+trials. It uses <strong>combinatorial symmetric cross-validation</strong> on a matrix of returns.</p>
+<p><strong>Setup.</strong> Let <span class="math notranslate nohighlight">\(\mathbf{R} \in \mathbb{R}^{T \times N}\)</span> be the matrix of bar-level returns,
+where column <span class="math notranslate nohighlight">\(k\)</span> contains the <span class="math notranslate nohighlight">\(T\)</span> OOS returns of configuration <span class="math notranslate nohighlight">\(k\)</span>, and <span class="math notranslate nohighlight">\(N\)</span> is the total
+number of configurations. Partition the <span class="math notranslate nohighlight">\(T\)</span> bars into <span class="math notranslate nohighlight">\(S\)</span> non-overlapping sub-periods of
+equal length <span class="math notranslate nohighlight">\(T/S\)</span>, yielding index sets <span class="math notranslate nohighlight">\(\mathcal{I}_1, \ldots, \mathcal{I}_S\)</span>.</p>
+<p><strong>Combinatorial splits.</strong> For each of the <span class="math notranslate nohighlight">\(\binom{S}{S/2}\)</span> ways to partition the <span class="math notranslate nohighlight">\(S\)</span>
+sub-periods into an IS set <span class="math notranslate nohighlight">\(\mathcal{J} \subset \{1,\ldots,S\}\)</span> of size <span class="math notranslate nohighlight">\(S/2\)</span> and a
+complementary OOS set <span class="math notranslate nohighlight">\(\mathcal{J}^c\)</span>:</p>
+<ol class="arabic">
+<li><p>Compute a scalar performance metric <span class="math notranslate nohighlight">\(\mu_k^\text{IS}\)</span> (e.g. the Sharpe ratio) for
+each configuration <span class="math notranslate nohighlight">\(k\)</span>, using only the rows of <span class="math notranslate nohighlight">\(\mathbf{R}\)</span> belonging to the IS
+sub-periods <span class="math notranslate nohighlight">\(\bigcup_{j \in \mathcal{J}} \mathcal{I}_j\)</span>.</p></li>
+<li><p>Select the best IS configuration <span class="math notranslate nohighlight">\(k^* = \arg\max_k\, \mu_k^\text{IS}\)</span>.</p></li>
+<li><p>Evaluate <span class="math notranslate nohighlight">\(k^*\)</span> on the OOS sub-periods: <span class="math notranslate nohighlight">\(\mu_{k^*}^\text{OOS}\)</span>.</p></li>
+<li><p>Record its relative OOS rank via the logit-transformed percentile:</p>
+<div class="math notranslate nohighlight">
+\[\omega = \Phi\!\left(
+    \frac{\mu_{k^*}^{\text{OOS}} - \bar{\mu}^{\text{OOS}}}{\hat{\sigma}^{\text{OOS}}}
+\right),\]</div>
+<p>where <span class="math notranslate nohighlight">\(\bar{\mu}^{\text{OOS}}\)</span> and <span class="math notranslate nohighlight">\(\hat{\sigma}^{\text{OOS}}\)</span> are the mean and
+standard deviation of <span class="math notranslate nohighlight">\(\{\mu_k^{\text{OOS}}\}_{k=1}^N\)</span> across all <span class="math notranslate nohighlight">\(N\)</span> configurations
+on that OOS subset.</p>
+</li>
+</ol>
+<p><strong>PBO.</strong> The probability of backtest overfitting is the fraction of splits where the IS
+winner ranks below median OOS (<span class="math notranslate nohighlight">\(\omega &lt; 0.5\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[
+PBO = \frac{1}{\binom{S}{S/2}} \sum_{\text{splits}} \mathbf{1}[\omega &lt; 0.5].
+\]</div>
+<p>A <span class="math notranslate nohighlight">\(PBO &gt; 0.5\)</span> means the IS winner is more likely than not to be below-median OOS —
+strong evidence of overfitting. A <span class="math notranslate nohighlight">\(PBO \approx 0\)</span> means the best IS configuration
+consistently wins OOS too.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>ProbabilityOfBacktestOverfitting(
+    returns_matrix : pd.DataFrame,   # T × N, column k = returns of configuration k
+    n_partitions   : int = 16,       # S
+    metric         : str = &quot;sharpe&quot;, # the scalar μ used for ranking
+)
+.fit()   → PBOResult
+    .pbo            : float          # probability of overfitting
+    .logit_sr       : pd.Series      # distribution of ω across splits
+    .plot_logit()
+    .plot_rank_correlation()
+</pre></div>
+</div>
+</section>
+<section id="parametersensitivity">
+<h3><code class="docutils literal notranslate"><span class="pre">ParameterSensitivity</span></code><a class="headerlink" href="#parametersensitivity" title="Link to this heading">#</a></h3>
+<p>A strategy is over-fitted if its performance is concentrated at a single point in
+parameter space. Robustness requires a <strong>plateau</strong>, not a spike.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>ParameterSensitivity(
+    engine       : BacktestEngine | WalkForwardEngine,
+    param_grid   : dict,   # e.g. {&quot;entry_threshold&quot;: [0.5, 1.0, 1.5, 2.0]}
+    metric       : str = &quot;sharpe&quot;,
+)
+.run(y, x) → pd.DataFrame    # one row per config
+.plot_heatmap()               # 2-param heatmap
+.plot_profile()               # 1-param sensitivity curve
+.robustness_score() → float  # fraction of configs within X% of optimum
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="the-strategyvalidator-class">
+<h2>The <code class="docutils literal notranslate"><span class="pre">StrategyValidator</span></code> class<a class="headerlink" href="#the-strategyvalidator-class" title="Link to this heading">#</a></h2>
+<p>All the above building blocks are orchestrated by a single entry point:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>StrategyValidator(
+    engine           : BacktestEngine,
+    walk_forward     : WalkForwardEngine | None,
+    param_grid       : dict | None,
+    n_trials         : int = 1,
+    significance     : float = 0.05,   # δ for MTRL and PSR
+    periods_per_year : int = 252,
+)
+.validate(y, x) → ValidationReport
+</pre></div>
+</div>
+<section id="validationreport">
+<h3><code class="docutils literal notranslate"><span class="pre">ValidationReport</span></code><a class="headerlink" href="#validationreport" title="Link to this heading">#</a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>ValidationReport
+├── walk_forward_results   : List[BacktestResult]
+├── aggregated_metrics     : pd.DataFrame        # per-fold
+├── dsr                    : DeflatedSharpeRatioResult
+│      .psr, .dsr, .n_trials, .sr_raw
+├── mtrl                   : MinimumTrackRecordLengthResult
+│      .required_bars, .available_bars, .sufficient
+├── pbo                    : PBOResult | None     # if param_grid provided
+│      .pbo, .logit_sr
+├── sensitivity            : SensitivityResult | None
+│      .heatmap, .robustness_score
+└── .summary()             → pd.DataFrame        # one-page verdict
+    .plot()                → matplotlib figure   # 4-panel dashboard
+</pre></div>
+</div>
+</section>
+<section id="the-one-page-verdict">
+<h3>The one-page verdict<a class="headerlink" href="#the-one-page-verdict" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">summary()</span></code> would return something like:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Check</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Threshold</p></th>
+<th class="head"><p>Pass?</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>OOS Sharpe (raw)</p></td>
+<td><p>0.82</p></td>
+<td><p>&gt; 0</p></td>
+<td><p>✓</p></td>
+</tr>
+<tr class="row-odd"><td><p>OOS Sharpe (Lo-adjusted)</p></td>
+<td><p>0.61</p></td>
+<td><p>&gt; 0</p></td>
+<td><p>✓</p></td>
+</tr>
+<tr class="row-even"><td><p>Deflated Sharpe Ratio (DSR)</p></td>
+<td><p>0.44</p></td>
+<td><p>&gt; 0</p></td>
+<td><p>✓</p></td>
+</tr>
+<tr class="row-odd"><td><p>PSR (p-value)</p></td>
+<td><p>0.031</p></td>
+<td><p>&lt; 0.05</p></td>
+<td><p>✓</p></td>
+</tr>
+<tr class="row-even"><td><p>Track record length</p></td>
+<td><p>504 bars</p></td>
+<td><p>≥ 387 (<span class="math notranslate nohighlight">\(T^*\)</span>)</p></td>
+<td><p>✓</p></td>
+</tr>
+<tr class="row-odd"><td><p>Probability of overfitting</p></td>
+<td><p>0.38</p></td>
+<td><p>&lt; 0.50</p></td>
+<td><p>✓</p></td>
+</tr>
+<tr class="row-even"><td><p>Walk-forward consistency</p></td>
+<td><p>7/10 folds profitable</p></td>
+<td><p>≥ 6/10</p></td>
+<td><p>✓</p></td>
+</tr>
+<tr class="row-odd"><td><p>Robustness score</p></td>
+<td><p>0.71</p></td>
+<td><p>&gt; 0.50</p></td>
+<td><p>✓</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="open-design-questions">
+<h2>Open design questions<a class="headerlink" href="#open-design-questions" title="Link to this heading">#</a></h2>
+<p>Before implementing, a few choices need to be made:</p>
+<p><strong>1. Where does <code class="docutils literal notranslate"><span class="pre">StrategyValidator</span></code> live?</strong>
+A new <code class="docutils literal notranslate"><span class="pre">spreadpy.validation</span></code> sub-package seems natural. It would sit alongside
+<code class="docutils literal notranslate"><span class="pre">spreadpy.backtest</span></code> and import from it.</p>
+<p><strong>2. How to handle multiple pairs?</strong>
+<code class="docutils literal notranslate"><span class="pre">PBO</span></code> and <code class="docutils literal notranslate"><span class="pre">DSR</span></code> are defined for a single strategy with <span class="math notranslate nohighlight">\(N\)</span> parameter configurations.
+If the user also selected the <em>pair</em> by screening, the pair selection is itself a trial
+and should count towards <span class="math notranslate nohighlight">\(N\)</span>.</p>
+<p><strong>3. Should walk-forward use purged folds?</strong>
+In time-series cross-validation, adjacent folds share information through overlapping
+positions. A <strong>purge gap</strong> of a few bars between train and test prevents data leakage from
+open trades that span the fold boundary. This is especially important for short
+holding-period strategies.</p>
+<p><strong>4. What is “one trial” for DSR?</strong>
+Each unique combination of (estimator type, signal parameters, sizer parameters) is one
+trial. The user should declare <span class="math notranslate nohighlight">\(N\)</span> explicitly, or <code class="docutils literal notranslate"><span class="pre">StrategyValidator</span></code> could count the
+configs in <code class="docutils literal notranslate"><span class="pre">param_grid</span></code> automatically.</p>
+</section>
+<hr class="docutils" />
+<section id="implementation-order">
+<h2>Implementation order<a class="headerlink" href="#implementation-order" title="Link to this heading">#</a></h2>
+<p>Given the above, a natural build order would be:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">WalkForwardEngine</span></code> — most impactful, immediately usable, no new maths</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">autocorr_adjusted_sharpe</span></code> — one function, easy win, fixes a systematic bias</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MinimumTrackRecordLength</span></code> — closed-form formula, tells the user if they have enough data</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DeflatedSharpeRatio</span></code> — requires knowing <span class="math notranslate nohighlight">\(N\)</span>, slightly more complex</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ParameterSensitivity</span></code> — useful for tuning, builds on <code class="docutils literal notranslate"><span class="pre">WalkForwardEngine</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ProbabilityOfBacktestOverfitting</span></code> — most complex, requires many backtests</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">StrategyValidator</span></code> + <code class="docutils literal notranslate"><span class="pre">ValidationReport</span></code> — orchestration layer, last step</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Bailey, D. H. &amp; López de Prado, M. (2014). <em>The Deflated Sharpe Ratio: Correcting for
+Selection Bias, Backtest Overfitting and Non-Normality.</em> Journal of Portfolio Management,
+40(5), 94–107.</p></li>
+<li><p>Bailey, D. H., Borwein, J., López de Prado, M. &amp; Zhu, Q. J. (2014). <em>Pseudo-Mathematics
+and Financial Charlatanism: The Effects of Backtest Overfitting on Out-of-Sample
+Performance.</em> Notices of the American Mathematical Society, 61(5), 458–471.</p></li>
+<li><p>Lo, A. W. (2002). <em>The Statistics of Sharpe Ratios.</em> Financial Analysts Journal, 58(4),
+36–52.</p></li>
+<li><p>López de Prado, M. (2018). <em>Advances in Financial Machine Learning.</em> Wiley. Ch. 11–12.</p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="kalman_filter.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Tracking the hedge ratio with the Kalman filter</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-four-failure-modes">The four failure modes</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-single-train-test-split-is-not-enough">1. A single train/test split is not enough</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multiple-testing-inflates-the-sharpe-ratio">2. Multiple testing inflates the Sharpe ratio</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#returns-are-autocorrelated-the-sharpe-ratio-is-biased">3. Returns are autocorrelated — the Sharpe ratio is biased</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#overfitting-to-a-specific-period">4. Overfitting to a specific period</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#proposed-building-blocks">Proposed building blocks</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#walkforwardengine"><code class="docutils literal notranslate"><span class="pre">WalkForwardEngine</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deflatedsharperatio"><code class="docutils literal notranslate"><span class="pre">DeflatedSharpeRatio</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#minimumtrackrecordlength"><code class="docutils literal notranslate"><span class="pre">MinimumTrackRecordLength</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#probabilityofbacktestoverfitting"><code class="docutils literal notranslate"><span class="pre">ProbabilityOfBacktestOverfitting</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parametersensitivity"><code class="docutils literal notranslate"><span class="pre">ParameterSensitivity</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-strategyvalidator-class">The <code class="docutils literal notranslate"><span class="pre">StrategyValidator</span></code> class</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validationreport"><code class="docutils literal notranslate"><span class="pre">ValidationReport</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-one-page-verdict">The one-page verdict</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#open-design-questions">Open design questions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-order">Implementation order</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/user_guide/strategy_validation.md.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=0790524f97105ba85085"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Théophile Schmutz.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.18.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

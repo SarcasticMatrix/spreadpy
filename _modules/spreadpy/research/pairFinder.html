@@ -147,15 +147,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -254,15 +254,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -490,9 +490,12 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_npd</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the Normalised Price Distance (NPD) between two series.</span>
 
-<span class="sd">    Both series are rebased to 1 at t = 0, then the NPD is:</span>
+<span class="sd">    Both series are rebased to 1 at :math:`t = 0`, then the NPD is:</span>
 
-<span class="sd">        NPD = √( (1/T) · Σ_{t=1}^{T} (x_t/x_0 − y_t/y_0)² )</span>
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \\text{NPD} = \\sqrt{\\frac{1}{T} \\sum_{t=1}^{T}</span>
+<span class="sd">        \\left(\\frac{x_t}{x_0} - \\frac{y_t}{y_0}\\right)^2}</span>
 
 <span class="sd">    A small NPD indicates that the two series track each other closely</span>
 <span class="sd">    in relative terms.</span>
@@ -513,7 +516,10 @@
 
 <span class="sd">    Solves the normal equations for:</span>
 
-<span class="sd">        [β, α]^T = argmin ||y − [x | 1] · [β, α]^T||²</span>
+<span class="sd">    .. math::</span>
+
+<span class="sd">        [\\beta, \\alpha]^\\top = \\operatorname{argmin}</span>
+<span class="sd">        \\|y - [x \\mid \\mathbf{1}] [\\beta, \\alpha]^\\top\\|^2</span>
 
 <span class="sd">    :param pd.Series x: Independent leg (regressor), shape (T,).</span>
 <span class="sd">    :param pd.Series y: Dependent leg (regressand), shape (T,).</span>
@@ -530,19 +536,25 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_hurst</span><span class="p">(</span><span class="n">spread</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Estimate the Hurst exponent via the variance-of-lags method.</span>
 
-<span class="sd">    For a range of lags τ, the empirical variance of lag-τ differences is:</span>
+<span class="sd">    For a range of lags :math:`\\tau`, the empirical variance of</span>
+<span class="sd">    lag-:math:`\\tau` differences is:</span>
 
-<span class="sd">        Var(τ) = Var(s_t − s_{t−τ})</span>
+<span class="sd">    .. math::</span>
 
-<span class="sd">    The Hurst exponent H is estimated by OLS on:</span>
+<span class="sd">        \\mathrm{Var}(\\tau) = \\mathrm{Var}(s_t - s_{t-\\tau})</span>
 
-<span class="sd">        log Var(τ) ≈ 2H · log(τ)  ⟹  H = slope / 2</span>
+<span class="sd">    The Hurst exponent :math:`H` is estimated by OLS on:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \\log \\mathrm{Var}(\\tau) \\approx 2H \\cdot \\log(\\tau)</span>
+<span class="sd">        \\implies H = \\text{slope} / 2</span>
 
 <span class="sd">    Interpretation:</span>
 
-<span class="sd">        H &lt; 0.5 — mean-reverting (sub-diffusive)</span>
-<span class="sd">        H = 0.5 — random walk (Brownian motion)</span>
-<span class="sd">        H &gt; 0.5 — trending (super-diffusive)</span>
+<span class="sd">    - :math:`H &lt; 0.5` — mean-reverting (sub-diffusive)</span>
+<span class="sd">    - :math:`H = 0.5` — random walk (Brownian motion)</span>
+<span class="sd">    - :math:`H &gt; 0.5` — trending (super-diffusive)</span>
 
 <span class="sd">    :param pd.Series spread: Spread residual series.</span>
 
@@ -572,12 +584,17 @@
 
 <span class="sd">    Fits the discrete-time Ornstein-Uhlenbeck regression:</span>
 
-<span class="sd">        Δs_t = λ · s_{t−1} + α + ε_t,   ε_t ~ N(0, σ²)</span>
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \\Delta s_t = \\lambda \\cdot s_{t-1} + \\alpha + \\varepsilon_t,</span>
+<span class="sd">        \\quad \\varepsilon_t \\sim \\mathcal{N}(0, \\sigma^2)</span>
 
 <span class="sd">    The half-life is the time (in bars) for a deviation from equilibrium to</span>
 <span class="sd">    decay by half:</span>
 
-<span class="sd">        τ_{1/2} = −log 2 / log(1 + λ)</span>
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \\tau_{1/2} = -\\frac{\\log 2}{\\log(1 + \\lambda)}</span>
 
 <span class="sd">    :param pd.Series spread: Spread residual series.</span>
 

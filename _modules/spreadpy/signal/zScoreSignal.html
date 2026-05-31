@@ -147,15 +147,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -254,15 +254,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -377,25 +377,27 @@
 
 <span class="sd">    At each bar, computes a rolling z-score of the spread residuals:</span>
 
-<span class="sd">        z_t = (s_t − μ̂_t) / σ̂_t</span>
+<span class="sd">    .. math::</span>
 
-<span class="sd">    where μ̂_t and σ̂_t are the rolling mean and standard deviation over</span>
-<span class="sd">    the last ``window`` bars (no lookahead).</span>
+<span class="sd">        z_t = \\frac{s_t - \\hat{\\mu}_t}{\\hat{\\sigma}_t}</span>
 
-<span class="sd">    Entry / exit rules:</span>
+<span class="sd">    where :math:`\\hat{\\mu}_t` and :math:`\\hat{\\sigma}_t` are the rolling mean and</span>
+<span class="sd">    standard deviation over the last ``window`` bars (no lookahead).</span>
 
-<span class="sd">        LONG   if z_t &lt; −entry_threshold</span>
+<span class="sd">    Entry / exit rules::</span>
+
+<span class="sd">        LONG   if z_t &lt; -entry_threshold</span>
 <span class="sd">        SHORT  if z_t &gt; +entry_threshold</span>
-<span class="sd">        FLAT   if LONG  and z_t &gt; −revert_threshold  (z reverted back up)</span>
+<span class="sd">        FLAT   if LONG  and z_t &gt; -revert_threshold  (z reverted back up)</span>
 <span class="sd">        FLAT   if SHORT and z_t &lt; +revert_threshold  (z reverted back down)</span>
 
-<span class="sd">    Setting ``revert_threshold=0`` exits at the mean crossing (z crosses 0).</span>
+<span class="sd">    Setting ``revert_threshold=0`` exits at the mean crossing (:math:`z` crosses 0).</span>
 <span class="sd">    Setting it to a positive value exits before the mean is fully reached.</span>
 
 <span class="sd">    :param int window: Number of bars for the rolling z-score computation.</span>
-<span class="sd">    :param float entry_threshold: |z| level above which a position is opened.</span>
-<span class="sd">    :param float revert_threshold: z level at which mean reversion is considered</span>
-<span class="sd">        complete and the position is closed. Must be ≤ entry_threshold.</span>
+<span class="sd">    :param float entry_threshold: :math:`|z|` level above which a position is opened.</span>
+<span class="sd">    :param float revert_threshold: :math:`z` level at which mean reversion is considered</span>
+<span class="sd">        complete and the position is closed. Must be :math:`\\leq` ``entry_threshold``.</span>
 <span class="sd">        Use 0.0 to exit at the mean (default).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -438,13 +440,16 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spread</span><span class="p">:</span> <span class="n">SpreadSeries</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the rolling z-score and map each bar to a :class:`Signal`.</span>
 
-<span class="sd">        At each bar t the z-score is:</span>
+<span class="sd">        At each bar :math:`t` the z-score is:</span>
 
-<span class="sd">            z_t = (s_t − μ̂_{t,w}) / σ̂_{t,w}</span>
+<span class="sd">        .. math::</span>
 
-<span class="sd">        where μ̂_{t,w} and σ̂_{t,w} are the rolling mean and standard deviation</span>
-<span class="sd">        over the previous ``window`` bars (no lookahead). Bars with fewer than</span>
-<span class="sd">        ``window`` predecessors yield ``Direction.FLAT`` with ``zscore=NaN``.</span>
+<span class="sd">            z_t = \\frac{s_t - \\hat{\\mu}_{t,w}}{\\hat{\\sigma}_{t,w}}</span>
+
+<span class="sd">        where :math:`\\hat{\\mu}_{t,w}` and :math:`\\hat{\\sigma}_{t,w}` are the rolling</span>
+<span class="sd">        mean and standard deviation over the previous ``window`` bars (no lookahead).</span>
+<span class="sd">        Bars with fewer than ``window`` predecessors yield ``Direction.FLAT`` with</span>
+<span class="sd">        ``zscore=NaN``.</span>
 
 <span class="sd">        :param SpreadSeries spread: Spread series to generate signals for</span>
 <span class="sd">            (may be out-of-sample).</span>

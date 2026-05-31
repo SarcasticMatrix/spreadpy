@@ -147,15 +147,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../../../../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -254,15 +254,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../../../../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -390,16 +390,20 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">InverseVolSizer</span><span class="p">(</span><span class="n">PositionSizer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Markowitz inverse-volatility position sizer.</span>
 
-<span class="sd">    Sizes each position so that a 1-σ adverse move of the spread residual</span>
-<span class="sd">    costs exactly ``target_vol`` of the current capital:</span>
+<span class="sd">    Sizes each position so that a 1-:math:`\\sigma` adverse move of the spread</span>
+<span class="sd">    residual costs exactly ``target_vol`` of the current capital:</span>
 
-<span class="sd">        frac_t = min(target_vol / σ_t,  f_max)</span>
+<span class="sd">    .. math::</span>
 
-<span class="sd">    where σ_t is the rolling standard deviation of spread residuals over the</span>
-<span class="sd">    last ``window`` bars (no lookahead), consistent with the rolling z-score</span>
-<span class="sd">    used by :class:`ZScoreSignal`. The y-leg notional is then:</span>
+<span class="sd">        f_t = \\min\\!\\left(\\frac{\\texttt{target\\_vol}}{\\sigma_t},\\; f_{\\max}\\right)</span>
 
-<span class="sd">        notional_y = frac_t · capital_t</span>
+<span class="sd">    where :math:`\\sigma_t` is the rolling standard deviation of spread residuals</span>
+<span class="sd">    over the last ``window`` bars (no lookahead), consistent with the rolling</span>
+<span class="sd">    z-score used by :class:`ZScoreSignal`. The y-leg notional is then:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        N_y = f_t \\cdot \\text{capital}_t</span>
 
 <span class="sd">    :meth:`fit` **must** be called before :meth:`size`. Pass the combined</span>
 <span class="sd">    train + evaluation spread so that σ_t is already warmed up at the first</span>
@@ -454,13 +458,13 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute quantities using inverse-volatility sizing.</span>
 
 <span class="sd">        Returns ``(0, 0)`` when ``signal.direction`` is ``FLAT``,</span>
-<span class="sd">        ``signal.zscore`` is NaN, ``capital`` ≤ 0, or σ_t is unavailable</span>
-<span class="sd">        or non-positive.</span>
+<span class="sd">        ``signal.zscore`` is NaN, ``capital`` ≤ 0, or :math:`\\sigma_t` is</span>
+<span class="sd">        unavailable or non-positive.</span>
 
 <span class="sd">        :param Signal signal: Signal at the current bar.</span>
 <span class="sd">        :param float price_y: Current price of the y leg.</span>
 <span class="sd">        :param float price_x: Current price of the x leg.</span>
-<span class="sd">        :param float hedge_ratio: Hedge ratio β_t (absolute value used).</span>
+<span class="sd">        :param float hedge_ratio: Hedge ratio :math:`\\beta_t` (absolute value used).</span>
 <span class="sd">        :param float capital: Current mark-to-market equity in monetary units.</span>
 
 <span class="sd">        :returns: ``(qty_y, qty_x)`` — absolute quantities for each leg.</span>

@@ -147,15 +147,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -254,15 +254,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Example
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../examples/index.html">
-    Example
+  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+    Explorations
   </a>
 </li>
 
@@ -380,12 +380,15 @@
 
 <span class="sd">    The total cost per fill is computed as:</span>
 
-<span class="sd">        fill_price  = mid ± (slippage_bps / 10 000) · mid    (+ for buys, − for sells)</span>
-<span class="sd">        slippage    = |fill_price − mid| · qty</span>
-<span class="sd">        commission  = max(commission_per_unit · qty</span>
-<span class="sd">                          + notional · commission_bps / 10 000,</span>
-<span class="sd">                          min_commission)</span>
-<span class="sd">        total_cost  = slippage + commission</span>
+<span class="sd">    .. math::</span>
+
+<span class="sd">        p_{\\text{fill}} &amp;= p_{\\text{mid}} \\cdot (1 + d \\cdot s / 10^4)</span>
+<span class="sd">            &amp;&amp; (d = +1 \\text{ for buys, } -1 \\text{ for sells}) \\\\</span>
+<span class="sd">        c_{\\text{slip}} &amp;= |p_{\\text{fill}} - p_{\\text{mid}}| \\cdot q \\\\</span>
+<span class="sd">        c_{\\text{comm}} &amp;= \\max\\!\\left(c_{\\text{unit}} \\cdot q</span>
+<span class="sd">            + |p_{\\text{fill}} \\cdot q| \\cdot b / 10^4,\\;</span>
+<span class="sd">            c_{\\min}\\right) \\\\</span>
+<span class="sd">        c_{\\text{total}} &amp;= c_{\\text{slip}} + c_{\\text{comm}}</span>
 
 <span class="sd">    :param float slippage_bps: One-way adverse price move in basis points.</span>
 <span class="sd">    :param float commission_per_unit: Fixed commission charged per unit traded.</span>
@@ -406,15 +409,19 @@
 
 <span class="sd">        The fill price incorporates one-way adverse slippage:</span>
 
-<span class="sd">            fill_price = price · (1 + direction · slippage_bps / 10 000)</span>
+<span class="sd">        .. math::</span>
+
+<span class="sd">            p_{\\text{fill}} = p \\cdot (1 + d \\cdot s / 10^4)</span>
 
 <span class="sd">        The total monetary cost is:</span>
 
-<span class="sd">            slippage   = |fill_price − price| · qty</span>
-<span class="sd">            commission = max(commission_per_unit · qty</span>
-<span class="sd">                             + |fill_price · qty| · commission_bps / 10 000,</span>
-<span class="sd">                             min_commission)</span>
-<span class="sd">            total_cost = slippage + commission</span>
+<span class="sd">        .. math::</span>
+
+<span class="sd">            c_{\\text{slip}}  &amp;= |p_{\\text{fill}} - p| \\cdot q \\\\</span>
+<span class="sd">            c_{\\text{comm}}  &amp;= \\max\\!\\left(c_{\\text{unit}} \\cdot q</span>
+<span class="sd">                + |p_{\\text{fill}} \\cdot q| \\cdot b / 10^4,\\;</span>
+<span class="sd">                c_{\\min}\\right) \\\\</span>
+<span class="sd">            c_{\\text{total}} &amp;= c_{\\text{slip}} + c_{\\text{comm}}</span>
 
 <span class="sd">        :param float price: Mid price at signal time.</span>
 <span class="sd">        :param float qty: Absolute quantity (always positive).</span>
