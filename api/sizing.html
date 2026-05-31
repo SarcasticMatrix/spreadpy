@@ -33,7 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/_static/css/custom.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=af91de31" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=ec4c69d2" />
   
   <!-- So that users can add custom icons -->
   <script defer src="../_static/scripts/fontawesome.js?digest=0790524f97105ba85085"></script>
@@ -46,6 +46,8 @@
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/sizing';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -403,17 +405,215 @@
                   
   <section id="sizing">
 <h1>Sizing<a class="headerlink" href="#sizing" title="Link to this heading">#</a></h1>
-<p>Position sizing models that convert a <code class="xref py py-class docutils literal notranslate"><span class="pre">Signal</span></code>
+<p>Position sizing models that convert a <a class="reference internal" href="signal.html#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><code class="xref py py-class docutils literal notranslate"><span class="pre">Signal</span></code></a>
 into absolute quantities for each leg.</p>
 <section id="positionsizer">
 <h2>PositionSizer<a class="headerlink" href="#positionsizer" title="Link to this heading">#</a></h2>
 <p>Abstract base class for all position sizers.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="spreadpy.sizing.positionSizer.PositionSizer">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">spreadpy.sizing.positionSizer.</span></span><span class="sig-name descname"><span class="pre">PositionSizer</span></span><a class="reference internal" href="../_modules/spreadpy/sizing/positionSizer.html#PositionSizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.sizing.positionSizer.PositionSizer" title="Link to this definition">#</a></dt>
+<dd><p>Abstract base class for position sizers.</p>
+<p>Converts a <code class="xref py py-class docutils literal notranslate"><span class="pre">Signal</span></code> into absolute quantities <code class="docutils literal notranslate"><span class="pre">(qty_y,</span> <span class="pre">qty_x)</span></code> for
+each leg. Concrete subclasses implement different sizing models (linear
+z-score scaling, inverse volatility, Kelly criterion, etc.).</p>
+<p>The <a class="reference internal" href="#spreadpy.sizing.positionSizer.PositionSizer.fit" title="spreadpy.sizing.positionSizer.PositionSizer.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> / <a class="reference internal" href="#spreadpy.sizing.positionSizer.PositionSizer.size" title="spreadpy.sizing.positionSizer.PositionSizer.size"><code class="xref py py-meth docutils literal notranslate"><span class="pre">size()</span></code></a> discipline mirrors that of
+<code class="xref py py-class docutils literal notranslate"><span class="pre">SignalGenerator</span></code>: <a class="reference internal" href="#spreadpy.sizing.positionSizer.PositionSizer.fit" title="spreadpy.sizing.positionSizer.PositionSizer.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> is called once on the combined
+train + evaluation spread to warm up any rolling estimators, then
+<a class="reference internal" href="#spreadpy.sizing.positionSizer.PositionSizer.size" title="spreadpy.sizing.positionSizer.PositionSizer.size"><code class="xref py py-meth docutils literal notranslate"><span class="pre">size()</span></code></a> is called bar-by-bar on the evaluation period.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.sizing.positionSizer.PositionSizer.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><span class="pre">SpreadSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#spreadpy.sizing.positionSizer.PositionSizer" title="spreadpy.sizing.positionSizer.PositionSizer"><span class="pre">PositionSizer</span></a></span></span><a class="reference internal" href="../_modules/spreadpy/sizing/positionSizer.html#PositionSizer.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.sizing.positionSizer.PositionSizer.fit" title="Link to this definition">#</a></dt>
+<dd><p>Calibrate the sizer on a spread series (no-op by default).</p>
+<p>Subclasses that require a warm-up period (e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">InverseVolSizer</span></code>)
+override this method to precompute rolling statistics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>spread</strong> (<a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><em>SpreadSeries</em></a>) – Combined train + evaluation spread, used to
+warm up any rolling estimators before the first evaluation bar.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spreadpy.sizing.positionSizer.PositionSizer" title="spreadpy.sizing.positionSizer.PositionSizer">PositionSizer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.sizing.positionSizer.PositionSizer.size">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="signal.html#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><span class="pre">Signal</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hedge_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capital</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/spreadpy/sizing/positionSizer.html#PositionSizer.size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.sizing.positionSizer.PositionSizer.size" title="Link to this definition">#</a></dt>
+<dd><p>Compute absolute quantities for each leg given a signal.</p>
+<p>The direction of each leg is determined by the signal:</p>
+<ul class="simple">
+<li><p>LONG  spread: buy y (+qty_y), sell x (−qty_x)</p></li>
+<li><p>SHORT spread: sell y (−qty_y), buy x (+qty_x)</p></li>
+<li><p>FLAT: returns (0, 0)</p></li>
+</ul>
+<p>Quantities are always returned as non-negative values; the engine
+applies the signed direction when executing fills.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal</strong> (<a class="reference internal" href="signal.html#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><em>Signal</em></a>) – Signal at the current bar.</p></li>
+<li><p><strong>price_y</strong> (<em>float</em>) – Current price of the y leg.</p></li>
+<li><p><strong>price_x</strong> (<em>float</em>) – Current price of the x leg.</p></li>
+<li><p><strong>hedge_ratio</strong> (<em>float</em>) – Hedge ratio β_t at the current bar.</p></li>
+<li><p><strong>capital</strong> (<em>float</em>) – Current mark-to-market equity in monetary units.
+Used by capital-fraction sizers (e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">KellyTruncatedEntry</span></code>);
+ignored by notional-based sizers.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(qty_y,</span> <span class="pre">qty_x)</span></code> — absolute quantities for each leg.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[float, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="linearsizer">
 <h2>LinearSizer<a class="headerlink" href="#linearsizer" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="spreadpy.sizing.sizers.linearSizer.LinearSizer">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">spreadpy.sizing.sizers.linearSizer.</span></span><span class="sig-name descname"><span class="pre">LinearSizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_notional</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/sizing/sizers/linearSizer.html#LinearSizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.sizing.sizers.linearSizer.LinearSizer" title="Link to this definition">#</a></dt>
+<dd><p>Converts a Signal into (qty_y, qty_x) absolute quantities.</p>
+<p>The position size is proportional to the z-score magnitude via a scaling
+function:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}N_y &amp;= N_{\max} \cdot \mathrm{scale}(|z|) \\
+q_y &amp;= N_y / p_y \\
+q_x &amp;= N_y \cdot |\beta| / p_x\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\beta\)</span> is the hedge ratio at signal time. The x-leg quantity
+is adjusted so that the notional exposure is hedged:
+<span class="math notranslate nohighlight">\(q_x \cdot p_x \approx |\beta| \cdot q_y \cdot p_y\)</span>.</p>
+<p>The default scale function is a linear ramp:</p>
+<div class="math notranslate nohighlight">
+\[\mathrm{scale}(|z|) = \mathrm{clip}\!\left(\frac{|z| - 1}{2},\; 0,\; 1\right)\]</div>
+<p>mapping <span class="math notranslate nohighlight">\(|z| = 1 \to 0\%\)</span> and <span class="math notranslate nohighlight">\(|z| \geq 3 \to 100\%\)</span>
+of <code class="docutils literal notranslate"><span class="pre">max_notional</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_notional</strong> (<em>float</em>) – Maximum notional per leg in monetary units.</p></li>
+<li><p><strong>scale_fn</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>[</em><em>[</em><em>float</em><em>]</em><em>, </em><em>float</em><em>]</em><em>]</em>) – Maps <a href="#id1"><span class="problematic" id="id2">|z|</span></a> → [0, 1].
+Defaults to the linear ramp described above.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.sizing.sizers.linearSizer.LinearSizer.size">
+<span class="sig-name descname"><span class="pre">size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="signal.html#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><span class="pre">Signal</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hedge_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capital</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/spreadpy/sizing/sizers/linearSizer.html#LinearSizer.size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.sizing.sizers.linearSizer.LinearSizer.size" title="Link to this definition">#</a></dt>
+<dd><p>Compute absolute quantities proportional to the z-score magnitude.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">0)</span></code> when <code class="docutils literal notranslate"><span class="pre">signal.direction</span></code> is <code class="docutils literal notranslate"><span class="pre">FLAT</span></code> or
+<code class="docutils literal notranslate"><span class="pre">signal.zscore</span></code> is NaN. The <code class="docutils literal notranslate"><span class="pre">capital</span></code> parameter is accepted for
+interface compatibility but is not used by this sizer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal</strong> (<a class="reference internal" href="signal.html#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><em>Signal</em></a>) – Signal at the current bar.</p></li>
+<li><p><strong>price_y</strong> (<em>float</em>) – Current price of the y leg.</p></li>
+<li><p><strong>price_x</strong> (<em>float</em>) – Current price of the x leg.</p></li>
+<li><p><strong>hedge_ratio</strong> (<em>float</em>) – Hedge ratio β_t (absolute value used).</p></li>
+<li><p><strong>capital</strong> (<em>float</em>) – Ignored (notional-based sizer).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(qty_y,</span> <span class="pre">qty_x)</span></code> — absolute quantities for each leg.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[float, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="inversevolsizer">
 <h2>InverseVolSizer<a class="headerlink" href="#inversevolsizer" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">spreadpy.sizing.sizers.inverseVolSizer.</span></span><span class="sig-name descname"><span class="pre">InverseVolSizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_vol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/sizing/sizers/inverseVolSizer.html#InverseVolSizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer" title="Link to this definition">#</a></dt>
+<dd><p>Markowitz inverse-volatility position sizer.</p>
+<p>Sizes each position so that a 1-<span class="math notranslate nohighlight">\(\sigma\)</span> adverse move of the spread
+residual costs exactly <code class="docutils literal notranslate"><span class="pre">target_vol</span></code> of the current capital:</p>
+<div class="math notranslate nohighlight">
+\[f_t = \min\!\left(\frac{\texttt{target\_vol}}{\sigma_t},\; f_{\max}\right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\sigma_t\)</span> is the rolling standard deviation of spread residuals
+over the last <code class="docutils literal notranslate"><span class="pre">window</span></code> bars (no lookahead), consistent with the rolling
+z-score used by <code class="xref py py-class docutils literal notranslate"><span class="pre">ZScoreSignal</span></code>. The y-leg notional is then:</p>
+<div class="math notranslate nohighlight">
+\[N_y = f_t \cdot \text{capital}_t\]</div>
+<p><a class="reference internal" href="#spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer.fit" title="spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> <strong>must</strong> be called before <a class="reference internal" href="#spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer.size" title="spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer.size"><code class="xref py py-meth docutils literal notranslate"><span class="pre">size()</span></code></a>. Pass the combined
+train + evaluation spread so that σ_t is already warmed up at the first
+evaluation bar.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>window</strong> (<em>int</em>) – Rolling window for spread volatility estimation (bars).</p></li>
+<li><p><strong>target_vol</strong> (<em>float</em>) – Target capital fraction at risk for a 1-σ adverse
+spread move (e.g. 0.02 means 2% of capital).</p></li>
+<li><p><strong>f_max</strong> (<em>float</em>) – Hard cap on the capital fraction (default 0.5).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><span class="pre">SpreadSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer" title="spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer"><span class="pre">InverseVolSizer</span></a></span></span><a class="reference internal" href="../_modules/spreadpy/sizing/sizers/inverseVolSizer.html#InverseVolSizer.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer.fit" title="Link to this definition">#</a></dt>
+<dd><p>Precompute the rolling volatility series from the spread residuals.</p>
+<p>Must be called before <a class="reference internal" href="#spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer.size" title="spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer.size"><code class="xref py py-meth docutils literal notranslate"><span class="pre">size()</span></code></a>. Pass the combined train + evaluation
+spread so that the rolling window is warmed up before the first
+evaluation bar.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>spread</strong> (<a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><em>SpreadSeries</em></a>) – Combined train + evaluation spread series.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer" title="spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer">InverseVolSizer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer.size">
+<span class="sig-name descname"><span class="pre">size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="signal.html#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><span class="pre">Signal</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hedge_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capital</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/spreadpy/sizing/sizers/inverseVolSizer.html#InverseVolSizer.size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer.size" title="Link to this definition">#</a></dt>
+<dd><p>Compute quantities using inverse-volatility sizing.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">0)</span></code> when <code class="docutils literal notranslate"><span class="pre">signal.direction</span></code> is <code class="docutils literal notranslate"><span class="pre">FLAT</span></code>,
+<code class="docutils literal notranslate"><span class="pre">signal.zscore</span></code> is NaN, <code class="docutils literal notranslate"><span class="pre">capital</span></code> ≤ 0, or <span class="math notranslate nohighlight">\(\sigma_t\)</span> is
+unavailable or non-positive.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal</strong> (<a class="reference internal" href="signal.html#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><em>Signal</em></a>) – Signal at the current bar.</p></li>
+<li><p><strong>price_y</strong> (<em>float</em>) – Current price of the y leg.</p></li>
+<li><p><strong>price_x</strong> (<em>float</em>) – Current price of the x leg.</p></li>
+<li><p><strong>hedge_ratio</strong> (<em>float</em>) – Hedge ratio <span class="math notranslate nohighlight">\(\beta_t\)</span> (absolute value used).</p></li>
+<li><p><strong>capital</strong> (<em>float</em>) – Current mark-to-market equity in monetary units.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(qty_y,</span> <span class="pre">qty_x)</span></code> — absolute quantities for each leg.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[float, float]</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>RuntimeError</strong> – If <a class="reference internal" href="#spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer.fit" title="spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> has not been called.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="kelly-sizers">
 <h2>Kelly sizers<a class="headerlink" href="#kelly-sizers" title="Link to this heading">#</a></h2>
@@ -421,12 +621,195 @@ into absolute quantities for each leg.</p>
 normal distributions of the entry and exit z-scores.</p>
 <section id="kellytruncatedentry">
 <h3>KellyTruncatedEntry<a class="headerlink" href="#kellytruncatedentry" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spreadpy.sizing.sizers.kellySizers.KellyTruncatedEntry">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">spreadpy.sizing.sizers.kellySizers.</span></span><span class="sig-name descname"><span class="pre">KellyTruncatedEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_revert</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/sizing/sizers/kellySizers.html#KellyTruncatedEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.sizing.sizers.kellySizers.KellyTruncatedEntry" title="Link to this definition">#</a></dt>
+<dd><p>Kelly sizer where only the entry level <span class="math notranslate nohighlight">\(z\)</span> is random.</p>
+<p>The entry z-score is modelled as a truncated standard normal:</p>
+<div class="math notranslate nohighlight">
+\[z \sim \mathcal{N}(0,1) \text{ truncated to } [z_{\text{entry}}, +\infty),
+\quad p(z) = \frac{\varphi(z)}{1 - \Phi(z_{\text{entry}})}\]</div>
+<p>The reversion target <span class="math notranslate nohighlight">\(z_{\text{revert}}\)</span> is treated as a deterministic
+constant. The per-trade gain is <span class="math notranslate nohighlight">\(G = z - z_{\text{revert}}\)</span>.</p>
+<p>Moments (<span class="math notranslate nohighlight">\(\lambda_+ = \lambda_+(z_{\text{entry}})\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mathbb{E}[G]   &amp;= \lambda_+ - z_{\text{revert}} \\
+\mathrm{Var}(z) &amp;= 1 - \lambda_+(\lambda_+ - z_{\text{entry}}) \\
+\mathbb{E}[G^2] &amp;= \mathrm{Var}(z) + \mathbb{E}[G]^2\end{split}\]</div>
+<p>Second-order Kelly fraction:</p>
+<div class="math notranslate nohighlight">
+\[f^* = \frac{\lambda_+ - z_{\text{revert}}}
+       {1 - \lambda_+(\lambda_+ - z_{\text{entry}}) + (\lambda_+ - z_{\text{revert}})^2}\]</div>
+<p>The fraction is constant and computed once at construction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z_entry</strong> (<em>float</em>) – Entry threshold; positions are opened when <span class="math notranslate nohighlight">\(|z_t| \geq z_{\text{entry}}\)</span>.</p></li>
+<li><p><strong>z_revert</strong> (<em>float</em>) – Deterministic reversion target (default 0.0, i.e. the mean).</p></li>
+<li><p><strong>f_max</strong> (<em>float</em>) – Hard cap on the Kelly fraction (default 0.5).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.sizing.sizers.kellySizers.KellyTruncatedEntry.size">
+<span class="sig-name descname"><span class="pre">size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="signal.html#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><span class="pre">Signal</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hedge_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capital</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/spreadpy/sizing/sizers/kellySizers.html#KellyTruncatedEntry.size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.sizing.sizers.kellySizers.KellyTruncatedEntry.size" title="Link to this definition">#</a></dt>
+<dd><p>Compute quantities using the constant Kelly fraction f*.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">0)</span></code> when <code class="docutils literal notranslate"><span class="pre">signal.direction</span></code> is <code class="docutils literal notranslate"><span class="pre">FLAT</span></code>,
+<code class="docutils literal notranslate"><span class="pre">signal.zscore</span></code> is NaN, <code class="docutils literal notranslate"><span class="pre">capital</span></code> ≤ 0, or f* ≤ 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal</strong> (<a class="reference internal" href="signal.html#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><em>Signal</em></a>) – Signal at the current bar.</p></li>
+<li><p><strong>price_y</strong> (<em>float</em>) – Current price of the y leg.</p></li>
+<li><p><strong>price_x</strong> (<em>float</em>) – Current price of the x leg.</p></li>
+<li><p><strong>hedge_ratio</strong> (<em>float</em>) – Hedge ratio β_t (absolute value used).</p></li>
+<li><p><strong>capital</strong> (<em>float</em>) – Current mark-to-market equity in monetary units.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(qty_y,</span> <span class="pre">qty_x)</span></code> — absolute quantities for each leg.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[float, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="kellytruncatedexit">
 <h3>KellyTruncatedExit<a class="headerlink" href="#kellytruncatedexit" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spreadpy.sizing.sizers.kellySizers.KellyTruncatedExit">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">spreadpy.sizing.sizers.kellySizers.</span></span><span class="sig-name descname"><span class="pre">KellyTruncatedExit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_revert</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/sizing/sizers/kellySizers.html#KellyTruncatedExit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.sizing.sizers.kellySizers.KellyTruncatedExit" title="Link to this definition">#</a></dt>
+<dd><p>Kelly sizer where only the reversion level <span class="math notranslate nohighlight">\(\tilde{z}\)</span> is random.</p>
+<p>The exit z-score is modelled as a truncated standard normal:</p>
+<div class="math notranslate nohighlight">
+\[\tilde{z} \sim \mathcal{N}(0,1) \text{ truncated to }
+(-\infty, z_{\text{revert}}],
+\quad p(\tilde{z}) = \frac{\varphi(\tilde{z})}{\Phi(z_{\text{revert}})}\]</div>
+<p>The observed entry <span class="math notranslate nohighlight">\(z_t\)</span> is treated as a deterministic constant.
+The per-trade gain is <span class="math notranslate nohighlight">\(G = z_t - \tilde{z}\)</span>.</p>
+<p>Moments (<span class="math notranslate nohighlight">\(\lambda_- = \lambda_-(z_{\text{revert}})\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mathbb{E}[\tilde{z}]  &amp;= -\lambda_- \\
+\mathbb{E}[G]            &amp;= z_t + \lambda_- \\
+\mathrm{Var}(\tilde{z}) &amp;= 1 - \lambda_-(\lambda_- + z_{\text{revert}}) \\
+\mathbb{E}[G^2]          &amp;= \mathrm{Var}(\tilde{z}) + \mathbb{E}[G]^2\end{split}\]</div>
+<p>Second-order Kelly fraction (function of the observed <span class="math notranslate nohighlight">\(z_t\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[f^*(z_t) = \frac{z_t + \lambda_-}
+            {1 - \lambda_-(\lambda_- + z_{\text{revert}}) + (z_t + \lambda_-)^2}\]</div>
+<p>By symmetry of <span class="math notranslate nohighlight">\(\mathcal{N}(0,1)\)</span>, a LONG entry with
+<span class="math notranslate nohighlight">\(z_t = -|z|\)</span> is equivalent to a SHORT entry with the reflected
+<span class="math notranslate nohighlight">\(|z|\)</span>, so <code class="docutils literal notranslate"><span class="pre">|signal.zscore|</span></code> is used for both directions.
+The fraction is recomputed at each bar.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z_revert</strong> (<em>float</em>) – Right-truncation point for the exit distribution
+(default 0.0, i.e. exit at the mean).</p></li>
+<li><p><strong>f_max</strong> (<em>float</em>) – Hard cap on the Kelly fraction (default 0.5).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.sizing.sizers.kellySizers.KellyTruncatedExit.size">
+<span class="sig-name descname"><span class="pre">size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="signal.html#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><span class="pre">Signal</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hedge_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capital</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/spreadpy/sizing/sizers/kellySizers.html#KellyTruncatedExit.size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.sizing.sizers.kellySizers.KellyTruncatedExit.size" title="Link to this definition">#</a></dt>
+<dd><p>Compute quantities using the bar-dependent Kelly fraction f*(<a href="#id3"><span class="problematic" id="id4">|z_t|</span></a>).</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">0)</span></code> when <code class="docutils literal notranslate"><span class="pre">signal.direction</span></code> is <code class="docutils literal notranslate"><span class="pre">FLAT</span></code>,
+<code class="docutils literal notranslate"><span class="pre">signal.zscore</span></code> is NaN, <code class="docutils literal notranslate"><span class="pre">capital</span></code> ≤ 0, or f*(<a href="#id5"><span class="problematic" id="id6">|z_t|</span></a>) ≤ 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal</strong> (<a class="reference internal" href="signal.html#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><em>Signal</em></a>) – Signal at the current bar.</p></li>
+<li><p><strong>price_y</strong> (<em>float</em>) – Current price of the y leg.</p></li>
+<li><p><strong>price_x</strong> (<em>float</em>) – Current price of the x leg.</p></li>
+<li><p><strong>hedge_ratio</strong> (<em>float</em>) – Hedge ratio β_t (absolute value used).</p></li>
+<li><p><strong>capital</strong> (<em>float</em>) – Current mark-to-market equity in monetary units.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(qty_y,</span> <span class="pre">qty_x)</span></code> — absolute quantities for each leg.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[float, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="kellytruncatedboth">
 <h3>KellyTruncatedBoth<a class="headerlink" href="#kellytruncatedboth" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spreadpy.sizing.sizers.kellySizers.KellyTruncatedBoth">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">spreadpy.sizing.sizers.kellySizers.</span></span><span class="sig-name descname"><span class="pre">KellyTruncatedBoth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_revert</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/sizing/sizers/kellySizers.html#KellyTruncatedBoth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.sizing.sizers.kellySizers.KellyTruncatedBoth" title="Link to this definition">#</a></dt>
+<dd><p>Kelly sizer where both entry <span class="math notranslate nohighlight">\(z\)</span> and exit <span class="math notranslate nohighlight">\(\tilde{z}\)</span> are
+random and independent.</p>
+<p>Entry and exit z-scores are modelled as independent truncated normals:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}z         &amp;\sim \mathcal{N}(0,1) \text{ truncated to }
+          [z_{\text{entry}}, +\infty) &amp;&amp; \text{(entry level)} \\
+\tilde{z} &amp;\sim \mathcal{N}(0,1) \text{ truncated to }
+          (-\infty, z_{\text{revert}}] &amp;&amp; \text{(exit level)} \\
+z &amp;\perp \tilde{z}\end{split}\]</div>
+<p>The per-trade gain is <span class="math notranslate nohighlight">\(G = z - \tilde{z}\)</span>.</p>
+<p>Moments (<span class="math notranslate nohighlight">\(\lambda_+ = \lambda_+(z_{\text{entry}})\)</span>,
+<span class="math notranslate nohighlight">\(\lambda_- = \lambda_-(z_{\text{revert}})\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mathbb{E}[G]            &amp;= \lambda_+ + \lambda_- \\
+\mathrm{Var}(z)          &amp;= 1 - \lambda_+(\lambda_+ - z_{\text{entry}}) \\
+\mathrm{Var}(\tilde{z}) &amp;= 1 - \lambda_-(\lambda_- + z_{\text{revert}}) \\
+\mathrm{Var}(G)          &amp;= \mathrm{Var}(z) + \mathrm{Var}(\tilde{z})
+                          &amp;&amp; \text{(independence)} \\
+\mathbb{E}[G^2]          &amp;= \mathrm{Var}(G) + \mathbb{E}[G]^2\end{split}\]</div>
+<p>Second-order Kelly fraction:</p>
+<div class="math notranslate nohighlight">
+\[f^* = \frac{\lambda_+ + \lambda_-}
+       {2 - \lambda_+(\lambda_+ - z_{\text{entry}})
+       - \lambda_-(\lambda_- + z_{\text{revert}})
+       + (\lambda_+ + \lambda_-)^2}\]</div>
+<p>The fraction is constant and computed once at construction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z_entry</strong> (<em>float</em>) – Entry threshold; positions are opened when <span class="math notranslate nohighlight">\(|z_t| \geq z_{\text{entry}}\)</span>.</p></li>
+<li><p><strong>z_revert</strong> (<em>float</em>) – Right-truncation point for the exit distribution
+(default 0.0, i.e. exit at the mean).</p></li>
+<li><p><strong>f_max</strong> (<em>float</em>) – Hard cap on the Kelly fraction (default 0.5).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.sizing.sizers.kellySizers.KellyTruncatedBoth.size">
+<span class="sig-name descname"><span class="pre">size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="signal.html#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><span class="pre">Signal</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hedge_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capital</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/spreadpy/sizing/sizers/kellySizers.html#KellyTruncatedBoth.size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.sizing.sizers.kellySizers.KellyTruncatedBoth.size" title="Link to this definition">#</a></dt>
+<dd><p>Compute quantities using the constant Kelly fraction f*.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">0)</span></code> when <code class="docutils literal notranslate"><span class="pre">signal.direction</span></code> is <code class="docutils literal notranslate"><span class="pre">FLAT</span></code>,
+<code class="docutils literal notranslate"><span class="pre">signal.zscore</span></code> is NaN, <code class="docutils literal notranslate"><span class="pre">capital</span></code> ≤ 0, or f* ≤ 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal</strong> (<a class="reference internal" href="signal.html#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><em>Signal</em></a>) – Signal at the current bar.</p></li>
+<li><p><strong>price_y</strong> (<em>float</em>) – Current price of the y leg.</p></li>
+<li><p><strong>price_x</strong> (<em>float</em>) – Current price of the x leg.</p></li>
+<li><p><strong>hedge_ratio</strong> (<em>float</em>) – Hedge ratio β_t (absolute value used).</p></li>
+<li><p><strong>capital</strong> (<em>float</em>) – Current mark-to-market equity in monetary units.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(qty_y,</span> <span class="pre">qty_x)</span></code> — absolute quantities for each leg.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[float, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 </section>
@@ -478,13 +861,51 @@ normal distributions of the entry and exit z-scores.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#positionsizer">PositionSizer</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linearsizer">LinearSizer</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inversevolsizer">InverseVolSizer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#positionsizer">PositionSizer</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.sizing.positionSizer.PositionSizer"><code class="docutils literal notranslate"><span class="pre">PositionSizer</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.sizing.positionSizer.PositionSizer.fit"><code class="docutils literal notranslate"><span class="pre">PositionSizer.fit()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.sizing.positionSizer.PositionSizer.size"><code class="docutils literal notranslate"><span class="pre">PositionSizer.size()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linearsizer">LinearSizer</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.sizing.sizers.linearSizer.LinearSizer"><code class="docutils literal notranslate"><span class="pre">LinearSizer</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.sizing.sizers.linearSizer.LinearSizer.size"><code class="docutils literal notranslate"><span class="pre">LinearSizer.size()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inversevolsizer">InverseVolSizer</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer"><code class="docutils literal notranslate"><span class="pre">InverseVolSizer</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer.fit"><code class="docutils literal notranslate"><span class="pre">InverseVolSizer.fit()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer.size"><code class="docutils literal notranslate"><span class="pre">InverseVolSizer.size()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#kelly-sizers">Kelly sizers</a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kellytruncatedentry">KellyTruncatedEntry</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kellytruncatedexit">KellyTruncatedExit</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kellytruncatedboth">KellyTruncatedBoth</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kellytruncatedentry">KellyTruncatedEntry</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.sizing.sizers.kellySizers.KellyTruncatedEntry"><code class="docutils literal notranslate"><span class="pre">KellyTruncatedEntry</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.sizing.sizers.kellySizers.KellyTruncatedEntry.size"><code class="docutils literal notranslate"><span class="pre">KellyTruncatedEntry.size()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kellytruncatedexit">KellyTruncatedExit</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.sizing.sizers.kellySizers.KellyTruncatedExit"><code class="docutils literal notranslate"><span class="pre">KellyTruncatedExit</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.sizing.sizers.kellySizers.KellyTruncatedExit.size"><code class="docutils literal notranslate"><span class="pre">KellyTruncatedExit.size()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kellytruncatedboth">KellyTruncatedBoth</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.sizing.sizers.kellySizers.KellyTruncatedBoth"><code class="docutils literal notranslate"><span class="pre">KellyTruncatedBoth</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.sizing.sizers.kellySizers.KellyTruncatedBoth.size"><code class="docutils literal notranslate"><span class="pre">KellyTruncatedBoth.size()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

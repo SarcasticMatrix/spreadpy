@@ -33,7 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/_static/css/custom.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=af91de31" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=ec4c69d2" />
   
   <!-- So that users can add custom icons -->
   <script defer src="../_static/scripts/fontawesome.js?digest=0790524f97105ba85085"></script>
@@ -406,6 +406,61 @@
 <p>Pair discovery and cointegration screening.</p>
 <section id="pairfinder">
 <h2>PairFinder<a class="headerlink" href="#pairfinder" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="spreadpy.research.pairFinder.PairFinder">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">spreadpy.research.pairFinder.</span></span><span class="sig-name descname"><span class="pre">PairFinder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="data.html#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">significance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npd_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_prices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/research/pairFinder.html#PairFinder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.research.pairFinder.PairFinder" title="Link to this definition">#</a></dt>
+<dd><p>Scan a universe of assets and rank candidate cointegrated pairs.</p>
+<p>For each pair (s₁, s₂) the following sequential pipeline is applied:</p>
+<ol class="arabic simple">
+<li><p><strong>NPD pre-filter</strong> — normalised price distance. Skips pairs whose
+rebased price paths diverge too much, avoiding expensive statistical
+tests on clearly non-cointegrated pairs.</p></li>
+<li><p><strong>Engle-Granger cointegration test</strong> — bivariate OLS + ADF on the
+OLS residuals. Reports the EG p-value.</p></li>
+<li><p><strong>ADF on OLS residuals</strong> — direct stationarity test on the spread.</p></li>
+<li><p><strong>Half-life</strong> — mean-reversion speed via AR(1) on the spread.</p></li>
+<li><p><strong>Hurst exponent</strong> — degree of mean-reversion from the log-variance method.</p></li>
+</ol>
+<p>Only pairs passing both the EG and ADF significance thresholds are returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>series</strong> (<em>list</em><em>[</em><a class="reference internal" href="data.html#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><em>PriceTimeSeries</em></a><em>]</em>) – Universe of price series to scan.</p></li>
+<li><p><strong>significance</strong> (<em>float</em>) – p-value threshold applied to both the EG and
+ADF tests (default 0.05).</p></li>
+<li><p><strong>npd_threshold</strong> (<em>float</em>) – Maximum normalised price distance to pass the
+pre-filter. Set to <code class="docutils literal notranslate"><span class="pre">None</span></code> to disable the pre-filter.</p></li>
+<li><p><strong>log_prices</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, apply log-transform to all series
+before running any test. Recommended when prices span very different
+scales or when using the Kalman filter downstream.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.research.pairFinder.PairFinder.scan">
+<span class="sig-name descname"><span class="pre">scan</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../_modules/spreadpy/research/pairFinder.html#PairFinder.scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.research.pairFinder.PairFinder.scan" title="Link to this definition">#</a></dt>
+<dd><p>Scan all pairs in the universe and return a ranked DataFrame.</p>
+<p>Iterates over all C(n, 2) pairs, applies the NPD pre-filter, runs
+the Engle-Granger and ADF tests, and retains only pairs that pass
+both significance thresholds. Results are sorted by EG p-value
+ascending (strongest cointegration first).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>DataFrame with one row per qualifying pair, columns:
+<code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">npd</span></code>, <code class="docutils literal notranslate"><span class="pre">eg_stat</span></code>, <code class="docutils literal notranslate"><span class="pre">eg_pvalue</span></code>,
+<code class="docutils literal notranslate"><span class="pre">adf_stat</span></code>, <code class="docutils literal notranslate"><span class="pre">adf_pvalue</span></code>, <code class="docutils literal notranslate"><span class="pre">adf_crit_1%</span></code>, <code class="docutils literal notranslate"><span class="pre">adf_crit_5%</span></code>,
+<code class="docutils literal notranslate"><span class="pre">adf_crit_10%</span></code>, <code class="docutils literal notranslate"><span class="pre">half_life</span></code>, <code class="docutils literal notranslate"><span class="pre">hurst</span></code>, <code class="docutils literal notranslate"><span class="pre">hedge_ratio</span></code>.
+Returns an empty DataFrame (with the same columns) if no pair
+passes both thresholds.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 
@@ -456,7 +511,13 @@
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pairfinder">PairFinder</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pairfinder">PairFinder</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.research.pairFinder.PairFinder"><code class="docutils literal notranslate"><span class="pre">PairFinder</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.research.pairFinder.PairFinder.scan"><code class="docutils literal notranslate"><span class="pre">PairFinder.scan()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

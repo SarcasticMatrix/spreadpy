@@ -33,7 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/_static/css/custom.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=af91de31" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=ec4c69d2" />
   
   <!-- So that users can add custom icons -->
   <script defer src="../_static/scripts/fontawesome.js?digest=0790524f97105ba85085"></script>
@@ -404,31 +404,81 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="data.html">Data</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="data.html#dataloader">DataLoader</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data.html#pricetimeseries">PriceTimeSeries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data.html#dataloader">DataLoader</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data.html#spreadpy.data.dataLoader.DataLoader"><code class="docutils literal notranslate"><span class="pre">DataLoader</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data.html#pricetimeseries">PriceTimeSeries</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data.html#spreadpy.data.priceTimeSeries.PriceTimeSeries"><code class="docutils literal notranslate"><span class="pre">PriceTimeSeries</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="spread.html">Spread</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="spread.html#spreadseries">SpreadSeries</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spread.html#hedgeratioestimator">HedgeRatioEstimator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spread.html#constantols">ConstantOLS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spread.html#rollingols">RollingOLS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spread.html#kalmanfilter">KalmanFilter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spread.html#kalmanfilterwithvelocity">KalmanFilterWithVelocity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spread.html#spreadseries">SpreadSeries</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries"><code class="docutils literal notranslate"><span class="pre">SpreadSeries</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="spread.html#hedgeratioestimator">HedgeRatioEstimator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="spread.html#spreadpy.spread.hedgeRatioEstimator.HedgeRatioEstimator"><code class="docutils literal notranslate"><span class="pre">HedgeRatioEstimator</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="spread.html#constantols">ConstantOLS</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="spread.html#spreadpy.spread.hedgeRatio.constantOLS.ConstantOLS"><code class="docutils literal notranslate"><span class="pre">ConstantOLS</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="spread.html#rollingols">RollingOLS</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="spread.html#spreadpy.spread.hedgeRatio.rollingOLS.RollingOLS"><code class="docutils literal notranslate"><span class="pre">RollingOLS</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="spread.html#kalmanfilter">KalmanFilter</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="spread.html#spreadpy.spread.hedgeRatio.kalmanFilter.KalmanFilterParams"><code class="docutils literal notranslate"><span class="pre">KalmanFilterParams</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="spread.html#spreadpy.spread.hedgeRatio.kalmanFilter.KalmanFilter"><code class="docutils literal notranslate"><span class="pre">KalmanFilter</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="spread.html#kalmanfilterwithvelocity">KalmanFilterWithVelocity</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="spread.html#spreadpy.spread.hedgeRatio.kalmanFilterWithVelocity.KalmanFilterWithVelocityParams"><code class="docutils literal notranslate"><span class="pre">KalmanFilterWithVelocityParams</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="spread.html#spreadpy.spread.hedgeRatio.kalmanFilterWithVelocity.KalmanFilterWithVelocity"><code class="docutils literal notranslate"><span class="pre">KalmanFilterWithVelocity</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="signal.html">Signal</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="signal.html#direction">Direction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="signal.html#id1">Signal</a></li>
-<li class="toctree-l2"><a class="reference internal" href="signal.html#signalgenerator">SignalGenerator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="signal.html#zscoresignal">ZScoreSignal</a></li>
-<li class="toctree-l2"><a class="reference internal" href="signal.html#copulasignal">CopulaSignal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="signal.html#direction">Direction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="signal.html#spreadpy.signal.signal.Direction"><code class="docutils literal notranslate"><span class="pre">Direction</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="signal.html#id1">Signal</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="signal.html#spreadpy.signal.signal.Signal"><code class="docutils literal notranslate"><span class="pre">Signal</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="signal.html#signalgenerator">SignalGenerator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="signal.html#spreadpy.signal.signal.SignalGenerator"><code class="docutils literal notranslate"><span class="pre">SignalGenerator</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="signal.html#zscoresignal">ZScoreSignal</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="signal.html#spreadpy.signal.zScoreSignal.ZScoreSignal"><code class="docutils literal notranslate"><span class="pre">ZScoreSignal</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="signal.html#copulasignal">CopulaSignal</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="signal.html#spreadpy.signal.copulaSignal.CopulaSignal"><code class="docutils literal notranslate"><span class="pre">CopulaSignal</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sizing.html">Sizing</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="sizing.html#positionsizer">PositionSizer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sizing.html#linearsizer">LinearSizer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sizing.html#inversevolsizer">InverseVolSizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sizing.html#positionsizer">PositionSizer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sizing.html#spreadpy.sizing.positionSizer.PositionSizer"><code class="docutils literal notranslate"><span class="pre">PositionSizer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sizing.html#linearsizer">LinearSizer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sizing.html#spreadpy.sizing.sizers.linearSizer.LinearSizer"><code class="docutils literal notranslate"><span class="pre">LinearSizer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sizing.html#inversevolsizer">InverseVolSizer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sizing.html#spreadpy.sizing.sizers.inverseVolSizer.InverseVolSizer"><code class="docutils literal notranslate"><span class="pre">InverseVolSizer</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="sizing.html#kelly-sizers">Kelly sizers</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="sizing.html#kellytruncatedentry">KellyTruncatedEntry</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sizing.html#kellytruncatedexit">KellyTruncatedExit</a></li>
@@ -438,16 +488,37 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="backtest.html">Backtest</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="backtest.html#transactioncosts">TransactionCosts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="backtest.html#trade">Trade</a></li>
-<li class="toctree-l2"><a class="reference internal" href="backtest.html#portfolio">Portfolio</a></li>
-<li class="toctree-l2"><a class="reference internal" href="backtest.html#riskmetrics">RiskMetrics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="backtest.html#backtestresult">BacktestResult</a></li>
-<li class="toctree-l2"><a class="reference internal" href="backtest.html#backtestengine">BacktestEngine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backtest.html#transactioncosts">TransactionCosts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="backtest.html#spreadpy.backtest.costs.TransactionCosts"><code class="docutils literal notranslate"><span class="pre">TransactionCosts</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="backtest.html#trade">Trade</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="backtest.html#spreadpy.backtest.portfolio.Trade"><code class="docutils literal notranslate"><span class="pre">Trade</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="backtest.html#portfolio">Portfolio</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="backtest.html#spreadpy.backtest.portfolio.Portfolio"><code class="docutils literal notranslate"><span class="pre">Portfolio</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="backtest.html#riskmetrics">RiskMetrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="backtest.html#spreadpy.backtest.metrics.RiskMetrics"><code class="docutils literal notranslate"><span class="pre">RiskMetrics</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="backtest.html#backtestresult">BacktestResult</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="backtest.html#spreadpy.backtest.result.BacktestResult"><code class="docutils literal notranslate"><span class="pre">BacktestResult</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="backtest.html#backtestengine">BacktestEngine</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="backtest.html#spreadpy.backtest.engine.BacktestEngine"><code class="docutils literal notranslate"><span class="pre">BacktestEngine</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="research.html">Research</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="research.html#pairfinder">PairFinder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="research.html#pairfinder">PairFinder</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="research.html#spreadpy.research.pairFinder.PairFinder"><code class="docutils literal notranslate"><span class="pre">PairFinder</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

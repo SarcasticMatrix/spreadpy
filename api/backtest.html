@@ -33,7 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/_static/css/custom.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=af91de31" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=ec4c69d2" />
   
   <!-- So that users can add custom icons -->
   <script defer src="../_static/scripts/fontawesome.js?digest=0790524f97105ba85085"></script>
@@ -46,6 +46,8 @@
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/backtest';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -406,21 +408,647 @@
 <p>Walk-forward backtesting engine with transaction costs and risk metrics.</p>
 <section id="transactioncosts">
 <h2>TransactionCosts<a class="headerlink" href="#transactioncosts" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="spreadpy.backtest.costs.TransactionCosts">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">spreadpy.backtest.costs.</span></span><span class="sig-name descname"><span class="pre">TransactionCosts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slippage_bps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commission_per_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commission_bps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_commission</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4.9</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/backtest/costs.html#TransactionCosts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.costs.TransactionCosts" title="Link to this definition">#</a></dt>
+<dd><p>Transaction cost model applied at each leg fill.</p>
+<p>The total cost per fill is computed as:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}p_{\text{fill}} &amp;= p_{\text{mid}} \cdot (1 + d \cdot s / 10^4)
+    &amp;&amp; (d = +1 \text{ for buys, } -1 \text{ for sells}) \\
+c_{\text{slip}} &amp;= |p_{\text{fill}} - p_{\text{mid}}| \cdot q \\
+c_{\text{comm}} &amp;= \max\!\left(c_{\text{unit}} \cdot q
+    + |p_{\text{fill}} \cdot q| \cdot b / 10^4,\;
+    c_{\min}\right) \\
+c_{\text{total}} &amp;= c_{\text{slip}} + c_{\text{comm}}\end{split}\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>slippage_bps</strong> (<em>float</em>) – One-way adverse price move in basis points.</p></li>
+<li><p><strong>commission_per_unit</strong> (<em>float</em>) – Fixed commission charged per unit traded.</p></li>
+<li><p><strong>commission_bps</strong> (<em>float</em>) – Ad-valorem commission on notional, in basis points
+(e.g. 1.0 = 1 bps = 0.01%).</p></li>
+<li><p><strong>min_commission</strong> (<em>float</em>) – Minimum commission floor per fill.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.costs.TransactionCosts.apply">
+<span class="sig-name descname"><span class="pre">apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">price</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/costs.html#TransactionCosts.apply"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.costs.TransactionCosts.apply" title="Link to this definition">#</a></dt>
+<dd><p>Compute the fill price and total cost for a single leg fill.</p>
+<p>The fill price incorporates one-way adverse slippage:</p>
+<div class="math notranslate nohighlight">
+\[p_{\text{fill}} = p \cdot (1 + d \cdot s / 10^4)\]</div>
+<p>The total monetary cost is:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}c_{\text{slip}}  &amp;= |p_{\text{fill}} - p| \cdot q \\
+c_{\text{comm}}  &amp;= \max\!\left(c_{\text{unit}} \cdot q
+    + |p_{\text{fill}} \cdot q| \cdot b / 10^4,\;
+    c_{\min}\right) \\
+c_{\text{total}} &amp;= c_{\text{slip}} + c_{\text{comm}}\end{split}\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>price</strong> (<em>float</em>) – Mid price at signal time.</p></li>
+<li><p><strong>qty</strong> (<em>float</em>) – Absolute quantity (always positive).</p></li>
+<li><p><strong>direction</strong> (<em>int</em>) – Fill direction: +1 (buy) or −1 (sell).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(fill_price,</span> <span class="pre">total_cost)</span></code> where <code class="docutils literal notranslate"><span class="pre">total_cost</span></code> is always
+positive.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[float, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="trade">
 <h2>Trade<a class="headerlink" href="#trade" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="spreadpy.backtest.portfolio.Trade">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">spreadpy.backtest.portfolio.</span></span><span class="sig-name descname"><span class="pre">Trade</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Timestamp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_price</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="signal.html#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><span class="pre">Signal</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/backtest/portfolio.html#Trade"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.portfolio.Trade" title="Link to this definition">#</a></dt>
+<dd><p>Record of a single leg fill.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timestamp</strong> (<em>pd.Timestamp</em>) – Fill time.</p></li>
+<li><p><strong>leg</strong> (<em>str</em>) – Asset leg — <code class="docutils literal notranslate"><span class="pre">'y'</span></code> (dependent) or <code class="docutils literal notranslate"><span class="pre">'x'</span></code> (independent).</p></li>
+<li><p><strong>direction</strong> (<em>int</em>) – Fill direction: +1 (buy) or −1 (sell).</p></li>
+<li><p><strong>qty</strong> (<em>float</em>) – Absolute quantity filled.</p></li>
+<li><p><strong>price</strong> (<em>float</em>) – Mid price at signal time.</p></li>
+<li><p><strong>fill_price</strong> (<em>float</em>) – Execution price after slippage.</p></li>
+<li><p><strong>cost</strong> (<em>float</em>) – Total transaction cost in monetary units (always positive).</p></li>
+<li><p><strong>signal</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="signal.html#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><em>Signal</em></a><em>]</em>) – The Signal that triggered this fill.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="portfolio">
 <h2>Portfolio<a class="headerlink" href="#portfolio" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="spreadpy.backtest.portfolio.Portfolio">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">spreadpy.backtest.portfolio.</span></span><span class="sig-name descname"><span class="pre">Portfolio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_capital</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spreadpy.backtest.costs.TransactionCosts" title="spreadpy.backtest.costs.TransactionCosts"><span class="pre">TransactionCosts</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/backtest/portfolio.html#Portfolio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.portfolio.Portfolio" title="Link to this definition">#</a></dt>
+<dd><p>Manages position state, P&amp;L, and equity throughout a backtest.</p>
+<p>Tracks open positions per leg (qty and average fill price), realised P&amp;L,
+and bar-by-bar mark-to-market equity. Position changes use FIFO accounting.</p>
+<p>Mark-to-market equity at each bar:</p>
+<div class="math notranslate nohighlight">
+\[\text{equity}_t = \text{cash}_t
++ \sum_{\ell \in \{y,x\}} q_\ell \cdot (p_\ell - \bar{p}_\ell)\]</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">cash_t</span></code> accumulates realised P&amp;L net of transaction costs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>initial_capital</strong> (<em>float</em>) – Starting equity in monetary units.</p></li>
+<li><p><strong>costs</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="#spreadpy.backtest.costs.TransactionCosts" title="spreadpy.backtest.costs.TransactionCosts"><em>TransactionCosts</em></a><em>]</em>) – Cost model applied at each fill.
+Defaults to <code class="docutils literal notranslate"><span class="pre">TransactionCosts()</span></code> (2 bps slippage + 1 bps commission).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="spreadpy.backtest.portfolio.Portfolio.current_equity">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">current_equity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spreadpy.backtest.portfolio.Portfolio.current_equity" title="Link to this definition">#</a></dt>
+<dd><p>Current mark-to-market equity using the most recently seen prices.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.portfolio.Portfolio.equity_curve">
+<span class="sig-name descname"><span class="pre">equity_curve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/portfolio.html#Portfolio.equity_curve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.portfolio.Portfolio.equity_curve" title="Link to this definition">#</a></dt>
+<dd><p>Return the full bar-level equity curve as a DataFrame.</p>
+<p>Each row corresponds to one <a class="reference internal" href="#spreadpy.backtest.portfolio.Portfolio.mark" title="spreadpy.backtest.portfolio.Portfolio.mark"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mark()</span></code></a> call.  Columns:
+<code class="docutils literal notranslate"><span class="pre">equity</span></code>, <code class="docutils literal notranslate"><span class="pre">cash</span></code>, <code class="docutils literal notranslate"><span class="pre">unrealised_pnl</span></code>, <code class="docutils literal notranslate"><span class="pre">realised_pnl</span></code>,
+<code class="docutils literal notranslate"><span class="pre">total_costs</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Equity curve indexed by timestamp.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.portfolio.Portfolio.fill">
+<span class="sig-name descname"><span class="pre">fill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Timestamp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="signal.html#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><span class="pre">Signal</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">qty_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qty_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#spreadpy.backtest.portfolio.Trade" title="spreadpy.backtest.portfolio.Trade"><span class="pre">Trade</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/portfolio.html#Portfolio.fill"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.portfolio.Portfolio.fill" title="Link to this definition">#</a></dt>
+<dd><p>Execute fills for both legs based on the signal direction.</p>
+<p>If the signal is <code class="docutils literal notranslate"><span class="pre">FLAT</span></code>, all open positions are closed at the current
+prices. If the signal implies a direction change, the existing position
+is first closed before the new position is opened. Transaction costs
+are applied to every fill via <code class="xref py py-meth docutils literal notranslate"><span class="pre">TransactionCosts.apply()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timestamp</strong> (<em>pd.Timestamp</em>) – Current bar timestamp.</p></li>
+<li><p><strong>signal</strong> (<a class="reference internal" href="signal.html#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><em>Signal</em></a>) – Signal directing the trade.</p></li>
+<li><p><strong>qty_y</strong> (<em>float</em>) – Absolute quantity to trade for the y leg (from sizer).</p></li>
+<li><p><strong>qty_x</strong> (<em>float</em>) – Absolute quantity to trade for the x leg (from sizer).</p></li>
+<li><p><strong>price_y</strong> (<em>float</em>) – Mid price of the y leg at signal time.</p></li>
+<li><p><strong>price_x</strong> (<em>float</em>) – Mid price of the x leg at signal time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of <a class="reference internal" href="#spreadpy.backtest.portfolio.Trade" title="spreadpy.backtest.portfolio.Trade"><code class="xref py py-class docutils literal notranslate"><span class="pre">Trade</span></code></a> records generated (one per leg filled,
+two per leg on direction reversal).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="#spreadpy.backtest.portfolio.Trade" title="spreadpy.backtest.portfolio.Trade">Trade</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.portfolio.Portfolio.mark">
+<span class="sig-name descname"><span class="pre">mark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Timestamp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/portfolio.html#Portfolio.mark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.portfolio.Portfolio.mark" title="Link to this definition">#</a></dt>
+<dd><p>Mark positions to market and record the equity snapshot.</p>
+<p>Computes and stores bar-level equity:</p>
+<div class="math notranslate nohighlight">
+\[\text{equity}_t = \text{cash}_t
++ \sum_{\ell \in \{y,x\}} q_\ell \cdot (p_\ell - \bar{p}_\ell)\]</div>
+<p>Should be called at every bar, whether or not a trade occurred.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timestamp</strong> (<em>pd.Timestamp</em>) – Current bar timestamp.</p></li>
+<li><p><strong>price_y</strong> (<em>float</em>) – Current mid price of the y leg.</p></li>
+<li><p><strong>price_x</strong> (<em>float</em>) – Current mid price of the x leg.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Current mark-to-market equity in monetary units.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.portfolio.Portfolio.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/portfolio.html#Portfolio.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.portfolio.Portfolio.reset" title="Link to this definition">#</a></dt>
+<dd><p>Reset the portfolio to its initial state.</p>
+<p>Clears all positions, trades, equity records, and P&amp;L accumulators,
+restoring cash to <code class="docutils literal notranslate"><span class="pre">initial_capital</span></code>. Useful when reusing the same
+portfolio object across walk-forward folds.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="riskmetrics">
 <h2>RiskMetrics<a class="headerlink" href="#riskmetrics" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="spreadpy.backtest.metrics.RiskMetrics">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">spreadpy.backtest.metrics.</span></span><span class="sig-name descname"><span class="pre">RiskMetrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">equity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">risk_free_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/backtest/metrics.html#RiskMetrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.metrics.RiskMetrics" title="Link to this definition">#</a></dt>
+<dd><p>Stateless risk metric calculator for a backtest equity curve.</p>
+<p>All methods operate on the equity series supplied at construction
+and return scalar values. Annualisation uses the <code class="docutils literal notranslate"><span class="pre">periods_per_year</span></code>
+argument passed to each method.</p>
+<p>Key metrics:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\text{Sharpe}  &amp;= \frac{\mathbb{E}[r - r_f]}{\sigma[r]} \cdot \sqrt{T} \\
+\text{Sortino} &amp;= \frac{\text{CAGR} - r_f}{\sigma_{\downarrow}} \cdot \sqrt{T}
+                 \quad (\text{downside std below MAR}) \\
+\text{Calmar}  &amp;= \frac{\text{CAGR}}{|\text{MaxDD}|} \\
+\text{MaxDD}   &amp;= \min_t\!\left(\frac{\text{equity}_t}
+                 {\max_{s \leq t}\, \text{equity}_s} - 1\right)\end{split}\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>equity</strong> (<em>pd.Series</em>) – Bar-level or daily equity curve (NaNs are dropped).</p></li>
+<li><p><strong>risk_free_rate</strong> (<em>float</em>) – Annual risk-free rate r_f (e.g. 0.04 for 4%).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.metrics.RiskMetrics.annualised_return">
+<span class="sig-name descname"><span class="pre">annualised_return</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">periods_per_year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">252</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/metrics.html#RiskMetrics.annualised_return"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.metrics.RiskMetrics.annualised_return" title="Link to this definition">#</a></dt>
+<dd><p>Compute the Compound Annual Growth Rate (CAGR).</p>
+<p>Defined as:</p>
+<div class="math notranslate nohighlight">
+\[\text{CAGR} = (1 + R)^{T/n} - 1\]</div>
+<p>where <span class="math notranslate nohighlight">\(R\)</span> is the total return, <span class="math notranslate nohighlight">\(n\)</span> the number of bars,
+and <span class="math notranslate nohighlight">\(T\)</span> = <code class="docutils literal notranslate"><span class="pre">periods_per_year</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>periods_per_year</strong> (<em>int</em>) – Number of bars per year (252 for daily).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Annualised return as a fraction. Returns −1 if total equity
+is non-positive.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.metrics.RiskMetrics.avg_drawdown">
+<span class="sig-name descname"><span class="pre">avg_drawdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/metrics.html#RiskMetrics.avg_drawdown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.metrics.RiskMetrics.avg_drawdown" title="Link to this definition">#</a></dt>
+<dd><p>Compute the average drawdown over all sub-zero drawdown bars.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Mean drawdown as a negative fraction, or 0 if no bar is
+in drawdown.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.metrics.RiskMetrics.calmar">
+<span class="sig-name descname"><span class="pre">calmar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">periods_per_year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">252</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/metrics.html#RiskMetrics.calmar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.metrics.RiskMetrics.calmar" title="Link to this definition">#</a></dt>
+<dd><p>Compute the Calmar ratio.</p>
+<p>Defined as:</p>
+<div class="math notranslate nohighlight">
+\[\text{Calmar} = \frac{\text{CAGR}}{|\text{MDD}|}\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>periods_per_year</strong> (<em>int</em>) – Number of bars per year (252 for daily).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Calmar ratio. Returns <code class="docutils literal notranslate"><span class="pre">+inf</span></code> if max drawdown is zero.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.metrics.RiskMetrics.conditional_drawdown">
+<span class="sig-name descname"><span class="pre">conditional_drawdown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.05</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/metrics.html#RiskMetrics.conditional_drawdown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.metrics.RiskMetrics.conditional_drawdown" title="Link to this definition">#</a></dt>
+<dd><p>Conditional Drawdown at Risk (CDaR) at level alpha.</p>
+<p>Average of the worst alpha-fraction of drawdown observations:</p>
+<div class="math notranslate nohighlight">
+\[\text{CDaR}_\alpha = \mathbb{E}[DD_t \mid DD_t \leq \text{VaR}_\alpha(DD)]\]</div>
+<p>where <span class="math notranslate nohighlight">\(\text{VaR}_\alpha\)</span> is the <span class="math notranslate nohighlight">\(\alpha\)</span>-quantile of the
+drawdown distribution. Returns a negative value (same sign convention
+as <a class="reference internal" href="#spreadpy.backtest.metrics.RiskMetrics.max_drawdown" title="spreadpy.backtest.metrics.RiskMetrics.max_drawdown"><code class="xref py py-meth docutils literal notranslate"><span class="pre">max_drawdown()</span></code></a>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>alpha</strong> (<em>float</em>) – Tail level (default 0.05 = worst 5%).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Mean drawdown in the worst alpha fraction of bars.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.metrics.RiskMetrics.drawdown_series">
+<span class="sig-name descname"><span class="pre">drawdown_series</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/metrics.html#RiskMetrics.drawdown_series"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.metrics.RiskMetrics.drawdown_series" title="Link to this definition">#</a></dt>
+<dd><p>Compute the full drawdown time series.</p>
+<p>At each bar <span class="math notranslate nohighlight">\(t\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[DD_t = \frac{\text{equity}_t}{\max_{s \leq t}\, \text{equity}_s} - 1\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Drawdown series (values ≤ 0) aligned with <code class="docutils literal notranslate"><span class="pre">self.equity.index</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pd.Series</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.metrics.RiskMetrics.max_drawdown">
+<span class="sig-name descname"><span class="pre">max_drawdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/metrics.html#RiskMetrics.max_drawdown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.metrics.RiskMetrics.max_drawdown" title="Link to this definition">#</a></dt>
+<dd><p>Compute the maximum peak-to-trough drawdown.</p>
+<p>Defined as:</p>
+<div class="math notranslate nohighlight">
+\[\text{MDD} = \min_t\!\left(
+    \frac{\text{equity}_t}{\max_{s \leq t}\, \text{equity}_s} - 1
+\right)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Maximum drawdown as a negative fraction (e.g. −0.15 for −15%).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.metrics.RiskMetrics.profit_factor">
+<span class="sig-name descname"><span class="pre">profit_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trades</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'Trade'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/metrics.html#RiskMetrics.profit_factor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.metrics.RiskMetrics.profit_factor" title="Link to this definition">#</a></dt>
+<dd><p>Compute the profit factor (gross profits divided by gross losses).</p>
+<p>Defined as:</p>
+<div class="math notranslate nohighlight">
+\[\text{PF} = \frac{\sum_{\text{winning}} \text{P\&amp;L}}
+                   {\left|\sum_{\text{losing}} \text{P\&amp;L}\right|}\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trades</strong> (<em>List</em><em>[</em><a class="reference internal" href="#spreadpy.backtest.portfolio.Trade" title="spreadpy.backtest.portfolio.Trade"><em>Trade</em></a><em>]</em>) – List of leg fills from <code class="xref py py-attr docutils literal notranslate"><span class="pre">Portfolio.trades</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Profit factor &gt; 1 indicates net profitability. Returns
+<code class="docutils literal notranslate"><span class="pre">+inf</span></code> if there are no losing trades.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.metrics.RiskMetrics.sharpe">
+<span class="sig-name descname"><span class="pre">sharpe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">periods_per_year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">252</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/metrics.html#RiskMetrics.sharpe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.metrics.RiskMetrics.sharpe" title="Link to this definition">#</a></dt>
+<dd><p>Compute the annualised Sharpe ratio.</p>
+<p>Defined as:</p>
+<div class="math notranslate nohighlight">
+\[\text{Sharpe} = \frac{\mathbb{E}[r_t - r_f/T]}{\sigma_{\text{bar}}} \cdot \sqrt{T}\]</div>
+<p>where <span class="math notranslate nohighlight">\(r_t\)</span> is the bar-level return, <span class="math notranslate nohighlight">\(T\)</span> = <code class="docutils literal notranslate"><span class="pre">periods_per_year</span></code>,
+and <span class="math notranslate nohighlight">\(\sigma_{\text{bar}}\)</span> the sample standard deviation of bar returns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>periods_per_year</strong> (<em>int</em>) – Number of bars per year (252 for daily).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Annualised Sharpe ratio. Returns 0 if volatility is zero.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.metrics.RiskMetrics.sortino">
+<span class="sig-name descname"><span class="pre">sortino</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">periods_per_year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">252</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/metrics.html#RiskMetrics.sortino"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.metrics.RiskMetrics.sortino" title="Link to this definition">#</a></dt>
+<dd><p>Compute the annualised Sortino ratio.</p>
+<p>Uses downside deviation below the minimum acceptable return (MAR)
+as the risk denominator:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\sigma_{\downarrow} &amp;= \sqrt{\mathbb{E}[\min(r_t - \text{mar},\, 0)^2]}
+                      \cdot \sqrt{T} \\
+\text{Sortino} &amp;= \frac{\text{CAGR} - r_f}{\sigma_{\downarrow}}\end{split}\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>periods_per_year</strong> (<em>int</em>) – Number of bars per year (252 for daily).</p></li>
+<li><p><strong>mar</strong> (<em>float</em>) – Minimum acceptable return per bar (default 0.0).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Annualised Sortino ratio. Returns <code class="docutils literal notranslate"><span class="pre">+inf</span></code> if there are no
+returns below <code class="docutils literal notranslate"><span class="pre">mar</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.metrics.RiskMetrics.summary">
+<span class="sig-name descname"><span class="pre">summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">periods_per_year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">252</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trades</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/metrics.html#RiskMetrics.summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.metrics.RiskMetrics.summary" title="Link to this definition">#</a></dt>
+<dd><p>Return all key risk metrics as a labelled series.</p>
+<p>Always includes: <code class="docutils literal notranslate"><span class="pre">total_return</span></code>, <code class="docutils literal notranslate"><span class="pre">annualised_return</span></code>,
+<code class="docutils literal notranslate"><span class="pre">volatility</span></code>, <code class="docutils literal notranslate"><span class="pre">sharpe</span></code>, <code class="docutils literal notranslate"><span class="pre">sortino</span></code>, <code class="docutils literal notranslate"><span class="pre">max_drawdown</span></code>,
+<code class="docutils literal notranslate"><span class="pre">avg_drawdown</span></code>, <code class="docutils literal notranslate"><span class="pre">cdar_5</span></code>, <code class="docutils literal notranslate"><span class="pre">calmar</span></code>.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">trades</span></code> is provided, also includes: <code class="docutils literal notranslate"><span class="pre">win_rate</span></code>,
+<code class="docutils literal notranslate"><span class="pre">profit_factor</span></code>, <code class="docutils literal notranslate"><span class="pre">n_trades</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>periods_per_year</strong> (<em>int</em>) – Number of bars per year (252 for daily).</p></li>
+<li><p><strong>trades</strong> (<em>Optional</em><em>[</em><em>List</em><em>[</em><a class="reference internal" href="#spreadpy.backtest.portfolio.Trade" title="spreadpy.backtest.portfolio.Trade"><em>Trade</em></a><em>]</em><em>]</em>) – Leg fills used to compute
+trade-level metrics.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Named series of risk metrics.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.Series</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.metrics.RiskMetrics.total_return">
+<span class="sig-name descname"><span class="pre">total_return</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/metrics.html#RiskMetrics.total_return"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.metrics.RiskMetrics.total_return" title="Link to this definition">#</a></dt>
+<dd><p>Compute the total (cumulative) return over the evaluation period.</p>
+<p>Defined as:</p>
+<div class="math notranslate nohighlight">
+\[R = \frac{\text{equity}_T}{\text{equity}_0} - 1\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Total return as a fraction (e.g. 0.12 for +12%).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.metrics.RiskMetrics.turnover">
+<span class="sig-name descname"><span class="pre">turnover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trades</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'Trade'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods_per_year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">252</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/metrics.html#RiskMetrics.turnover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.metrics.RiskMetrics.turnover" title="Link to this definition">#</a></dt>
+<dd><p>Compute annualised portfolio turnover.</p>
+<p>Defined as:</p>
+<div class="math notranslate nohighlight">
+\[\text{turnover} = \frac{\sum_i |N_i| \cdot T}{n \cdot \bar{\text{equity}}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(n\)</span> is the number of bars in the equity series,
+<span class="math notranslate nohighlight">\(T\)</span> = <code class="docutils literal notranslate"><span class="pre">periods_per_year</span></code>, and <span class="math notranslate nohighlight">\(\bar{\text{equity}}\)</span> is
+the mean equity over the period.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trades</strong> (<em>List</em><em>[</em><a class="reference internal" href="#spreadpy.backtest.portfolio.Trade" title="spreadpy.backtest.portfolio.Trade"><em>Trade</em></a><em>]</em>) – List of leg fills from <code class="xref py py-attr docutils literal notranslate"><span class="pre">Portfolio.trades</span></code>.</p></li>
+<li><p><strong>periods_per_year</strong> (<em>int</em>) – Number of bars per year (252 for daily).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Annualised turnover as a multiple of average equity.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.metrics.RiskMetrics.volatility">
+<span class="sig-name descname"><span class="pre">volatility</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">periods_per_year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">252</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/metrics.html#RiskMetrics.volatility"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.metrics.RiskMetrics.volatility" title="Link to this definition">#</a></dt>
+<dd><p>Compute the annualised volatility of bar-level returns.</p>
+<p>Defined as <span class="math notranslate nohighlight">\(\sigma_{\text{ann}} = \sigma_{\text{bar}} \cdot \sqrt{T}\)</span>
+where <span class="math notranslate nohighlight">\(\sigma_{\text{bar}}\)</span> is the sample standard deviation of
+simple returns and <span class="math notranslate nohighlight">\(T\)</span> = <code class="docutils literal notranslate"><span class="pre">periods_per_year</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>periods_per_year</strong> (<em>int</em>) – Number of bars per year (252 for daily).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Annualised volatility as a fraction.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.metrics.RiskMetrics.win_rate">
+<span class="sig-name descname"><span class="pre">win_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trades</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'Trade'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/metrics.html#RiskMetrics.win_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.metrics.RiskMetrics.win_rate" title="Link to this definition">#</a></dt>
+<dd><p>Compute the fraction of round-trip trades with positive P&amp;L.</p>
+<p>Round trips are matched FIFO per leg via <code class="xref py py-meth docutils literal notranslate"><span class="pre">_compute_round_trips()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trades</strong> (<em>List</em><em>[</em><a class="reference internal" href="#spreadpy.backtest.portfolio.Trade" title="spreadpy.backtest.portfolio.Trade"><em>Trade</em></a><em>]</em>) – List of leg fills from <code class="xref py py-attr docutils literal notranslate"><span class="pre">Portfolio.trades</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Win rate ∈ [0, 1], or NaN if no round trips exist.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="backtestresult">
 <h2>BacktestResult<a class="headerlink" href="#backtestresult" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="spreadpy.backtest.result.BacktestResult">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">spreadpy.backtest.result.</span></span><span class="sig-name descname"><span class="pre">BacktestResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Timestamp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Timestamp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Timestamp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Timestamp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equity_curve</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trades</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#spreadpy.backtest.portfolio.Trade" title="spreadpy.backtest.portfolio.Trade"><span class="pre">Trade</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><span class="pre">SpreadSeries</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/backtest/result.html#BacktestResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.result.BacktestResult" title="Link to this definition">#</a></dt>
+<dd><p>Immutable container for the output of a single backtest split.</p>
+<p>Produced by <code class="xref py py-class docutils literal notranslate"><span class="pre">BacktestEngine</span></code> for both the validation and test
+periods. The <code class="docutils literal notranslate"><span class="pre">split</span></code> field identifies which period this result covers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>split</strong> (<em>str</em>) – Period identifier — <code class="docutils literal notranslate"><span class="pre">'val'</span></code> or <code class="docutils literal notranslate"><span class="pre">'test'</span></code>.</p></li>
+<li><p><strong>train_start</strong> (<em>pd.Timestamp</em>) – Start of the in-sample (fitting) period.</p></li>
+<li><p><strong>train_end</strong> (<em>pd.Timestamp</em>) – End of the in-sample (fitting) period.</p></li>
+<li><p><strong>eval_start</strong> (<em>pd.Timestamp</em>) – Start of the out-of-sample evaluation period.</p></li>
+<li><p><strong>eval_end</strong> (<em>pd.Timestamp</em>) – End of the out-of-sample evaluation period.</p></li>
+<li><p><strong>equity_curve</strong> (<em>pd.DataFrame</em>) – Bar-level mark-to-market equity.
+Columns: <code class="docutils literal notranslate"><span class="pre">equity</span></code>, <code class="docutils literal notranslate"><span class="pre">cash</span></code>, <code class="docutils literal notranslate"><span class="pre">unrealised_pnl</span></code>, <code class="docutils literal notranslate"><span class="pre">realised_pnl</span></code>, <code class="docutils literal notranslate"><span class="pre">total_costs</span></code>.</p></li>
+<li><p><strong>trades</strong> (<em>List</em><em>[</em><a class="reference internal" href="#spreadpy.backtest.portfolio.Trade" title="spreadpy.backtest.portfolio.Trade"><em>Trade</em></a><em>]</em>) – All leg fills executed during the eval period.</p></li>
+<li><p><strong>signals</strong> (<em>pd.Series</em>) – <code class="xref py py-class docutils literal notranslate"><span class="pre">Signal</span></code> objects indexed by timestamp.</p></li>
+<li><p><strong>spread</strong> (<a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><em>SpreadSeries</em></a>) – Spread series for the eval period.</p></li>
+<li><p><strong>metrics</strong> (<em>pd.Series</em>) – Risk metrics summary from <code class="xref py py-class docutils literal notranslate"><span class="pre">RiskMetrics</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.result.BacktestResult.print_summary">
+<span class="sig-name descname"><span class="pre">print_summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/result.html#BacktestResult.print_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.result.BacktestResult.print_summary" title="Link to this definition">#</a></dt>
+<dd><p>Print a formatted metrics table to stdout.</p>
+<p>Outputs the split label, evaluation date range, and all metrics
+from <a class="reference internal" href="#spreadpy.backtest.result.BacktestResult.summary_df" title="spreadpy.backtest.result.BacktestResult.summary_df"><code class="xref py py-meth docutils literal notranslate"><span class="pre">summary_df()</span></code></a> as an aligned table.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.result.BacktestResult.summary_df">
+<span class="sig-name descname"><span class="pre">summary_df</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/result.html#BacktestResult.summary_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.result.BacktestResult.summary_df" title="Link to this definition">#</a></dt>
+<dd><p>Format all metrics as a single-column DataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>DataFrame indexed by metric label with a <code class="docutils literal notranslate"><span class="pre">Value</span></code> column.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="backtestengine">
 <h2>BacktestEngine<a class="headerlink" href="#backtestengine" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="spreadpy.backtest.engine.BacktestEngine">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">spreadpy.backtest.engine.</span></span><span class="sig-name descname"><span class="pre">BacktestEngine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spread.html#spreadpy.spread.hedgeRatioEstimator.HedgeRatioEstimator" title="spreadpy.spread.hedgeRatioEstimator.HedgeRatioEstimator"><span class="pre">HedgeRatioEstimator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_gen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="signal.html#spreadpy.signal.signal.SignalGenerator" title="spreadpy.signal.signal.SignalGenerator"><span class="pre">SignalGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="sizing.html#spreadpy.sizing.positionSizer.PositionSizer" title="spreadpy.sizing.positionSizer.PositionSizer"><span class="pre">PositionSizer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spreadpy.backtest.costs.TransactionCosts" title="spreadpy.backtest.costs.TransactionCosts"><span class="pre">TransactionCosts</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_capital</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods_per_year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">252</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_prices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/backtest/engine.html#BacktestEngine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.engine.BacktestEngine" title="Link to this definition">#</a></dt>
+<dd><p>Simple train / validation / test backtest engine.</p>
+<p>Splits the data once into three consecutive periods and fits the full
+pipeline — hedge ratio estimator then signal generator — on the training
+period only:</p>
+<blockquote>
+<div><p><a href="#id1"><span class="problematic" id="id2">|←── train_frac ──→|←── val_frac ──→|←── test (remainder) ──→|</span></a></p>
+</div></blockquote>
+<p>Use the validation result to tune hyperparameters; consult the test
+result only for the final held-out evaluation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>estimator</strong> (<a class="reference internal" href="spread.html#spreadpy.spread.hedgeRatioEstimator.HedgeRatioEstimator" title="spreadpy.spread.hedgeRatioEstimator.HedgeRatioEstimator"><em>HedgeRatioEstimator</em></a>) – Hedge ratio estimator
+(e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">KalmanFilterWithVelocity</span></code>).</p></li>
+<li><p><strong>signal_gen</strong> (<a class="reference internal" href="signal.html#spreadpy.signal.signal.SignalGenerator" title="spreadpy.signal.signal.SignalGenerator"><em>SignalGenerator</em></a>) – Signal generator
+(e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">ZScoreSignal</span></code>).</p></li>
+<li><p><strong>sizer</strong> (<a class="reference internal" href="sizing.html#spreadpy.sizing.sizers.linearSizer.LinearSizer" title="spreadpy.sizing.sizers.linearSizer.LinearSizer"><em>LinearSizer</em></a>) – Position sizing model.</p></li>
+<li><p><strong>costs</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="#spreadpy.backtest.costs.TransactionCosts" title="spreadpy.backtest.costs.TransactionCosts"><em>TransactionCosts</em></a><em>]</em>) – Transaction cost model.
+Defaults to 2 bps slippage + 1 bps commission.</p></li>
+<li><p><strong>initial_capital</strong> (<em>float</em>) – Starting equity in monetary units.</p></li>
+<li><p><strong>train_frac</strong> (<em>float</em>) – Fraction of data reserved for training / fitting
+(default 0.6).</p></li>
+<li><p><strong>val_frac</strong> (<em>float</em>) – Fraction of data used as validation set (default 0.2).
+Set to 0.0 for a simple train / test split with no validation —
+<a class="reference internal" href="#spreadpy.backtest.engine.BacktestEngine.run" title="spreadpy.backtest.engine.BacktestEngine.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> will then return <code class="docutils literal notranslate"><span class="pre">(None,</span> <span class="pre">test_result)</span></code>.
+The remainder <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">−</span> <span class="pre">train_frac</span> <span class="pre">−</span> <span class="pre">val_frac</span></code> forms the test set.</p></li>
+<li><p><strong>periods_per_year</strong> (<em>int</em>) – Bars per year for annualisation
+(252 for daily, 252 × 23 ≈ 5796 for hourly futures).</p></li>
+<li><p><strong>log_prices</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, log-transform prices before passing
+them to the hedge ratio estimator and signal generator. The Kalman
+filter then operates on log-prices, which better satisfies the
+constant observation-noise assumption (σ²_ε homoscedastic).
+Position sizing and P&amp;L accounting always use the original prices.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="spreadpy.backtest.engine.BacktestEngine.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="data.html#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="data.html#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><span class="pre">PriceTimeSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#spreadpy.backtest.result.BacktestResult" title="spreadpy.backtest.result.BacktestResult"><span class="pre">BacktestResult</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#spreadpy.backtest.result.BacktestResult" title="spreadpy.backtest.result.BacktestResult"><span class="pre">BacktestResult</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/spreadpy/backtest/engine.html#BacktestEngine.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.backtest.engine.BacktestEngine.run" title="Link to this definition">#</a></dt>
+<dd><p>Fit the pipeline on the training period and evaluate on validation and test.</p>
+<p>Pipeline:</p>
+<ol class="arabic simple">
+<li><p>Align <code class="docutils literal notranslate"><span class="pre">y</span></code> and <code class="docutils literal notranslate"><span class="pre">x</span></code> and split into train / val / test.</p></li>
+<li><p>Fit the hedge ratio estimator on the training set, then re-run it
+over the full train + val + test range for Kalman filter state
+continuity.</p></li>
+<li><p>Fit the signal generator on the training spread.</p></li>
+<li><p>Evaluate on val (if <code class="docutils literal notranslate"><span class="pre">val_frac</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>) and on test, calling
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">_run_split()</span></code> for each.</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<a class="reference internal" href="data.html#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><em>PriceTimeSeries</em></a>) – Dependent-leg price series.</p></li>
+<li><p><strong>x</strong> (<a class="reference internal" href="data.html#spreadpy.data.priceTimeSeries.PriceTimeSeries" title="spreadpy.data.priceTimeSeries.PriceTimeSeries"><em>PriceTimeSeries</em></a>) – Independent-leg price series.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(val_result,</span> <span class="pre">test_result)</span></code> where <code class="docutils literal notranslate"><span class="pre">val_result</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>
+when <code class="docutils literal notranslate"><span class="pre">val_frac</span> <span class="pre">=</span> <span class="pre">0.0</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[Optional[<a class="reference internal" href="#spreadpy.backtest.result.BacktestResult" title="spreadpy.backtest.result.BacktestResult">BacktestResult</a>], <a class="reference internal" href="#spreadpy.backtest.result.BacktestResult" title="spreadpy.backtest.result.BacktestResult">BacktestResult</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 
@@ -471,12 +1099,63 @@
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transactioncosts">TransactionCosts</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#trade">Trade</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#portfolio">Portfolio</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#riskmetrics">RiskMetrics</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backtestresult">BacktestResult</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backtestengine">BacktestEngine</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transactioncosts">TransactionCosts</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.costs.TransactionCosts"><code class="docutils literal notranslate"><span class="pre">TransactionCosts</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.costs.TransactionCosts.apply"><code class="docutils literal notranslate"><span class="pre">TransactionCosts.apply()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#trade">Trade</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.portfolio.Trade"><code class="docutils literal notranslate"><span class="pre">Trade</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#portfolio">Portfolio</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.portfolio.Portfolio"><code class="docutils literal notranslate"><span class="pre">Portfolio</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.portfolio.Portfolio.current_equity"><code class="docutils literal notranslate"><span class="pre">Portfolio.current_equity</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.portfolio.Portfolio.equity_curve"><code class="docutils literal notranslate"><span class="pre">Portfolio.equity_curve()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.portfolio.Portfolio.fill"><code class="docutils literal notranslate"><span class="pre">Portfolio.fill()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.portfolio.Portfolio.mark"><code class="docutils literal notranslate"><span class="pre">Portfolio.mark()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.portfolio.Portfolio.reset"><code class="docutils literal notranslate"><span class="pre">Portfolio.reset()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#riskmetrics">RiskMetrics</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.metrics.RiskMetrics"><code class="docutils literal notranslate"><span class="pre">RiskMetrics</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.metrics.RiskMetrics.annualised_return"><code class="docutils literal notranslate"><span class="pre">RiskMetrics.annualised_return()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.metrics.RiskMetrics.avg_drawdown"><code class="docutils literal notranslate"><span class="pre">RiskMetrics.avg_drawdown()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.metrics.RiskMetrics.calmar"><code class="docutils literal notranslate"><span class="pre">RiskMetrics.calmar()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.metrics.RiskMetrics.conditional_drawdown"><code class="docutils literal notranslate"><span class="pre">RiskMetrics.conditional_drawdown()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.metrics.RiskMetrics.drawdown_series"><code class="docutils literal notranslate"><span class="pre">RiskMetrics.drawdown_series()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.metrics.RiskMetrics.max_drawdown"><code class="docutils literal notranslate"><span class="pre">RiskMetrics.max_drawdown()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.metrics.RiskMetrics.profit_factor"><code class="docutils literal notranslate"><span class="pre">RiskMetrics.profit_factor()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.metrics.RiskMetrics.sharpe"><code class="docutils literal notranslate"><span class="pre">RiskMetrics.sharpe()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.metrics.RiskMetrics.sortino"><code class="docutils literal notranslate"><span class="pre">RiskMetrics.sortino()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.metrics.RiskMetrics.summary"><code class="docutils literal notranslate"><span class="pre">RiskMetrics.summary()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.metrics.RiskMetrics.total_return"><code class="docutils literal notranslate"><span class="pre">RiskMetrics.total_return()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.metrics.RiskMetrics.turnover"><code class="docutils literal notranslate"><span class="pre">RiskMetrics.turnover()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.metrics.RiskMetrics.volatility"><code class="docutils literal notranslate"><span class="pre">RiskMetrics.volatility()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.metrics.RiskMetrics.win_rate"><code class="docutils literal notranslate"><span class="pre">RiskMetrics.win_rate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backtestresult">BacktestResult</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.result.BacktestResult"><code class="docutils literal notranslate"><span class="pre">BacktestResult</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.result.BacktestResult.print_summary"><code class="docutils literal notranslate"><span class="pre">BacktestResult.print_summary()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.result.BacktestResult.summary_df"><code class="docutils literal notranslate"><span class="pre">BacktestResult.summary_df()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backtestengine">BacktestEngine</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.engine.BacktestEngine"><code class="docutils literal notranslate"><span class="pre">BacktestEngine</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.backtest.engine.BacktestEngine.run"><code class="docutils literal notranslate"><span class="pre">BacktestEngine.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
