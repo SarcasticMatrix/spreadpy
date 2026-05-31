@@ -52,7 +52,6 @@ Each post mixes theory, intuition, and concrete code to dig into one specific qu
    :hidden:
    :maxdepth: 1
 
-   arbitrage_free
    kalman_filter
    position_sizing
    strategy_validation
