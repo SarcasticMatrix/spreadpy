@@ -1,3 +1,13 @@
+---
+jupytext:
+  text_representation:
+    format_name: myst
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
+---
+
 # Tracking the hedge ratio with the Kalman filter
 
 ```{admonition} Topics
@@ -7,7 +17,7 @@ Kalman filter · state-space model · dynamic hedge ratio · pairs trading · OL
 ```
 
 In pairs trading, the spread between two assets is only stationary if we subtract the right
-proportion of one asset from the other. That proportion — the **hedge ratio** $\beta_t$ — is
+proportion of one asset from the other. That proportion, the **hedge ratio** $\beta_t$, is
 rarely constant in practice. Structural shifts in business models, changing correlations, or
 regime transitions all cause the relationship to drift over time.
 
@@ -229,40 +239,40 @@ than the hedge ratio itself: the trend is persistent but not erratic. The defaul
 
 ## Application with `spreadpy`
 
-We illustrate the three estimators on a classic pair: **GLD** (SPDR Gold Shares)
-and **GDX** (VanEck Gold Miners ETF). Both are exposed to gold prices, but GDX
-carries additional equity and operational risk, so the relationship drifts over time.
+We illustrate the three estimators on a classic soft-commodities pair: **CC=F** (Cocoa futures)
+and **KC=F** (Coffee futures). Both are agricultural commodities sensitive to weather and
+supply-chain shocks, but their demand drivers differ enough that the relationship drifts over time.
 
 ### Loading data
 
-```python
+```{code-cell} python
 import numpy as np
 import yfinance as yf
 from spreadpy.data import PriceTimeSeries
 
-raw = yf.download(["GLD", "GDX"], start="2018-01-01", end="2024-01-01",
+raw = yf.download(["CC=F", "KC=F"], start="2018-01-01", end="2024-01-01",
                   auto_adjust=True)["Close"].dropna()
 
-y = PriceTimeSeries(raw["GLD"], name="GLD")
-x = PriceTimeSeries(raw["GDX"], name="GDX")
+y = PriceTimeSeries(raw["CC=F"], name="Cacoa")
+x = PriceTimeSeries(raw["KC=F"], name="Coffee")
 ```
 
 ### Fitting the three estimators
 
-```python
+```{code-cell} python
 from spreadpy.spread.hedgeRatio.constantOLS import ConstantOLS
 from spreadpy.spread.hedgeRatio.rollingOLS import RollingOLS
 from spreadpy.spread.hedgeRatio.kalmanFilter import KalmanFilter
 from spreadpy.spread.hedgeRatio.kalmanFilterWithVelocity import KalmanFilterWithVelocity
 
-ols     = ConstantOLS()
-rolling = RollingOLS(window=120)
-kf      = KalmanFilter(alpha=1e-5)
-kfv     = KalmanFilterWithVelocity(alpha=1e-6, alpha_dgam=1e-7)
+ols     = ConstantOLS(add_intercept=False)
+rolling = RollingOLS(window=120, add_intercept=False)
+kf      = KalmanFilter(alpha=1e-4, add_intercept=False)
+kfv     = KalmanFilterWithVelocity(alpha=1e-4, alpha_dgam=1e-6, add_intercept=False)
 
 # All estimators work on log-prices for homoscedastic residuals
-y_log = PriceTimeSeries(np.log(y.series), name="log GLD")
-x_log = PriceTimeSeries(np.log(x.series), name="log GDX")
+y_log = PriceTimeSeries(np.log(y.series), name="log CC=F")
+x_log = PriceTimeSeries(np.log(x.series), name="log KC=F")
 
 beta_ols     = ols.fit(y_log, x_log)
 beta_rolling = rolling.fit(y_log, x_log)
@@ -272,17 +282,18 @@ beta_kfv     = kfv.fit(y_log, x_log)
 
 ### Comparing the hedge ratios
 
-```python
+```{code-cell} python
 import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots(figsize=(12, 4))
-ax.axhline(beta_ols.iloc[0], color="gray", linestyle="--", label="Constant OLS")
-ax.plot(beta_rolling, color="steelblue", alpha=0.7, label="Rolling OLS (w=120)")
-ax.plot(beta_kf,      color="tomato",    lw=1.5,   label="Kalman 2-state")
-ax.plot(beta_kfv,     color="seagreen",  lw=1.5,   label="Kalman 3-state (velocity)")
-ax.set_title("Hedge ratio $\\gamma_t$ — GLD / GDX", fontsize=13)
+ax.axhline(beta_ols.iloc[0], color="gray", lw=1.5, label="Constant OLS")
+ax.plot(beta_rolling, color="steelblue", lw=1.5, label="Rolling OLS (w=120)")
+ax.plot(beta_kf,      color="tomato",    lw=1.5,   label="Kalman 1-state")
+ax.plot(beta_kfv,     color="seagreen",  lw=1.5,   label="Kalman 2-state (velocity)")
+ax.set_title("Hedge ratio $\\gamma_t$ — Cocoa / Coffee", fontsize=13)
 ax.set_ylabel("$\\gamma_t$")
 ax.legend()
+plt.grid(linestyle="--", dashes=(5, 10), color="gray", linewidth=0.5)
 plt.tight_layout()
 plt.show()
 ```
@@ -295,19 +306,21 @@ produces step-like jumps and lags by half a window.
 Both Kalman estimators expose the normalised spread $z_t$ directly as an attribute
 after `fit()`:
 
-```python
+```{code-cell} python
 fig, axes = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
 
-axes[0].plot(kf.normalized_spread_,  color="tomato",   label="2-state")
-axes[0].plot(kfv.normalized_spread_, color="seagreen",  label="3-state")
+axes[0].plot(kf.normalized_spread_,  color="tomato",   label="1-state")
+axes[0].plot(kfv.normalized_spread_, color="seagreen",  label="2-state (velocity)")
 axes[0].axhline(0, color="k", lw=0.5)
 axes[0].set_title("Normalised spread $z_t$")
 axes[0].legend()
+axes[0].grid(linestyle="--", dashes=(5, 10), color="gray", linewidth=0.5)
 
-axes[1].plot(kf.innovation_var_ts_,  color="tomato",   label="$S_t$ — 2-state")
-axes[1].plot(kfv.innovation_var_ts_, color="seagreen",  label="$S_t$ — 3-state")
+axes[1].plot(kf.innovation_var_ts_,  color="tomato",   label="1-state")
+axes[1].plot(kfv.innovation_var_ts_, color="seagreen",  label="2-state (velocity)")
 axes[1].set_title("Innovation variance $S_t$")
 axes[1].legend()
+axes[1].grid(linestyle="--", dashes=(5, 10), color="gray", linewidth=0.5)
 
 plt.tight_layout()
 plt.show()
@@ -318,21 +331,97 @@ are temporarily inconsistent. This often coincides with news events or regime ch
 
 ### Stationarity diagnostics
 
-```python
+```{code-cell} python
 from spreadpy.spread import SpreadSeries
 
 # Build the spread series (in log-price space) with the KF hedge ratio
 spread_kf = SpreadSeries(y_log, x_log, beta_kf, estimator_name="KalmanFilter")
+spread_kfv = SpreadSeries(y_log, x_log, beta_kfv, estimator_name="KalmanFilterVelocity")
 
 hl   = spread_kf.half_life()
 stat, pval = spread_kf.adf_statistic()
 
+print("For Kalman filter:")
 print(f"Half-life : {hl:.1f} bars")
 print(f"ADF stat  : {stat:.3f}  (p = {pval:.4f})")
+
+hlv   = spread_kfv.half_life()
+statv, pvalv = spread_kfv.adf_statistic()
+
+print("\nFor Kalman filter with velocity:")
+print(f"Half-life : {hlv:.1f} bars")
+print(f"ADF stat  : {statv:.3f}  (p = {pvalv:.4f})")
 ```
 
 A short half-life (say, 20–60 bars for daily data) and a p-value below 0.05 suggest that
 the Kalman-filtered spread is mean-reverting and suitable for z-score signal generation.
+
+The full-sample statistics give a single answer, but the spread around early 2020 shows
+a clear structural break. It is more informative to track stationarity **continuously**
+with a rolling ADF test.
+
+```{code-cell} python
+import numpy as np
+import pandas as pd
+from statsmodels.tsa.stattools import adfuller
+
+ROLL = 252
+
+def rolling_diagnostics(spread, roll):
+    residuals = spread.residuals.dropna()
+    delta  = residuals.diff().dropna()
+    lagged = residuals.shift(1).dropna()
+    stats, half_lives, idx = [], [], []
+    for i in range(roll, len(residuals)):
+        res   = adfuller(residuals.iloc[i - roll : i], maxlag=1, autolag=None)
+        s_lag = lagged.iloc[i - roll : i].values
+        ds    = delta.iloc[i - roll : i].values
+        b     = np.dot(s_lag, ds) / np.dot(s_lag, s_lag)
+        stats.append(res[0])
+        half_lives.append(-np.log(2) / b if b < 0 else np.nan)
+        idx.append(residuals.index[i])
+    return pd.Series(stats, index=idx), pd.Series(half_lives, index=idx)
+
+roll_stat,   roll_hl   = rolling_diagnostics(spread_kf,  ROLL)
+roll_stat_v, roll_hl_v = rolling_diagnostics(spread_kfv, ROLL)
+
+cv_5pct = -2.86
+
+fig, axes = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
+
+# Panel 1 — rolling half-life
+axes[0].plot(roll_hl,   color="tomato",   lw=1.2, label="Kalman 1-state")
+axes[0].plot(roll_hl_v, color="seagreen", lw=1.2, label="Kalman 2-state (velocity)")
+axes[0].set_ylabel("Half-life (bars)")
+axes[0].legend(fontsize=8)
+axes[0].set_title(f"Rolling stationarity diagnostics (window = {ROLL} bars) — Cocoa / Coffee")
+axes[0].grid(linestyle="--", dashes=(5, 10), color="gray", linewidth=0.5)
+
+# Panel 2 — rolling ADF statistic
+axes[1].plot(roll_stat,   color="tomato",   lw=1.2, label="Kalman 1-state")
+axes[1].plot(roll_stat_v, color="seagreen", lw=1.2, label="Kalman 2-state (velocity)")
+axes[1].axhline(cv_5pct, color="black", lw=1.0, linestyle="--",
+                label=f"5 % critical value ({cv_5pct})")
+axes[1].fill_between(roll_stat.index, roll_stat, cv_5pct,
+                     where=(roll_stat > cv_5pct), alpha=0.12, color="tomato")
+axes[1].fill_between(roll_stat_v.index, roll_stat_v, cv_5pct,
+                     where=(roll_stat_v > cv_5pct), alpha=0.12, color="seagreen")
+axes[1].set_ylabel("ADF statistic")
+axes[1].legend(fontsize=8)
+axes[1].grid(linestyle="--", dashes=(5, 10), color="gray", linewidth=0.5)
+
+plt.tight_layout()
+plt.show()
+```
+
+The red zones in the ADF panel highlight periods where the spread temporarily loses its
+mean-reverting property. A rising half-life confirms the same story from a different angle:
+the spread reverts more slowly when the relationship is under stress.
+Any structural break visible in the plots reflects supply or demand shocks specific to
+cocoa or coffee markets — droughts, disease, or geopolitical disruptions — pushing the
+relationship out of its historical range for extended periods.
+This kind of diagnostic is useful for **gating the signal**: one can suspend trading
+whenever the ADF statistic rises above its critical value.
 
 ---
 

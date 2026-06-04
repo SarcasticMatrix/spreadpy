@@ -30,6 +30,7 @@
 <link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=0790524f97105ba85085" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css?v=6550b9e0" />
   
@@ -43,7 +44,6 @@
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spreadpy/spread/hedgeRatio/kalmanFilter';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -453,6 +453,14 @@
 <span class="sd">        Typical range: 1e-6 to 1e-4. Palomar uses 1e-5 for this model.</span>
 <span class="sd">    :param Optional[int] ls_window: Number of bars for the OLS initialisation.</span>
 <span class="sd">        None uses the entire series (recommended: pass ``train_size`` from the engine).</span>
+<span class="sd">    :param bool add_intercept: If ``False``, the intercept state :math:`\\mu_t` is</span>
+<span class="sd">        pinned to zero for the entire filter run (``mu0=0``, ``P0[0,0]=0``,</span>
+<span class="sd">        ``sigma2_mu=0``). The Kalman gain on :math:`\\mu` is then identically zero</span>
+<span class="sd">        at every step, so the state vector effectively reduces to a 1-state model</span>
+<span class="sd">        without any structural change to ``_run_filter``. Useful when the</span>
+<span class="sd">        relationship between ``y`` and ``x`` is expected to be purely proportional</span>
+<span class="sd">        (e.g. realised-variance series where a constant offset is not meaningful).</span>
+<span class="sd">        Default: ``True``.</span>
 
 <span class="sd">    .. note::</span>
 <span class="sd">        **Use log-prices.** The filter assumes constant observation noise</span>
@@ -469,9 +477,11 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">,</span>
         <span class="n">ls_window</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">add_intercept</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ls_window</span> <span class="o">=</span> <span class="n">ls_window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_intercept</span> <span class="o">=</span> <span class="n">add_intercept</span>
 
         <span class="c1"># Exposés après fit()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">params_</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">KalmanFilterParams</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -579,17 +589,21 @@
         <span class="n">coef</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">y_ls</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
         <span class="n">mu_ls</span><span class="p">,</span> <span class="n">gam_ls</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_intercept</span><span class="p">:</span>
+            <span class="n">mu_ls</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">gam_ls</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x_ls</span><span class="p">,</span> <span class="n">y_ls</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x_ls</span><span class="p">,</span> <span class="n">x_ls</span><span class="p">))</span>  <span class="c1"># OLS sans intercept</span>
+
         <span class="n">eps_ls</span>    <span class="o">=</span> <span class="n">y_ls</span> <span class="o">-</span> <span class="p">(</span><span class="n">mu_ls</span> <span class="o">+</span> <span class="n">gam_ls</span> <span class="o">*</span> <span class="n">x_ls</span><span class="p">)</span>
         <span class="n">sigma2_eps</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">eps_ls</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
         <span class="n">var_y2</span>     <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">x_ls</span><span class="p">,</span>   <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
 
-        <span class="c1"># Bruits d&#39;état</span>
-        <span class="n">sigma2_mu</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">sigma2_eps</span>
+        <span class="c1"># Bruits d&#39;état — μ épinglé à 0 si add_intercept=False</span>
+        <span class="n">sigma2_mu</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">sigma2_eps</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_intercept</span> <span class="k">else</span> <span class="mf">0.0</span>
         <span class="n">sigma2_gam</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">sigma2_eps</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">var_y2</span><span class="p">,</span> <span class="mf">1e-12</span><span class="p">)</span>
 
-        <span class="c1"># Covariance initiale P0 (diagonale, formule Palomar)</span>
+        <span class="c1"># Covariance initiale P0 — P0[0,0]=0 épingle μ définitivement à 0</span>
         <span class="n">P0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span>
-            <span class="n">sigma2_eps</span> <span class="o">/</span> <span class="n">T_ls</span><span class="p">,</span>
+            <span class="n">sigma2_eps</span> <span class="o">/</span> <span class="n">T_ls</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_intercept</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">,</span>
             <span class="n">sigma2_eps</span> <span class="o">/</span> <span class="p">(</span><span class="n">T_ls</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">var_y2</span><span class="p">,</span> <span class="mf">1e-12</span><span class="p">)),</span>
         <span class="p">])</span>
 
