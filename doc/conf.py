@@ -20,8 +20,7 @@ release = 'v0.1.0'
 
 extensions = [
     "sphinx_design",
-    "myst_parser",
-    'nbsphinx',
+    "myst_nb",
     'sphinx.ext.githubpages',
     'sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
