@@ -82,6 +82,14 @@ class KalmanFilterWithVelocity(HedgeRatioEstimator):
         Defaults to ``alpha / 10``.
     :param Optional[int] ls_window: Bars used for OLS initialisation.
         None uses the full series.
+    :param bool add_intercept: If ``False``, the intercept state :math:`\\mu_t` is
+        pinned to zero for the entire filter run (``mu0=0``, ``P0[0,0]=0``,
+        ``sigma2_mu=0``). The Kalman gain on :math:`\\mu` is then identically zero
+        at every step, so the state vector effectively reduces to a 2-state
+        :math:`[\\gamma_t, \\dot{\\gamma}_t]` model without any structural change to
+        ``_run_filter``. Useful when the relationship between ``y`` and ``x`` is
+        expected to be purely proportional (e.g. realised-variance series).
+        Default: ``True``.
 
     .. note::
         **Use log-prices.** The filter assumes constant observation noise
@@ -99,10 +107,12 @@ class KalmanFilterWithVelocity(HedgeRatioEstimator):
         alpha: float = 1e-6,
         alpha_dgam: Optional[float] = None,
         ls_window: Optional[int] = None,
+        add_intercept: bool = True,
     ) -> None:
         self.alpha = alpha
         self.alpha_dgam = alpha_dgam if alpha_dgam is not None else alpha / 10.0
         self.ls_window = ls_window
+        self.add_intercept = add_intercept
 
         # Exposés après fit()
         self.params_: Optional[KalmanFilterWithVelocityParams] = None
@@ -226,21 +236,24 @@ class KalmanFilterWithVelocity(HedgeRatioEstimator):
         coef, *_ = np.linalg.lstsq(A, y_ls, rcond=None)
         mu_ls, gam_ls = float(coef[0]), float(coef[1])
 
+        if not self.add_intercept:
+            mu_ls = 0.0
+            gam_ls = float(np.dot(x_ls, y_ls) / np.dot(x_ls, x_ls))  # OLS sans intercept
+
         eps_ls     = y_ls - (mu_ls + gam_ls * x_ls)
         sigma2_eps = float(np.var(eps_ls, ddof=1))
         var_y2     = float(np.var(x_ls,   ddof=1))
         var_y2     = max(var_y2, 1e-12)
 
-        sigma2_mu   = self.alpha      * sigma2_eps
+        # μ épinglé à 0 si add_intercept=False
+        sigma2_mu   = self.alpha      * sigma2_eps if self.add_intercept else 0.0
         sigma2_gam  = self.alpha      * sigma2_eps / var_y2
         sigma2_dgam = self.alpha_dgam * sigma2_eps / var_y2
 
-        # P0 3×3 diagonale : même logique que KalmanFilterWithDrift
-        # + incertitude initiale sur γ̇ ≈ σ²_γ (on ne sait pas la trend initiale)
         P0 = np.diag([
-            sigma2_eps / T_ls,
+            sigma2_eps / T_ls if self.add_intercept else 0.0,
             sigma2_eps / (T_ls * var_y2),
-            sigma2_gam,              # γ̇₁ inconnu → P₁[2,2] = σ²_γ
+            sigma2_gam,
         ])
 
         return KalmanFilterWithVelocityParams(
