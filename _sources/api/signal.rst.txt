@@ -30,8 +30,8 @@ ZScoreSignal
 .. autoclass:: spreadpy.signal.zScoreSignal.ZScoreSignal
     :members:
 
-CopulaSignal
-============
+RollingADFFilter
+================
 
-.. autoclass:: spreadpy.signal.copulaSignal.CopulaSignal
+.. autoclass:: spreadpy.signal.rollingADFFilter.RollingADFFilter
     :members:

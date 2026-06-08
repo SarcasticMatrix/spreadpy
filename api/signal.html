@@ -573,104 +573,84 @@ Bars with fewer than <code class="docutils literal notranslate"><span class="pre
 </dd></dl>
 
 </section>
-<section id="copulasignal">
-<h2>CopulaSignal<a class="headerlink" href="#copulasignal" title="Link to this heading">#</a></h2>
+<section id="rollingadffilter">
+<h2>RollingADFFilter<a class="headerlink" href="#rollingadffilter" title="Link to this heading">#</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="spreadpy.signal.copulaSignal.CopulaSignal">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">spreadpy.signal.copulaSignal.</span></span><span class="sig-name descname"><span class="pre">CopulaSignal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">family</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gaussian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entry_prob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">revert_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_zscore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/signal/copulaSignal.html#CopulaSignal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.copulaSignal.CopulaSignal" title="Link to this definition">#</a></dt>
-<dd><p>Copula-based entry / exit signal generator.</p>
-<p>Uses the conditional CDF of a fitted bivariate copula to detect
-statistical mispricings between the two legs.</p>
-<p><strong>In-sample fitting:</strong></p>
-<ol class="arabic simple">
-<li><p>Convert prices to pseudo-observations <span class="math notranslate nohighlight">\(u_t = \hat{F}_y(y_t)\)</span>,
-<span class="math notranslate nohighlight">\(v_t = \hat{F}_x(x_t)\)</span> via empirical ranks (Hazen formula).</p></li>
-<li><p>Estimate Kendall’s <span class="math notranslate nohighlight">\(\tau\)</span> and invert to copula parameter <span class="math notranslate nohighlight">\(\theta\)</span>:</p>
-<ul class="simple">
-<li><p>Gaussian: <span class="math notranslate nohighlight">\(\theta = \sin(\pi\tau/2)\)</span></p></li>
-<li><p>Clayton:  <span class="math notranslate nohighlight">\(\theta = 2\tau/(1-\tau)\)</span>, <span class="math notranslate nohighlight">\(\theta &gt; 0\)</span></p></li>
-<li><p>Gumbel:   <span class="math notranslate nohighlight">\(\theta = 1/(1-\tau)\)</span>, <span class="math notranslate nohighlight">\(\theta \geq 1\)</span></p></li>
-</ul>
-</li>
-</ol>
-<p><strong>Entry logic (out-of-sample):</strong></p>
-<ul class="simple">
-<li><p><strong>LONG</strong>  if <span class="math notranslate nohighlight">\(C(u_t \mid v_t) &lt; p_{\text{entry}}\)</span> (y cheap relative to x)</p></li>
-<li><p><strong>SHORT</strong> if <span class="math notranslate nohighlight">\(C(u_t \mid v_t) &gt; 1 - p_{\text{entry}}\)</span> (y expensive relative to x)</p></li>
-</ul>
-<p>Exit uses the rolling z-score: <strong>FLAT</strong> when
-<span class="math notranslate nohighlight">\(|z| &lt; z_{\text{revert}}\)</span> or <span class="math notranslate nohighlight">\(|z| &gt; z_{\text{stop}}\)</span>.
-The z-score is also passed to the <code class="xref py py-class docutils literal notranslate"><span class="pre">LinearSizer</span></code> for sizing.</p>
+<dt class="sig sig-object py" id="spreadpy.signal.rollingADFFilter.RollingADFFilter">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">spreadpy.signal.rollingADFFilter.</span></span><span class="sig-name descname"><span class="pre">RollingADFFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spreadpy.signal.signal.SignalGenerator" title="spreadpy.signal.signal.SignalGenerator"><span class="pre">SignalGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">adf_window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">120</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_confirm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spreadpy/signal/rollingADFFilter.html#RollingADFFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.rollingADFFilter.RollingADFFilter" title="Link to this definition">#</a></dt>
+<dd><p>Wraps any <code class="xref py py-class docutils literal notranslate"><span class="pre">SignalGenerator</span></code> and suppresses new entries when the
+spread fails a rolling ADF stationarity test.</p>
+<p>At each bar t, the ADF test is evaluated on the preceding <code class="docutils literal notranslate"><span class="pre">adf_window</span></code>
+bars of the spread residuals. A new position is only opened if the
+p-value is below <code class="docutils literal notranslate"><span class="pre">p_threshold</span></code> (i.e. the spread is stationary).</p>
+<p>Exits and holds are always passed through unchanged. If an entry is
+blocked and the spread becomes stationary while still in the entry zone,
+the position opens at the first bar where the confirmation condition is
+met — with <code class="docutils literal notranslate"><span class="pre">is_entry=True</span></code> so sizers compute a fresh size.</p>
+<p>To reduce false signals from a noisy p-value, set <code class="docutils literal notranslate"><span class="pre">min_confirm</span> <span class="pre">&gt;</span> <span class="pre">1</span></code>:
+entry is only allowed after <code class="docutils literal notranslate"><span class="pre">min_confirm</span></code> consecutive bars where the
+p-value stayed below <code class="docutils literal notranslate"><span class="pre">p_threshold</span></code>.</p>
+<p>Usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">signal_gen</span> <span class="o">=</span> <span class="n">RollingADFFilter</span><span class="p">(</span>
+    <span class="n">base</span><span class="o">=</span><span class="n">ZScoreSignal</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">entry_threshold</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="n">adf_window</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
+    <span class="n">p_threshold</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">min_confirm</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>family</strong> (<em>str</em>) – Copula family — <code class="docutils literal notranslate"><span class="pre">'gaussian'</span></code>, <code class="docutils literal notranslate"><span class="pre">'clayton'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'gumbel'</span></code>.</p></li>
-<li><p><strong>window</strong> (<em>int</em>) – Rolling window for the z-score computation (position sizing only).</p></li>
-<li><p><strong>entry_prob</strong> (<em>float</em>) – Tail probability threshold <span class="math notranslate nohighlight">\(p_{\text{entry}}\)</span> for entry
-(default 0.10). Fires when <span class="math notranslate nohighlight">\(C(u_t \mid v_t)\)</span> is below <code class="docutils literal notranslate"><span class="pre">entry_prob</span></code>
-or above <span class="math notranslate nohighlight">\(1 - \texttt{entry\_prob}\)</span>.</p></li>
-<li><p><strong>revert_threshold</strong> (<em>float</em>) – Exit position when <span class="math notranslate nohighlight">\(|z|\)</span> drops below this value.</p></li>
-<li><p><strong>stop_zscore</strong> (<em>float</em>) – Stop-loss when <span class="math notranslate nohighlight">\(|z|\)</span> exceeds this value.</p></li>
+<li><p><strong>base</strong> (<a class="reference internal" href="#spreadpy.signal.signal.SignalGenerator" title="spreadpy.signal.signal.SignalGenerator"><em>SignalGenerator</em></a>) – Underlying signal generator to wrap.</p></li>
+<li><p><strong>adf_window</strong> (<em>int</em>) – Number of bars for the rolling ADF window.</p></li>
+<li><p><strong>p_threshold</strong> (<em>float</em>) – Maximum p-value to allow an entry (default 0.05).</p></li>
+<li><p><strong>min_confirm</strong> (<em>int</em>) – Number of consecutive bars the p-value must stay
+<em>above</em> <code class="docutils literal notranslate"><span class="pre">p_threshold</span></code> to block an entry (default 1). With the
+default of 1, any bar above the threshold blocks entry. Increase to
+require sustained non-stationarity before blocking — a single noisy
+bar above the threshold will not prevent entry.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="spreadpy.signal.copulaSignal.CopulaSignal.fit">
-<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><span class="pre">SpreadSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#spreadpy.signal.copulaSignal.CopulaSignal" title="spreadpy.signal.copulaSignal.CopulaSignal"><span class="pre">CopulaSignal</span></a></span></span><a class="reference internal" href="../_modules/spreadpy/signal/copulaSignal.html#CopulaSignal.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.copulaSignal.CopulaSignal.fit" title="Link to this definition">#</a></dt>
-<dd><p>Calibrate the copula parameter <span class="math notranslate nohighlight">\(\theta\)</span> from in-sample data.</p>
-<p>Estimates Kendall’s <span class="math notranslate nohighlight">\(\tau\)</span> from the in-sample price pair
-<span class="math notranslate nohighlight">\((y, x)\)</span> and inverts it to the copula parameter <span class="math notranslate nohighlight">\(\theta\)</span>
-via the family-specific mapping described in the class docstring.</p>
-<p>After fitting, <code class="docutils literal notranslate"><span class="pre">_theta</span></code> and <code class="docutils literal notranslate"><span class="pre">_kendall_tau</span></code> are set.</p>
+<dt class="sig sig-object py" id="spreadpy.signal.rollingADFFilter.RollingADFFilter.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><span class="pre">SpreadSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#spreadpy.signal.rollingADFFilter.RollingADFFilter" title="spreadpy.signal.rollingADFFilter.RollingADFFilter"><span class="pre">RollingADFFilter</span></a></span></span><a class="reference internal" href="../_modules/spreadpy/signal/rollingADFFilter.html#RollingADFFilter.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.rollingADFFilter.RollingADFFilter.fit" title="Link to this definition">#</a></dt>
+<dd><p>Calibrate parameters on in-sample spread data.</p>
+<p>Must be called before <a class="reference internal" href="#spreadpy.signal.rollingADFFilter.RollingADFFilter.generate" title="spreadpy.signal.rollingADFFilter.RollingADFFilter.generate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">generate()</span></code></a>. Implementations should
+compute any statistics (thresholds, copula parameters, etc.) from
+<code class="docutils literal notranslate"><span class="pre">spread</span></code> and store them as instance attributes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>spread</strong> (<a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><em>SpreadSeries</em></a>) – In-sample spread (exposes <code class="docutils literal notranslate"><span class="pre">spread.y</span></code>
-and <code class="docutils literal notranslate"><span class="pre">spread.x</span></code> as <code class="xref py py-class docutils literal notranslate"><span class="pre">PriceTimeSeries</span></code>).</p>
+<dd class="field-odd"><p><strong>spread</strong> (<a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><em>SpreadSeries</em></a>) – In-sample spread series used for fitting.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">self</span></code> (for method chaining).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#spreadpy.signal.copulaSignal.CopulaSignal" title="spreadpy.signal.copulaSignal.CopulaSignal">CopulaSignal</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#spreadpy.signal.signal.SignalGenerator" title="spreadpy.signal.signal.SignalGenerator">SignalGenerator</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spreadpy.signal.copulaSignal.CopulaSignal.generate">
-<span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><span class="pre">SpreadSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/spreadpy/signal/copulaSignal.html#CopulaSignal.generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.copulaSignal.CopulaSignal.generate" title="Link to this definition">#</a></dt>
-<dd><p>Generate copula-based entry / exit signals for each bar.</p>
-<p>For each bar <span class="math notranslate nohighlight">\(t\)</span>, the pseudo-observations
-<span class="math notranslate nohighlight">\(u_t = \hat{F}_y(y_t)\)</span> and <span class="math notranslate nohighlight">\(v_t = \hat{F}_x(x_t)\)</span>
-are computed via the empirical CDF (Hazen formula) over the full
-out-of-sample window. The conditional CDF</p>
-<div class="math notranslate nohighlight">
-\[C(u_t \mid v_t) = \frac{\partial C(u_t,\, v_t)}{\partial v_t}\]</div>
-<p>is then evaluated using the fitted copula parameter <span class="math notranslate nohighlight">\(\theta\)</span>.</p>
-<p>Entry / exit rules:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">LONG</span>   <span class="k">if</span> <span class="n">C</span><span class="p">(</span><span class="n">u_t</span> <span class="o">|</span> <span class="n">v_t</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">entry_prob</span>               <span class="p">(</span><span class="n">y</span> <span class="n">cheap</span><span class="p">)</span>
-<span class="n">SHORT</span>  <span class="k">if</span> <span class="n">C</span><span class="p">(</span><span class="n">u_t</span> <span class="o">|</span> <span class="n">v_t</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">entry_prob</span>           <span class="p">(</span><span class="n">y</span> <span class="n">expensive</span><span class="p">)</span>
-<span class="n">FLAT</span>   <span class="k">if</span> <span class="ow">in</span> <span class="n">position</span> <span class="ow">and</span> <span class="o">|</span><span class="n">z_t</span><span class="o">|</span> <span class="o">&lt;</span> <span class="n">revert_threshold</span> <span class="p">(</span><span class="n">mean</span><span class="o">-</span><span class="n">reverted</span><span class="p">)</span>
-<span class="n">FLAT</span>   <span class="k">if</span> <span class="ow">in</span> <span class="n">position</span> <span class="ow">and</span> <span class="o">|</span><span class="n">z_t</span><span class="o">|</span> <span class="o">&gt;</span> <span class="n">stop_zscore</span>      <span class="p">(</span><span class="n">stop</span><span class="o">-</span><span class="n">loss</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>The rolling z-score (same <code class="docutils literal notranslate"><span class="pre">window</span></code> as the class parameter) is
-computed in parallel and stored in each <code class="xref py py-class docutils literal notranslate"><span class="pre">Signal</span></code> for downstream
-position sizing.</p>
+<dt class="sig sig-object py" id="spreadpy.signal.rollingADFFilter.RollingADFFilter.generate">
+<span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><span class="pre">SpreadSeries</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/spreadpy/signal/rollingADFFilter.html#RollingADFFilter.generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.signal.rollingADFFilter.RollingADFFilter.generate" title="Link to this definition">#</a></dt>
+<dd><p>Generate a <code class="xref py py-class docutils literal notranslate"><span class="pre">Signal</span></code> for each bar of <code class="docutils literal notranslate"><span class="pre">spread</span></code>.</p>
+<p>Should be called after <a class="reference internal" href="#spreadpy.signal.rollingADFFilter.RollingADFFilter.fit" title="spreadpy.signal.rollingADFFilter.RollingADFFilter.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>. <code class="docutils literal notranslate"><span class="pre">spread</span></code> may be the same
+in-sample series or a disjoint out-of-sample window; in either
+case no lookahead is permitted — signal at bar t may only depend
+on observations up to and including t.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>spread</strong> (<a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><em>SpreadSeries</em></a>) – Spread series to generate signals for
-(may be out-of-sample). Must have been fitted first via
-<a class="reference internal" href="#spreadpy.signal.copulaSignal.CopulaSignal.fit" title="spreadpy.signal.copulaSignal.CopulaSignal.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>.</p>
+<dd class="field-odd"><p><strong>spread</strong> (<a class="reference internal" href="spread.html#spreadpy.spread.spreadSeries.SpreadSeries" title="spreadpy.spread.spreadSeries.SpreadSeries"><em>SpreadSeries</em></a>) – Spread series to generate signals for.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Series of <code class="xref py py-class docutils literal notranslate"><span class="pre">Signal</span></code> objects indexed by <code class="docutils literal notranslate"><span class="pre">spread.index</span></code>.</p>
+<dd class="field-even"><p>Series of <code class="xref py py-class docutils literal notranslate"><span class="pre">Signal</span></code> objects indexed by
+<code class="docutils literal notranslate"><span class="pre">spread.index</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>pd.Series</p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>RuntimeError</strong> – If <a class="reference internal" href="#spreadpy.signal.copulaSignal.CopulaSignal.fit" title="spreadpy.signal.copulaSignal.CopulaSignal.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> has not been called.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -751,10 +731,10 @@ position sizing.</p>
 </li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copulasignal">CopulaSignal</a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.signal.copulaSignal.CopulaSignal"><code class="docutils literal notranslate"><span class="pre">CopulaSignal</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.signal.copulaSignal.CopulaSignal.fit"><code class="docutils literal notranslate"><span class="pre">CopulaSignal.fit()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.signal.copulaSignal.CopulaSignal.generate"><code class="docutils literal notranslate"><span class="pre">CopulaSignal.generate()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rollingadffilter">RollingADFFilter</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.signal.rollingADFFilter.RollingADFFilter"><code class="docutils literal notranslate"><span class="pre">RollingADFFilter</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.signal.rollingADFFilter.RollingADFFilter.fit"><code class="docutils literal notranslate"><span class="pre">RollingADFFilter.fit()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spreadpy.signal.rollingADFFilter.RollingADFFilter.generate"><code class="docutils literal notranslate"><span class="pre">RollingADFFilter.generate()</span></code></a></li>
 </ul>
 </li>
 </ul>
