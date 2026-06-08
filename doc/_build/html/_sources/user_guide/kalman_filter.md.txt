@@ -17,7 +17,7 @@ Kalman filter · state-space model · dynamic hedge ratio · pairs trading · OL
 ```
 
 In pairs trading, the spread between two assets is only stationary if we subtract the right
-proportion of one asset from the other. That proportion — the **hedge ratio** $\beta_t$ — is
+proportion of one asset from the other. That proportion, the **hedge ratio** $\beta_t$, is
 rarely constant in practice. Structural shifts in business models, changing correlations, or
 regime transitions all cause the relationship to drift over time.
 

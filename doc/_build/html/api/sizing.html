@@ -31,7 +31,7 @@
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=6550b9e0" />
   
@@ -488,7 +488,7 @@ of <code class="docutils literal notranslate"><span class="pre">max_notional</sp
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>max_notional</strong> (<em>float</em>) – Maximum notional per leg in monetary units.</p></li>
-<li><p><strong>scale_fn</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>[</em><em>[</em><em>float</em><em>]</em><em>, </em><em>float</em><em>]</em><em>]</em>) – Maps <a href="#id1"><span class="problematic" id="id2">|z|</span></a> → [0, 1].
+<li><p><strong>scale_fn</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>[</em><em>[</em><em>float</em><em>]</em><em>, </em><em>float</em><em>]</em><em>]</em>) – Maps <span class="math notranslate nohighlight">\(|z|\)</span> → [0, 1].
 Defaults to the linear ramp described above.</p></li>
 </ul>
 </dd>
@@ -704,9 +704,9 @@ The fraction is recomputed at each bar.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spreadpy.sizing.sizers.kellySizers.KellyTruncatedExit.size">
 <span class="sig-name descname"><span class="pre">size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="signal.html#spreadpy.signal.signal.Signal" title="spreadpy.signal.signal.Signal"><span class="pre">Signal</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hedge_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capital</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/spreadpy/sizing/sizers/kellySizers.html#KellyTruncatedExit.size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spreadpy.sizing.sizers.kellySizers.KellyTruncatedExit.size" title="Link to this definition">#</a></dt>
-<dd><p>Compute quantities using the bar-dependent Kelly fraction f*(<a href="#id3"><span class="problematic" id="id4">|z_t|</span></a>).</p>
+<dd><p>Compute quantities using the bar-dependent Kelly fraction f*(<span class="math notranslate nohighlight">\(|z_t|\)</span>).</p>
 <p>Returns <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">0)</span></code> when <code class="docutils literal notranslate"><span class="pre">signal.direction</span></code> is <code class="docutils literal notranslate"><span class="pre">FLAT</span></code>,
-<code class="docutils literal notranslate"><span class="pre">signal.zscore</span></code> is NaN, <code class="docutils literal notranslate"><span class="pre">capital</span></code> ≤ 0, or f*(<a href="#id5"><span class="problematic" id="id6">|z_t|</span></a>) ≤ 0.</p>
+<code class="docutils literal notranslate"><span class="pre">signal.zscore</span></code> is NaN, <code class="docutils literal notranslate"><span class="pre">capital</span></code> ≤ 0, or f*(<span class="math notranslate nohighlight">\(|z_t|\)</span>) ≤ 0.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

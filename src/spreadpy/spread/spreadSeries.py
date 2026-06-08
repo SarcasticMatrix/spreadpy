@@ -4,6 +4,8 @@ import numpy as np
 from typing import Tuple
 import warnings
 
+from statsmodels.tsa.stattools import adfuller
+
 from spreadpy.data.priceTimeSeries import PriceTimeSeries
 
 class SpreadSeries:
@@ -132,14 +134,37 @@ class SpreadSeries:
 
         :returns: Tuple ``(adf_statistic, p_value)``.
         :rtype: Tuple[float, float]
-        :raises ImportError: If ``statsmodels`` is not installed.
         """
-        try:
-            from statsmodels.tsa.stattools import adfuller
-            result = adfuller(self._residuals.dropna())
-            return float(result[0]), float(result[1])
-        except ImportError:
-            raise ImportError("statsmodels required for ADF test: pip install statsmodels")
+        result = adfuller(self._residuals.dropna())
+        return float(result[0]), float(result[1])
+
+    def rolling_adf(self, window: int) -> pd.Series:
+        """
+        Compute rolling ADF p-values with no lookahead.
+
+        At each bar t, runs the ADF test (one lag, constant term) on the
+        preceding ``window`` bars of spread residuals. A p-value below 0.05
+        rejects the unit-root null and supports stationarity at that point.
+
+        Bars with fewer than ``window`` predecessors are ``NaN``.
+
+        :param int window: Rolling window length (in bars).
+        :returns: Series of ADF p-values aligned with ``self.index``.
+        :rtype: pd.Series
+        """
+        def _pval(arr: np.ndarray) -> float:
+            if np.any(np.isnan(arr)):
+                return 1.0
+            try:
+                return float(adfuller(arr, maxlag=1, autolag=None)[1])
+            except Exception:
+                return 1.0
+
+        return (
+            self._residuals.rolling(window)
+            .apply(_pval, raw=True)
+            .rename("adf_pvalue")
+        )
 
     def rolling_zscore(self, window: int) -> pd.Series:
         """

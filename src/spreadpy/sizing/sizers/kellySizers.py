@@ -241,10 +241,10 @@ class KellyTruncatedExit(PositionSizer):
         hedge_ratio: float,
         capital: float = 0.0,
     ) -> Tuple[float, float]:
-        """Compute quantities using the bar-dependent Kelly fraction f*(|z_t|).
+        """Compute quantities using the bar-dependent Kelly fraction f*(:math:`|z_t|`).
 
         Returns ``(0, 0)`` when ``signal.direction`` is ``FLAT``,
-        ``signal.zscore`` is NaN, ``capital`` ≤ 0, or f*(|z_t|) ≤ 0.
+        ``signal.zscore`` is NaN, ``capital`` ≤ 0, or f*(:math:`|z_t|`) ≤ 0.
 
         :param Signal signal: Signal at the current bar.
         :param float price_y: Current price of the y leg.

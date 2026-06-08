@@ -34,7 +34,7 @@ class LinearSizer(PositionSizer):
     of ``max_notional``.
 
     :param float max_notional: Maximum notional per leg in monetary units.
-    :param Optional[Callable[[float], float]] scale_fn: Maps |z| → [0, 1].
+    :param Optional[Callable[[float], float]] scale_fn: Maps :math:`|z|` → [0, 1].
         Defaults to the linear ramp described above.
     """
 

@@ -13,7 +13,7 @@ import pandas as pd
 
 from spreadpy.data import PriceTimeSeries
 from spreadpy.spread import HedgeRatioEstimator, SpreadSeries
-from spreadpy.signal import Direction, Signal, SignalGenerator
+from spreadpy.signal import Direction, Signal, SignalGenerator, RollingADFFilter
 from spreadpy.sizing import PositionSizer
 from spreadpy.backtest.costs import TransactionCosts
 from spreadpy.backtest.portfolio import Portfolio
@@ -28,6 +28,8 @@ class BacktestEngine:
     Splits the data once into three consecutive periods and fits the full
     pipeline — hedge ratio estimator then signal generator — on the training
     period only:
+
+    .. code-block:: text
 
         |←── train_frac ──→|←── val_frac ──→|←── test (remainder) ──→|
 
@@ -55,6 +57,16 @@ class BacktestEngine:
         filter then operates on log-prices, which better satisfies the
         constant observation-noise assumption (σ²_ε homoscedastic).
         Position sizing and P&L accounting always use the original prices.
+    :param Optional[int] adf_window: Rolling window (in bars) for the ADF
+        stationarity gate applied to every entry. Set to ``None`` to disable.
+        Defaults to 120. Has no effect if ``signal_gen`` is already a
+        :class:`RollingADFFilter`.
+    :param float adf_p_threshold: Maximum ADF p-value to allow an entry
+        (default 0.05). Ignored when ``adf_window`` is ``None``.
+    :param int adf_min_confirm: Number of consecutive bars the p-value must
+        stay *above* ``adf_p_threshold`` to block an entry (default 1).
+        Increase to require sustained non-stationarity before blocking —
+        isolated noisy bars above the threshold will not prevent entry.
     """
 
     def __init__(
@@ -68,12 +80,17 @@ class BacktestEngine:
         val_frac: float = 0.2,
         periods_per_year: int = 252,
         log_prices: bool = False,
+        adf_window: Optional[int] = 120,
+        adf_p_threshold: float = 0.05,
+        adf_min_confirm: int = 1,
     ) -> None:
         if not 0.0 <= val_frac < 1.0:
             raise ValueError("val_frac must be in [0, 1)")
         if train_frac + val_frac >= 1.0:
             raise ValueError("train_frac + val_frac must be < 1.0")
         self.estimator = estimator
+        if adf_window is not None and not isinstance(signal_gen, RollingADFFilter):
+            signal_gen = RollingADFFilter(signal_gen, adf_window, adf_p_threshold, adf_min_confirm)
         self.signal_gen = signal_gen
         self.sizer = sizer
         self.costs = costs or TransactionCosts()

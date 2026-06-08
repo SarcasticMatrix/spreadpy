@@ -30,9 +30,9 @@
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/_static/css/custom.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=af91de31" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=6550b9e0" />
   
   <!-- So that users can add custom icons -->
   <script defer src="../../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
@@ -41,10 +41,9 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
     <script src="../../../_static/documentation_options.js?v=fa47ad08"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spreadpy/backtest/engine';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -375,7 +374,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">PriceTimeSeries</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.spread</span><span class="w"> </span><span class="kn">import</span> <span class="n">HedgeRatioEstimator</span><span class="p">,</span> <span class="n">SpreadSeries</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">Direction</span><span class="p">,</span> <span class="n">Signal</span><span class="p">,</span> <span class="n">SignalGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">Direction</span><span class="p">,</span> <span class="n">Signal</span><span class="p">,</span> <span class="n">SignalGenerator</span><span class="p">,</span> <span class="n">RollingADFFilter</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.sizing</span><span class="w"> </span><span class="kn">import</span> <span class="n">PositionSizer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.backtest.costs</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransactionCosts</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">spreadpy.backtest.portfolio</span><span class="w"> </span><span class="kn">import</span> <span class="n">Portfolio</span>
@@ -392,6 +391,8 @@
 <span class="sd">    Splits the data once into three consecutive periods and fits the full</span>
 <span class="sd">    pipeline — hedge ratio estimator then signal generator — on the training</span>
 <span class="sd">    period only:</span>
+
+<span class="sd">    .. code-block:: text</span>
 
 <span class="sd">        |←── train_frac ──→|←── val_frac ──→|←── test (remainder) ──→|</span>
 
@@ -419,6 +420,16 @@
 <span class="sd">        filter then operates on log-prices, which better satisfies the</span>
 <span class="sd">        constant observation-noise assumption (σ²_ε homoscedastic).</span>
 <span class="sd">        Position sizing and P&amp;L accounting always use the original prices.</span>
+<span class="sd">    :param Optional[int] adf_window: Rolling window (in bars) for the ADF</span>
+<span class="sd">        stationarity gate applied to every entry. Set to ``None`` to disable.</span>
+<span class="sd">        Defaults to 120. Has no effect if ``signal_gen`` is already a</span>
+<span class="sd">        :class:`RollingADFFilter`.</span>
+<span class="sd">    :param float adf_p_threshold: Maximum ADF p-value to allow an entry</span>
+<span class="sd">        (default 0.05). Ignored when ``adf_window`` is ``None``.</span>
+<span class="sd">    :param int adf_min_confirm: Number of consecutive bars the p-value must</span>
+<span class="sd">        stay *above* ``adf_p_threshold`` to block an entry (default 1).</span>
+<span class="sd">        Increase to require sustained non-stationarity before blocking —</span>
+<span class="sd">        isolated noisy bars above the threshold will not prevent entry.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -432,12 +443,17 @@
         <span class="n">val_frac</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
         <span class="n">periods_per_year</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">252</span><span class="p">,</span>
         <span class="n">log_prices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">adf_window</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">120</span><span class="p">,</span>
+        <span class="n">adf_p_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+        <span class="n">adf_min_confirm</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">val_frac</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;val_frac must be in [0, 1)&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">train_frac</span> <span class="o">+</span> <span class="n">val_frac</span> <span class="o">&gt;=</span> <span class="mf">1.0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;train_frac + val_frac must be &lt; 1.0&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="n">estimator</span>
+        <span class="k">if</span> <span class="n">adf_window</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">signal_gen</span><span class="p">,</span> <span class="n">RollingADFFilter</span><span class="p">):</span>
+            <span class="n">signal_gen</span> <span class="o">=</span> <span class="n">RollingADFFilter</span><span class="p">(</span><span class="n">signal_gen</span><span class="p">,</span> <span class="n">adf_window</span><span class="p">,</span> <span class="n">adf_p_threshold</span><span class="p">,</span> <span class="n">adf_min_confirm</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signal_gen</span> <span class="o">=</span> <span class="n">signal_gen</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sizer</span> <span class="o">=</span> <span class="n">sizer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">costs</span> <span class="o">=</span> <span class="n">costs</span> <span class="ow">or</span> <span class="n">TransactionCosts</span><span class="p">()</span>
@@ -708,7 +724,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>
