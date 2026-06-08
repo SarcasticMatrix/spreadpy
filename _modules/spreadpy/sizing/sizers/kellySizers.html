@@ -624,10 +624,10 @@
         <span class="n">hedge_ratio</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">capital</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute quantities using the bar-dependent Kelly fraction f*(|z_t|).</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute quantities using the bar-dependent Kelly fraction f*(:math:`|z_t|`).</span>
 
 <span class="sd">        Returns ``(0, 0)`` when ``signal.direction`` is ``FLAT``,</span>
-<span class="sd">        ``signal.zscore`` is NaN, ``capital`` ≤ 0, or f*(|z_t|) ≤ 0.</span>
+<span class="sd">        ``signal.zscore`` is NaN, ``capital`` ≤ 0, or f*(:math:`|z_t|`) ≤ 0.</span>
 
 <span class="sd">        :param Signal signal: Signal at the current bar.</span>
 <span class="sd">        :param float price_y: Current price of the y leg.</span>
